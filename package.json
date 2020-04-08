@@ -1,7 +1,7 @@
 {
-  "name": "higlass",
+  "name": "resglass",
   "version": "1.9.1",
-  "description": "HiGlass Hi-C / genomic / large data viewer",
+  "description": "Resgen flavored HiGlass",
   "author": "Peter Kerpedjiev <pkerpedjiev@gmail.com>",
   "main": "dist/hglib.js",
   "unpkg": "dist/hglib.min.js",
@@ -31,7 +31,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/higlass/higlass"
+    "url": "https://github.com/reservoirgenomics/resglass"
   },
   "license": "MIT",
   "engines": {
