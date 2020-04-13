@@ -1,8 +1,11 @@
 {
-  "name": "resglass",
+  "name": "@reservoirgenomics/resglass",
   "version": "1.9.2",
   "description": "Resgen flavored HiGlass",
   "author": "Peter Kerpedjiev <pkerpedjiev@gmail.com>",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
   "main": "dist/hglib.js",
   "unpkg": "dist/hglib.min.js",
   "jsdelivr": "dist/hglib.min.js",
@@ -31,7 +34,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/reservoirgenomics/resglass"
+    "url": "git@github.com:reservoirgenomics/resglass.git"
   },
   "license": "MIT",
   "engines": {
