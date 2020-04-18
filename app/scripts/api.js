@@ -30,6 +30,9 @@ const createApi = function api(context, pubSub) {
   return {
     destroy,
     publish: apiPubSub.publish,
+    // Stack: mapping of callback names to arrays of callbacks, useful
+    // to determine how many callbacks exist for a particular event.
+    stack: apiPubSub.stack,
     // Public API
     public: {
       /**
@@ -340,7 +343,7 @@ const createApi = function api(context, pubSub) {
       measureSize() {
         self.measureSize();
 
-        for (const tiledPlot of dictValues(self.tiledPlots)) {
+        for (const tiledPlot of Object.values(self.tiledPlots)) {
           if (tiledPlot) {
             tiledPlot.measureSize();
           }
@@ -673,6 +676,7 @@ const createApi = function api(context, pubSub) {
        * hgv.off('rangeSelection', rangeListener);
        * hgv.off('viewConfig', viewConfigListener);
        * hgv.off('mouseMoveZoom', mmz);
+       * hgv.off('wheel', wheelListener);
        * hgv.off('createSVG');
        */
       off(event, listenerId, viewId) {
@@ -694,6 +698,10 @@ const createApi = function api(context, pubSub) {
 
           case 'mouseMoveZoom':
             apiPubSub.unsubscribe('mouseMoveZoom', callback);
+            break;
+
+          case 'wheel':
+            apiPubSub.unsubscribe('wheel', callback);
             break;
 
           case 'rangeSelection':
@@ -867,6 +875,9 @@ const createApi = function api(context, pubSub) {
        * const mmz = event => console.log('Moved', event);
        * hgv.on('mouseMoveZoom', mmz);
        *
+       * const wheelListener = event => console.log('Wheel', event);
+       * hgv.on('wheel', wheelListener);
+       *
        * hgv.on('createSVG', (svg) => {
        *    const circle = document.createElement('circle');
        *    circle.setAttribute('cx', 100);
@@ -891,6 +902,9 @@ const createApi = function api(context, pubSub) {
 
           case 'mouseMoveZoom':
             return apiPubSub.subscribe('mouseMoveZoom', callback);
+
+          case 'wheel':
+            return apiPubSub.subscribe('wheel', callback);
 
           case 'rangeSelection':
             return apiPubSub.subscribe('rangeSelection', callback);

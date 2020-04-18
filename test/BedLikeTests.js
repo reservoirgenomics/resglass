@@ -22,6 +22,61 @@ describe('BedLikeTrack |', () => {
   let hgc = null;
   let div = null;
 
+  describe('Options', () => {
+    beforeAll(done => {
+      [div, hgc] = mountHGComponent(div, hgc, viewConf1, done);
+    });
+
+    it('Changes text color independent of fill', () => {
+      let svg = hgc.instance().createSVGString();
+
+      // make sure the first time we export there's no black texts
+      let textIx = svg.indexOf('text');
+      expect(textIx).to.be.above(0);
+      let otherIx = svg.indexOf('fill="0"');
+      expect(otherIx).to.be.below(0);
+
+      hgc.instance().state.views.aa.tracks.top[1].options.fontColor = 'black';
+      hgc.setState(hgc.instance().state);
+      hgc.update();
+
+      svg = hgc.instance().createSVGString();
+
+      // we should still have textx and they should be black
+      textIx = svg.indexOf('text');
+      expect(textIx).to.be.above(0);
+      otherIx = svg.indexOf('fill="0"');
+      expect(otherIx).to.be.above(0);
+    });
+
+    it('Changes font size independent of fill', () => {
+      let svg = hgc.instance().createSVGString();
+      // make sure the first time we export there's no black texts
+      let textIx = svg.indexOf('text');
+      expect(textIx).to.be.above(0);
+      let changedIx = svg.indexOf('font-size="20"');
+      expect(changedIx).to.be.below(0);
+
+      hgc.instance().state.views.aa.tracks.top[1].options.fontSize = 20;
+      hgc.setState(hgc.instance().state);
+      hgc.update();
+
+      svg = hgc.instance().createSVGString();
+
+      // we should still have textx and they should be black
+      textIx = svg.indexOf('text');
+      expect(textIx).to.be.above(0);
+      changedIx = svg.indexOf('font-size="20"');
+      expect(changedIx).to.be.above(0);
+    });
+
+    afterAll(() => {
+      removeHGComponent(div);
+      div = null;
+      hgc = null;
+    });
+  });
+
   describe('vertical scaling', () => {
     beforeAll(done => {
       [div, hgc] = mountHGComponent(div, hgc, viewConf1, done);
@@ -227,13 +282,15 @@ describe('BedLikeTrack |', () => {
         tile.drawnAtScale.domain()[1] - tile.drawnAtScale.domain()[0];
 
       trackRenderer.zoomToDataPos(
-        1585600000,
-        1585800000,
-        1585600000,
-        1585800000,
+        1585200000,
+        1586400000,
+        1187975248,
+        1187975248,
         0
       );
-
+      // We have to rerender the tile due to synchronous tile loading.
+      // tile.drawnAtScale is not up to date otherwise.
+      trackObj.renderTile(tile);
       const newScaleWidth =
         tile.drawnAtScale.domain()[1] - tile.drawnAtScale.domain()[0];
 
@@ -254,7 +311,7 @@ describe('BedLikeTrack |', () => {
       {
         uid: 'aa',
         initialXDomain: [1585110207.2930722, 1586490384.5429244],
-        initialYDomain: [1187975248.2421436, 1187975248.2421436],
+        initialYDomain: [1187975248, 1187975248],
         autocompleteSource:
           'http://higlass.io/api/v1/suggest/?d=OHJakQICQD6gTD7skx4EWA&',
         genomePositionSearchBoxVisible: false,

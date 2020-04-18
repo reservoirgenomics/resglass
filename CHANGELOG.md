@@ -1,10 +1,17 @@
 # Release notes
 
-## Next release
+## v1.9.2
 
 - Fixed divided tracks bug by adding denseDataExtrema
+- Fixed divergent bar track
+- Made the bar track compatible with the local tile fetcher
+- Added fontColor, fontSize and fillOpacity options to BedLikeTrack
+- Added cheat code for making the component editable (i.e. with headers)
+- Fixed track names in config menu
+- Keep locks on track type change
+- Fix crashing higlass on non-existent value scale lock member
 
-_[Detailed changes since v1.9.1](https://github.com/higlass/higlass/compare/v1.9.1...develop)_
+_[Detailed changes since v1.9.1](https://github.com/higlass/higlass/compare/v1.9.1...v1.9.2)_
 
 ## v1.9.1
 
@@ -15,6 +22,7 @@ _[Detailed changes since v1.9.1](https://github.com/higlass/higlass/compare/v1.9
 - colorAnnotations are independent of valueScale
 - Vertical zooming on BedLike annotations
 - Added support for aggregation of `horizontal-multivec` rows by passing arrays of row indices to the `selectRows` option. With this addition also comes the track options `selectRowsAggregationMode` (for specifying an aggregation function, "mean", "sum", "variance", "deviation") and `selectRowsAggregationWithRelativeHeight` (boolean) to determine whether rows representing groups of indices have 1-unit heights or `group.length`-unit heights.
+- Added the JS API `.on('wheel', callback)` option for subscribing to mouse wheel events.
 
 _[Detailed changes since v1.9.0](https://github.com/higlass/higlass/compare/v1.9.0...v1.9.1)_
 
