@@ -357,8 +357,6 @@ class Tiled1DPixiTrack extends TiledPixiTrack {
       this.tilesetInfo.tile_size
     );
 
-    // console.log('dataPos:', this._xScale.invert(relPos));
-
     const tilePos = this._xScale.invert(relPos) / tileWidth;
     const tileId = this.tileToLocalId([zoomLevel, Math.floor(tilePos)]);
     const fetchedTile = this.fetchedTiles[tileId];

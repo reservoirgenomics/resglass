@@ -510,18 +510,20 @@ class TiledPixiTrack extends PixiTrack {
     return this.scale.maxRawValue;
   }
 
-  initTile(/* tile */) {
+  initTile(tile) {
     // create the tile
     // should be overwritten by child classes
-    this.scale.minRawValue = this.continuousScaling
-      ? this.minVisibleValue()
-      : this.minVisibleValueInTiles();
-    this.scale.maxRawValue = this.continuousScaling
-      ? this.maxVisibleValue()
-      : this.maxVisibleValueInTiles();
+    if (tile.tileData && tile.tileData.dense) {
+      this.scale.minRawValue = this.continuousScaling
+        ? this.minVisibleValue()
+        : this.minVisibleValueInTiles();
+      this.scale.maxRawValue = this.continuousScaling
+        ? this.maxVisibleValue()
+        : this.maxVisibleValueInTiles();
 
-    this.scale.minValue = this.scale.minRawValue;
-    this.scale.maxValue = this.scale.maxRawValue;
+      this.scale.minValue = this.scale.minRawValue;
+      this.scale.maxValue = this.scale.maxRawValue;
+    }
   }
 
   updateTile(/* tile */) {}
