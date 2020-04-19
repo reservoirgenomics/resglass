@@ -4,7 +4,7 @@ import Ajv from 'ajv';
 
 import schema from '../schema.json';
 
-import { setTileProxyAuthHeader } from './services';
+import { getTileProxyAuthHeader, setTileProxyAuthHeader } from './services';
 
 import { getTrackObjectFromHGC } from './utils';
 
@@ -99,7 +99,7 @@ const createApi = function api(context, pubSub) {
        * Get the currently set auth header
        */
       getAuthHeader() {
-        return setTileProxyAuthHeader();
+        return getTileProxyAuthHeader();
       },
 
       /**

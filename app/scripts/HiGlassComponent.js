@@ -610,15 +610,7 @@ class HiGlassComponent extends React.Component {
       // we go a new auth token so we should reload everything
       setTileProxyAuthHeader(newProps.options.authToken);
 
-      for (const viewId of this.iterateOverViews()) {
-        const trackRenderer = this.getTrackRenderer(viewId);
-        const trackDefinitions = JSON.parse(trackRenderer.prevTrackDefinitions);
-
-        // this will remove all the tracks and then recreate them
-        // re-requesting all tiles with the new auth key
-        trackRenderer.syncTrackObjects([]);
-        trackRenderer.syncTrackObjects(trackDefinitions);
-      }
+      this.reload();
 
       this.prevAuthToken = newProps.options.authToken;
     }
@@ -640,6 +632,18 @@ class HiGlassComponent extends React.Component {
     // let height = this.element.clientHeight;
 
     this.pixiRenderer.render(this.pixiRoot);
+  }
+
+  reload() {
+    for (const viewId of this.iterateOverViews()) {
+      const trackRenderer = this.getTrackRenderer(viewId);
+      const trackDefinitions = JSON.parse(trackRenderer.prevTrackDefinitions);
+
+      // this will remove all the tracks and then recreate them
+      // re-requesting all tiles with the new auth key
+      trackRenderer.syncTrackObjects([]);
+      trackRenderer.syncTrackObjects(trackDefinitions);
+    }
   }
 
   componentDidUpdate() {
@@ -1095,7 +1099,7 @@ class HiGlassComponent extends React.Component {
   iterateOverViews() {
     const viewIds = [];
 
-    for (const viewId in Object.keys(this.state.views)) {
+    for (const viewId of Object.keys(this.state.views)) {
       viewIds.push(viewId);
     }
 
