@@ -502,9 +502,7 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
             this.colorScale
           )(+geneInfo[+this.options.colorEncoding - 1]);
           fill = `rgba(${rgb.join(',')})`;
-        }
-
-        if (
+        } else if (
           this.options &&
           this.options.colorEncoding === 'itemRgb' &&
           td.fields[8]
@@ -514,7 +512,7 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
           if (parts.length === 3) {
             const color = `rgb(${td.fields[8]})`;
 
-            fill = colorToHex(color);
+            fill = color;
           }
         }
 
