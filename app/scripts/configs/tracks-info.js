@@ -286,6 +286,7 @@ export const TRACKS_INFO = [
     orientation: '1d-vertical',
     thumbnail: svg2DHeatmapIcon,
     defaultOptions: {
+      backgroundColor: '#eeeeee',
       labelPosition: 'bottomRight',
       labelLeftMargin: 0,
       labelRightMargin: 0,
@@ -309,6 +310,7 @@ export const TRACKS_INFO = [
       trackBorderColor: 'black'
     },
     availableOptions: [
+      'backgroundColor',
       'labelPosition',
       'labelLeftMargin',
       'labelRightMargin',
@@ -708,6 +710,7 @@ export const TRACKS_INFO = [
       'labelShowAssembly',
       'labelColor',
       'labelTextOpacity',
+      'labelBackgroundColor',
       'labelBackgroundOpacity',
       'axisLabelFormatting',
       'axisPositionVertical',
@@ -731,6 +734,7 @@ export const TRACKS_INFO = [
       labelRightMargin: 0,
       labelTopMargin: 0,
       labelBottomMargin: 0,
+      labelBackgroundColor: 'white',
       labelShowResolution: false,
       labelShowAssembly: true,
       axisLabelFormatting: 'scientific',
@@ -932,8 +936,9 @@ export const TRACKS_INFO = [
       'showMousePosition',
       'showTooltip',
       'aggregationMode',
-      'barMinHeightAtZero',
-      'barMinHeightAtZeroOpacity'
+      'zeroLineVisible',
+      'zeroLineColor',
+      'zeroLineOpacity'
     ],
     defaultOptions: {
       align: 'bottom',
@@ -974,8 +979,8 @@ export const TRACKS_INFO = [
       'axisLabelFormatting',
       'axisPositionHorizontal',
       'axisMargin',
-      'lineStrokeWidth',
-      'lineStrokeColor',
+      'pointColor',
+      'pointSize',
       'valueScaling',
       'trackBorderWidth',
       'trackBorderColor'
@@ -991,8 +996,8 @@ export const TRACKS_INFO = [
       labelShowAssembly: true,
       axisLabelFormatting: 'scientific',
       axisPositionHorizontal: 'right',
-      lineStrokeColor: 'red',
-      lineStrokeWidth: 1,
+      pointColor: 'red',
+      pointSize: 3,
       valueScaling: 'linear',
       trackBorderWidth: 0,
       trackBorderColor: 'black',
@@ -1332,7 +1337,11 @@ export const TRACKS_INFO = [
       'labelTextOpacity',
       'labelBackgroundOpacity',
       'trackBorderWidth',
-      'trackBorderColor'
+      'trackBorderColor',
+      'rectangleDomainFillColor',
+      'rectangleDomainStrokeColor',
+      'rectangleDomainOpacity',
+      'minSquareSize'
     ],
     defaultOptions: {
       labelColor: 'black',
@@ -1342,7 +1351,11 @@ export const TRACKS_INFO = [
       labelTopMargin: 0,
       labelBottomMargin: 0,
       trackBorderWidth: 0,
-      trackBorderColor: 'black'
+      trackBorderColor: 'black',
+      rectangleDomainFillColor: 'grey',
+      rectangleDomainStrokeColor: 'black',
+      rectangleDomainOpacity: 0.6,
+      minSquareSize: 'none'
     }
   },
 
@@ -1843,7 +1856,15 @@ export const TRACKS_INFO = [
     name: 'BED-like track',
     thumbnail: null,
     availableOptions: [
+      'alternating',
+      'annotationHeight',
+      'annotationStyle',
       'fillColor',
+      'fillOpacity',
+      'fontColor',
+      'fontSize',
+      'minusStrandColor',
+      'plusStrandColor',
       'labelPosition',
       'labelLeftMargin',
       'labelRightMargin',
@@ -1852,16 +1873,25 @@ export const TRACKS_INFO = [
       'labelColor',
       'labelTextOpacity',
       'labelBackgroundOpacity',
+      'maxAnnotationHeight',
       'minWidth',
       'trackBorderWidth',
       'trackBorderColor',
       'valueColumn',
+      'colorEncoding',
+      'colorRange',
+      'colorEncodingRange',
+      'showTexts',
       'axisPositionHorizontal',
       'axisMargin'
     ],
     defaultOptions: {
+      alternating: false,
+      annotationStyle: 'box',
       axisPositionHorizontal: 'right',
       fillColor: 'blue',
+      fillOpacity: 0.3,
+      fontSize: '10',
       labelColor: 'black',
       labelPosition: 'hidden',
       labelLeftMargin: 0,
@@ -1869,9 +1899,15 @@ export const TRACKS_INFO = [
       labelTopMargin: 0,
       labelBottomMargin: 0,
       minWidth: 55,
+      maxAnnotationHeight: null,
       trackBorderWidth: 0,
       trackBorderColor: 'black',
-      valueColumn: null
+      valueColumn: null,
+      colorEncoding: null,
+      showTexts: false,
+      colorRange: ['#000000', '#652537', '#bf5458', '#fba273', '#ffffe0'],
+      colorEncodingRange: false,
+      annotationHeight: 16
     }
   },
   {

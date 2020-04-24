@@ -494,12 +494,24 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
           }
         }
 
-        // if the regions are scaled according to a value column their height needs to
-        // be adjusted
-        if (this.colorValueScale) {
+        if (
+          this.options &&
+          this.options.colorEncoding === 'itemRgb' &&
+          td.fields[8]
+        ) {
+          const parts = td.fields[8].split(',');
+
+          if (parts.length === 3) {
+            const color = `rgb(${td.fields[8]})`;
+
+            fill = color;
+          }
+        } else if (this.colorValueScale) {
           const rgb = valueToColor(
             this.colorValueScale,
-            this.colorScale
+            this.colorScale,
+            0, // pseudocounts
+            -Number.MIN_VALUE
           )(+geneInfo[+this.options.colorEncoding - 1]);
           fill = `rgba(${rgb.join(',')})`;
         } else if (
