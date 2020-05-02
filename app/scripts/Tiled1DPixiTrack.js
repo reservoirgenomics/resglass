@@ -3,6 +3,7 @@ import { scaleLinear } from 'd3-scale';
 import TiledPixiTrack from './TiledPixiTrack';
 
 import { tileProxy } from './services';
+import trackUtils from './utils/track-utils';
 
 const BINS_PER_TILE = 1024;
 
@@ -125,6 +126,23 @@ class Tiled1DPixiTrack extends TiledPixiTrack {
       this.tilesetInfo.max_zoom,
       this.tilesetInfo.max_width
     );
+
+    const { tileWidth } = trackUtils.getTilePosAndDimensions(
+      this.tilesetInfo,
+      `${this.zoomLevel}.0`
+    );
+
+    if (tileWidth > this.tilesetInfo.max_tile_width) {
+      this.errorTextText = 'Zoom in to see details';
+      this.drawError();
+      this.animate();
+      return;
+    } 
+      this.errorTextText = null;
+      this.pBorder.clear();
+      this.drawError();
+      this.animate();
+    
 
     const tiles = xTiles.map(x => [this.zoomLevel, x]);
     this.setVisibleTiles(tiles);
