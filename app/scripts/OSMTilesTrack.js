@@ -11,6 +11,20 @@ import { debounce } from './utils';
 // Configs
 import { GLOBALS, ZOOM_DEBOUNCE } from './configs';
 
+function toDataURL(url, callback) {
+  const xhr = new XMLHttpRequest();
+  xhr.onload = function() {
+    const reader = new FileReader();
+    reader.onloadend = function() {
+      callback(reader.result);
+    };
+    reader.readAsDataURL(xhr.response);
+  };
+  xhr.open('GET', url);
+  xhr.responseType = 'blob';
+  xhr.send();
+}
+
 class OSMTilesTrack extends PixiTrack {
   /**
    * A track that must pull remote tiles
@@ -489,6 +503,10 @@ class OSMTilesTrack extends PixiTrack {
             tileSrc: src
           };
 
+          toDataURL(src, res => {
+            loadedTiles[tileId].base64 = res;
+          });
+
           this.receivedTiles(loadedTiles);
         };
       }
@@ -540,6 +558,52 @@ class OSMTilesTrack extends PixiTrack {
     if (this.delayDrawing) return;
 
     super.draw();
+  }
+
+  exportSVG() {
+    let track = null;
+    let base = null;
+
+    if (super.exportSVG) {
+      [base, track] = super.exportSVG();
+    } else {
+      base = document.createElement('g');
+      track = base;
+    }
+
+    const output = document.createElement('g');
+    track.appendChild(output);
+
+    output.setAttribute(
+      'transform',
+      `translate(${this.pMain.position.x},${this.pMain.position.y}) scale(${this.pMain.scale.x},${this.pMain.scale.y})`
+    );
+
+    for (const tile of this.visibleAndFetchedTiles()) {
+      const rotation = (tile.sprite.rotation * 180) / Math.PI;
+      const g = document.createElement('g');
+      g.setAttribute(
+        'transform',
+        `translate(${tile.sprite.x},${tile.sprite.y}) rotate(${rotation}) scale(${tile.sprite.scale.x},${tile.sprite.scale.y})`
+      );
+
+      const image = document.createElement('image');
+      image.setAttributeNS(
+        'http://www.w3.org/1999/xlink',
+        'xlink:href',
+        tile.tileData.base64
+      );
+      image.setAttribute('width', 256);
+      image.setAttribute('height', 256);
+      image.setAttribute('style', 'image-rendering: pixelated');
+
+      g.appendChild(image);
+      output.appendChild(g);
+    }
+
+    output.setAttribute('yo', 'joe');
+
+    return [base, base];
   }
 
   /**
