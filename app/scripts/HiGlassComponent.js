@@ -70,6 +70,7 @@ import {
   GLOBALS,
   MOUSE_TOOL_MOVE,
   MOUSE_TOOL_SELECT,
+  MOUSE_TOOL_TRACK_SELECT,
   LOCATION_LISTENER_PREFIX,
   LONG_DRAG_TIMEOUT,
   SHORT_DRAG_TIMEOUT,
@@ -231,6 +232,9 @@ class HiGlassComponent extends React.Component {
       switch (this.props.options.mouseTool) {
         case MOUSE_TOOL_SELECT:
           mouseTool = MOUSE_TOOL_SELECT;
+          break;
+        case MOUSE_TOOL_TRACK_SELECT:
+          mouseTool = MOUSE_TOOL_TRACK_SELECT;
           break;
         default:
           break;

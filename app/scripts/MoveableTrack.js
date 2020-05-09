@@ -20,6 +20,10 @@ class MoveableTrack extends TrackArea {
     this.moveable = true;
   }
 
+  getClass() {
+    return '';
+  }
+
   render() {
     return (
       <div
@@ -47,6 +51,7 @@ class MoveableTrack extends TrackArea {
       >
         <DraggableDiv
           key={this.props.uid}
+          className={this.getClass()}
           height={this.props.height}
           resizeHandles={
             this.props.editable ? this.props.resizeHandles : new Set()

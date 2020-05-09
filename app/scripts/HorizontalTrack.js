@@ -8,6 +8,10 @@ const STYLES = {
 };
 
 class HorizontalTrack extends MoveableTrack {
+  getClass() {
+    return 'horizontal-track';
+  }
+
   getControls(isVisible) {
     return (
       <TrackControl

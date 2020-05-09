@@ -1,4 +1,6 @@
-import { clientPoint } from 'd3-selection';
+import { select, clientPoint } from 'd3-selection';
+import { brush, brushX, brushY } from 'd3-brush';
+
 import slugid from 'slugid';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -54,6 +56,8 @@ class TiledPlot extends React.Component {
 
     this.closing = false;
     // that the tracks will be drawn on
+
+    this.brushX = brushX();
 
     const { tracks } = this.props;
     this.canvasElement = null;
@@ -204,6 +208,111 @@ class TiledPlot extends React.Component {
     );
   }
 
+  clearOtherBrushes(myBrush) {
+    for (const aBrush of Object.values(this.brushes)) {
+      aBrush.on('brush', null);
+    }
+
+    for (const trackUid in this.brushes) {
+      const otherBrush = this.brushes[trackUid];
+
+      if (otherBrush !== myBrush) {
+        this.brushEls[trackUid].call(otherBrush.move, null);
+        // this.brushEls[trackUid].selectAll('.selection').remove();
+      }
+    }
+
+    for (const aBrush of Object.values(this.brushes)) {
+      aBrush.on('brush', () => this.clearOtherBrushes(aBrush));
+    }
+  }
+
+  createBrushes(positionedTracks) {
+    const brushes = {};
+
+    for (const track of positionedTracks) {
+      let myBrush = null;
+
+      if (['top', 'bottom'].includes(track.track.position)) {
+        myBrush = brushX();
+      } else if (['left', 'right'].includes(track.track.position)) {
+        myBrush = brushY();
+      } else {
+        myBrush = brush();
+      }
+
+      myBrush.extent([
+        [track.left, track.top],
+        [track.left + track.width, track.top + track.height]
+      ]);
+
+      myBrush.on('brush', () => this.clearOtherBrushes(myBrush));
+
+      brushes[track.track.uid] = myBrush;
+    }
+
+    return brushes;
+  }
+
+  addBrushes() {
+    const selection = select(this.divTiledPlot).selectAll('.horizontal-track');
+
+    const positionedTracks = this.positionedTracks();
+    console.log('positionedTracks', positionedTracks);
+
+    const brushes = this.createBrushes(positionedTracks);
+    this.brushes = brushes;
+    const brushEls = {};
+    this.brushEls = brushEls;
+
+    select(this.divTiledPlot)
+      .selectAll('.brush')
+      .remove();
+
+    select(this.divTiledPlot)
+      .selectAll('svg')
+      .data([1])
+      .enter()
+      .append('svg')
+      .style('position', 'absolute')
+      .style('left', 0)
+      .style('top', 0)
+      .style('z-index', 101);
+
+    select(this.divTiledPlot)
+      .select('svg')
+      .selectAll('.brush')
+      .data(positionedTracks, d => d.track.uid)
+      .enter()
+      .append('g')
+      .attr('class', 'brush')
+      .append('rect')
+      .attr('class', 'brush-rect');
+
+    select(this.divTiledPlot)
+      .selectAll('svg')
+      .attr('width', this.state.width)
+      .attr('height', this.state.height);
+
+    select(this.divTiledPlot)
+      .selectAll('.brush-rect')
+      .attr('x', d => d.left)
+      .attr('y', d => d.top)
+      .style('stroke', '1px solid black')
+      .style('fill', 'transparent')
+      .attr('width', d => d.width)
+      .attr('height', d => d.height);
+
+    select(this.divTiledPlot)
+      .select('svg')
+      .selectAll('.brush')
+      .each(function(d) {
+        brushEls[d.track.uid] = select(this);
+        brushEls[d.track.uid].call(brushes[d.track.uid]);
+      });
+    // .attr('x', d => d.)
+  }
+
   // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(newProps) {
     this.addUidsToTracks(newProps.tracks);
@@ -243,6 +352,8 @@ class TiledPlot extends React.Component {
     this.reset = this.reset || (numPrevTracks === 0 && this.numTracks > 0);
 
     if (!this.numTracks) this.tracksByUidInit = {};
+
+    this.addBrushes();
 
     return toUpdate;
   }

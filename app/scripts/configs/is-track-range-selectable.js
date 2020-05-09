@@ -3,6 +3,7 @@ import { or } from '../utils';
 export const IS_TRACK_RANGE_SELECTABLE = track => {
   switch (track.type) {
     case 'heatmap':
+    case 'bedlike':
     case 'horizontal-1d-heatmap':
     case 'horizontal-bar':
     case 'horizontal-line':
