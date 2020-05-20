@@ -3,12 +3,16 @@
 - Zooming can now be restricted by specifying `zoomLimits` in the viewconf.
 - Fixed bug where the track config menu improperly positioned when clicked twice.
 <<<<<<< HEAD
+<<<<<<< HEAD
 - Update the heatmap option interface to allow seeing the preview when a color picker is opened.
 - Display an error message on tiles with errors in them
 - Don't try to assign a color value scale if the colorEncoding is set to itemRgb. itemRgb means that the color is present directly in the annotation
 - Add an option to separate the + / - strand annotations in the bedlike track
 =======
 >>>>>>> 31846471... Enable zoom limits (#882)
+=======
+- Update the heatmap option interface to allow seeing the preview when a color picker is opened.
+>>>>>>> 1974a9c2... Update the color config view to prevent occlusion (#912)
 
 ## v1.9.3
 
