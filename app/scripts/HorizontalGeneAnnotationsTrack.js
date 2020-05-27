@@ -668,10 +668,12 @@ class HorizontalGeneAnnotationsTrack extends HorizontalTiled1DPixiTrack {
 
     renderMask(this, tile);
 
-    trackUtils.stretchRects(this, [
-      x => x.rectGraphics,
-      x => x.rectMaskGraphics
-    ]);
+    Object.values(this.fetchedTiles).forEach(t => {
+      trackUtils.stretchRects(this, t, [
+        x => x.rectGraphics,
+        x => x.rectMaskGraphics
+      ]);
+    });
 
     for (const text of Object.values(tile.texts)) {
       text.style = {

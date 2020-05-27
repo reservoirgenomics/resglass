@@ -425,40 +425,35 @@ const getTilePosAndDimensions = (tilesetInfo, tileId) => {
  * but if we do this too much, shapes (particularly arrowheads) get
  * distorted. This function keeps track of how stretched the track is
  * and redraws it if it becomes too distorted (tileK < 0.5 or tileK > 2) */
-function stretchRects(track, graphicsAccessors) {
-  Object.values(track.fetchedTiles)
-    // tile hasn't been drawn properly because we likely got some
-    // bogus data from the server
-    .forEach(tile => {
-      if (!tile.drawnAtScale) return;
+function stretchRects(track, tile, graphicsAccessors) {
+  if (!tile.drawnAtScale) return;
 
-      const dasRange = tile.drawnAtScale.range();
-      const tRange = track._xScale.range();
+  const dasRange = tile.drawnAtScale.range();
+  const tRange = track._xScale.range();
 
-      // check to make sure the track extent hasn't changed
-      if (dasRange[0] !== tRange[0] || dasRange[1] !== tRange[1]) {
-        track.renderTile(tile);
-        return;
-      }
+  // check to make sure the track extent hasn't changed
+  if (dasRange[0] !== tRange[0] || dasRange[1] !== tRange[1]) {
+    track.renderTile(tile);
+    return;
+  }
 
-      const tileK =
-        (tile.drawnAtScale.domain()[1] - tile.drawnAtScale.domain()[0]) /
-        (track._xScale.domain()[1] - track._xScale.domain()[0]);
+  const tileK =
+    (tile.drawnAtScale.domain()[1] - tile.drawnAtScale.domain()[0]) /
+    (track._xScale.domain()[1] - track._xScale.domain()[0]);
 
-      if (tileK > 2 || tileK < 0.5) {
-        // too stretched out, needs to be re-rendered
-        track.renderTile(tile);
-      } else {
-        // can be stretched a little bit, just need to set the scale
-        const newRange = track._xScale.domain().map(tile.drawnAtScale);
-        const posOffset = newRange[0];
+  if (tileK > 2 || tileK < 0.5) {
+    // too stretched out, needs to be re-rendered
+    track.renderTile(tile);
+  } else {
+    // can be stretched a little bit, just need to set the scale
+    const newRange = track._xScale.domain().map(tile.drawnAtScale);
+    const posOffset = newRange[0];
 
-        for (const graphicsAccessor of graphicsAccessors) {
-          graphicsAccessor(tile).scale.x = tileK;
-          graphicsAccessor(tile).x = -posOffset * tileK;
-        }
-      }
-    });
+    for (const graphicsAccessor of graphicsAccessors) {
+      graphicsAccessor(tile).scale.x = tileK;
+      graphicsAccessor(tile).x = -posOffset * tileK;
+    }
+  }
 }
 
 const trackUtils = {
