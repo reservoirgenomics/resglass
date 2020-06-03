@@ -41,7 +41,7 @@ const TEXT_STYLE = {
 
 const hashFunc = function(s) {
   let hash = 0;
-  if (s.length == 0) {
+  if (s.length === 0) {
     return hash;
   }
   for (let i = 0; i < s.length; i++) {
@@ -562,7 +562,7 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
         const txMiddle = (txStart + txEnd) / 2;
         let yMiddle = rowScale(j) + rowScale.step() / 2;
 
-        let rectHeight = this.options.annotationHeight || GENE_RECT_HEIGHT;
+        let rectHeight = this.options.annotationHeight || 'scaled';
 
         if (rectHeight === 'scaled') {
           rectHeight = rowScale.bandwidth();

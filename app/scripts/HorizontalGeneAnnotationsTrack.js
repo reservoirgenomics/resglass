@@ -713,16 +713,15 @@ class HorizontalGeneAnnotationsTrack extends HorizontalTiled1DPixiTrack {
     this.geneAreaHeight = this.geneRectHeight;
     const fontSizeHalf = this.fontSize / 2;
 
-    trackUtils.stretchRects(this, [
-      x => x.rectGraphics,
-      x => x.rectMaskGraphics
-    ]);
-
     Object.values(this.fetchedTiles)
       // tile hasn't been drawn properly because we likely got some
       // bogus data from the server
       .filter(tile => tile.drawnAtScale)
       .forEach(tile => {
+        trackUtils.stretchRects(this, tile, [
+          x => x.rectGraphics,
+          x => x.rectMaskGraphics
+        ]);
         tile.textBgGraphics.clear();
         tile.textBgGraphics.beginFill(
           typeof this.options.labelBackgroundColor !== 'undefined'
