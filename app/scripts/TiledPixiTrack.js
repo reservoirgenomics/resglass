@@ -144,6 +144,7 @@ class TiledPixiTrack extends PixiTrack {
 
     // To indicate that this track is requiring a tileset info
     this.tilesetInfo = null;
+    this.tilesetInfoError = null;
     this.uuid = slugid.nice();
 
     // this needs to be above the tilesetInfo() call because if that
@@ -169,7 +170,6 @@ class TiledPixiTrack extends PixiTrack {
       if (this.tilesetInfo.chromsizes) {
         this.chromInfo = parseChromsizesRows(this.tilesetInfo.chromsizes);
       }
-
       if ('error' in this.tilesetInfo) {
         // no tileset info for this track
         console.warn(
@@ -178,7 +178,9 @@ class TiledPixiTrack extends PixiTrack {
           this.tilesetInfo.error
         );
 
-        this.setError(this.tilesetInfo.error);
+        this.tilesetInfoError = this.tilesetInfo.error;
+
+        this.setError(this.tilesetInfoError);
 
         // Fritz: Not sure why it's reset
         // this.trackNotFoundText = '';
@@ -741,6 +743,12 @@ class TiledPixiTrack extends PixiTrack {
       this.errorTextText = errors.join('\n');
     } else {
       this.errorTextText = '';
+    }
+
+    if (this.tilesetInfoError) {
+      this.errorTextText = this.tilesetInfoError;
+
+      errors.push(this.tilesetInfoError);
     }
 
     return errors;
