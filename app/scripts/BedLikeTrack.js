@@ -728,15 +728,21 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
       this.options.minusStrandColor || this.options.fillColor || 'purple';
 
     const MIDDLE_SPACE = 0;
-    const plusHeight =
-      (maxPlusRows * this.dimensions[1]) / (maxPlusRows + maxMinusRows) -
-      MIDDLE_SPACE / 2;
+    let plusHeight = 0;
+
+    if (this.options.separatePlusMinusStrands) {
+      plusHeight =
+        (maxPlusRows * this.dimensions[1]) / (maxPlusRows + maxMinusRows) -
+        MIDDLE_SPACE / 2;
+    } else {
+      plusHeight = this.dimensions[1];
+    }
 
     this.renderRows(this.plusStrandRows, maxPlusRows, 0, plusHeight, fill);
     this.renderRows(
       this.minusStrandRows,
       maxMinusRows,
-      plusHeight + MIDDLE_SPACE / 2,
+      this.options.separatePlusMinusStrands ? plusHeight + MIDDLE_SPACE / 2 : 0,
       this.dimensions[1],
       minusStrandFill
     );

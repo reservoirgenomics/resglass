@@ -47,7 +47,7 @@ class SketchInlinePicker extends React.Component {
     const styles = reactCSS({
       default: {
         color: {
-          width: '36px',
+          width: '32px',
           height: '14px',
           borderRadius: '2px',
           background: `rgba(${this.state.color.r}, ${this.state.color.g}, ${this.state.color.b}, ${this.state.color.a})`
@@ -55,10 +55,8 @@ class SketchInlinePicker extends React.Component {
         swatch: {
           padding: '5px',
           background: '#fff',
-          borderRadius: '1px',
-          boxShadow: '0 0 0 1px rgba(0,0,0,.1)',
-          display: 'inline-block',
-          cursor: 'pointer'
+          cursor: 'pointer',
+          borderRadius: '1px'
         },
         popover: {
           position: 'absolute',
