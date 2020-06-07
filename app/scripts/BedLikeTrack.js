@@ -126,6 +126,13 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
   }
 
   updateExistingGraphics() {
+    const errors = this.checkForErrors();
+
+    if (errors.length > 0) {
+      this.draw();
+      return;
+    }
+
     this.prevUniqueSegments = this.uniqueSegments;
     this.uniqueSegments = uniqueify(
       this.visibleAndFetchedTiles()
