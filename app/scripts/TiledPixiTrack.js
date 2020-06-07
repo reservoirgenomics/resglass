@@ -178,11 +178,12 @@ class TiledPixiTrack extends PixiTrack {
           this.tilesetInfo.error
         );
 
+        this.setError(this.tilesetInfo.error);
+
         // Fritz: Not sure why it's reset
         // this.trackNotFoundText = '';
         this.tilesetInfo = null;
 
-        this.setError(this.tilesetInfo.error);
         return;
       }
 
