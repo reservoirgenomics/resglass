@@ -1,5 +1,15 @@
 # Release notes
 
+<<<<<<< HEAD
+=======
+## Unreleased
+
+- Removed styles for naked td tag
+
+## v1.9.4
+
+- Added the `resolveImmediately` parameter to the setViewConfig API call.
+>>>>>>> ce96cb6c... Remove random td tag (#928)
 - Zooming can now be restricted by specifying `zoomLimits` in the viewconf.
 - Fixed bug where the track config menu improperly positioned when clicked twice.
 <<<<<<< HEAD
