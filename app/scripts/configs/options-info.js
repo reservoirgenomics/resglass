@@ -533,8 +533,12 @@ export const OPTIONS_INFO = {
   labelPosition: {
     name: 'Label Position',
     inlineOptions: {
+      l: { name: 'Left', value: 'left' },
+      r: { name: 'Right', value: 'right' },
       ol: { name: 'Outer left', value: 'outerLeft' },
       or: { name: 'Outer right', value: 'outerRight' },
+      t: { name: 'Top', value: 'top' },
+      b: { name: 'Bottom', value: 'bottom' },
       ot: { name: 'Outer top', value: 'outerTop' },
       ob: { name: 'Outer bottom', value: 'outerBottom' },
       tl: { name: 'Top left', value: 'topLeft' },
