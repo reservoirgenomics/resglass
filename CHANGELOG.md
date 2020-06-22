@@ -1,8 +1,16 @@
 # Release notes
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 ## Unreleased
+=======
+## Upcoming
+
+- Load matrices with "None" data transform without crashing
+
+## v1.9.5
+>>>>>>> b5badcd2... Fixed loading of heatmap tracks with no data transform (#915)
 
 - Removed styles for naked td tag
 
