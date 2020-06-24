@@ -13,6 +13,7 @@
 >>>>>>> b5badcd2... Fixed loading of heatmap tracks with no data transform (#915)
 
 - Removed styles for naked td tag
+- Reader for text genbank data (i.e. not pulled from a url)
 
 ## v1.9.4
 
