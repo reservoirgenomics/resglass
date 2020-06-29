@@ -14,7 +14,7 @@ class Tiled1DPixiTrack extends TiledPixiTrack {
     const {
       onMouseMoveZoom,
       isValueScaleLocked,
-      getLockGroupExtrema
+      getLockGroupExtrema,
     } = context;
 
     this.onMouseMoveZoom = onMouseMoveZoom;
@@ -23,7 +23,10 @@ class Tiled1DPixiTrack extends TiledPixiTrack {
 
     if (this.onMouseMoveZoom) {
       this.pubSubs.push(
-        this.pubSub.subscribe('app.mouseMove', this.mouseMoveHandler.bind(this))
+        this.pubSub.subscribe(
+          'app.mouseMove',
+          this.mouseMoveHandler.bind(this),
+        ),
       );
     }
   }
@@ -83,7 +86,7 @@ class Tiled1DPixiTrack extends TiledPixiTrack {
      */
     this.visibleTiles = tilePositions.map(x => ({
       tileId: this.tileToLocalId(x),
-      remoteId: this.tileToRemoteId(x)
+      remoteId: this.tileToRemoteId(x),
     }));
 
     this.visibleTileIds = new Set(this.visibleTiles.map(x => x.tileId));
@@ -108,7 +111,7 @@ class Tiled1DPixiTrack extends TiledPixiTrack {
         sortedResolutions[this.zoomLevel],
         this._xScale,
         this.tilesetInfo.min_pos[0],
-        this.tilesetInfo.max_pos[0]
+        this.tilesetInfo.max_pos[0],
       );
 
       const tiles = xTiles.map(x => [this.zoomLevel, x]);
@@ -124,12 +127,12 @@ class Tiled1DPixiTrack extends TiledPixiTrack {
       this.tilesetInfo.min_pos[0],
       this.tilesetInfo.max_pos[0],
       this.tilesetInfo.max_zoom,
-      this.tilesetInfo.max_width
+      this.tilesetInfo.max_width,
     );
 
     const { tileWidth } = trackUtils.getTilePosAndDimensions(
       this.tilesetInfo,
-      `${this.zoomLevel}.0`
+      `${this.zoomLevel}.0`,
     );
 
     if (tileWidth > this.tilesetInfo.max_tile_width) {
@@ -137,12 +140,11 @@ class Tiled1DPixiTrack extends TiledPixiTrack {
       this.drawError();
       this.animate();
       return;
-    } 
-      this.errorTextText = null;
-      this.pBorder.clear();
-      this.drawError();
-      this.animate();
-    
+    }
+    this.errorTextText = null;
+    this.pBorder.clear();
+    this.drawError();
+    this.animate();
 
     const tiles = xTiles.map(x => [this.zoomLevel, x]);
     this.setVisibleTiles(tiles);
@@ -177,7 +179,7 @@ class Tiled1DPixiTrack extends TiledPixiTrack {
         tileX,
         tileY,
         tileWidth,
-        tileHeight
+        tileHeight,
       };
     }
 
@@ -198,7 +200,7 @@ class Tiled1DPixiTrack extends TiledPixiTrack {
       tileX,
       tileY,
       tileWidth,
-      tileHeight
+      tileHeight,
     };
   }
 
@@ -211,7 +213,7 @@ class Tiled1DPixiTrack extends TiledPixiTrack {
     this.backgroundTaskScheduler.enqueueTask(
       this.handleRerender.bind(this),
       null,
-      this.uuid
+      this.uuid,
     );
   }
 
@@ -222,26 +224,28 @@ class Tiled1DPixiTrack extends TiledPixiTrack {
   getIndicesOfVisibleDataInTile(tile) {
     const visible = this._xScale.range();
 
+    if (!this.tilesetInfo) return [null, null];
+
     const { tileX, tileWidth } = this.getTilePosAndDimensions(
       tile.tileData.zoomLevel,
       tile.tileData.tilePos,
-      this.tilesetInfo.bins_per_dimension || this.tilesetInfo.tile_size
+      this.tilesetInfo.bins_per_dimension || this.tilesetInfo.tile_size,
     );
 
     const tileXScale = scaleLinear()
       .domain([
         0,
-        this.tilesetInfo.tile_size || this.tilesetInfo.bins_per_dimension
+        this.tilesetInfo.tile_size || this.tilesetInfo.bins_per_dimension,
       ])
       .range([tileX, tileX + tileWidth]);
 
     const start = Math.max(
       0,
-      Math.round(tileXScale.invert(this._xScale.invert(visible[0])))
+      Math.round(tileXScale.invert(this._xScale.invert(visible[0]))),
     );
     const end = Math.min(
       tile.tileData.dense.length,
-      Math.round(tileXScale.invert(this._xScale.invert(visible[1])))
+      Math.round(tileXScale.invert(this._xScale.invert(visible[1]))),
     );
 
     return [start, end];
@@ -333,23 +337,23 @@ class Tiled1DPixiTrack extends TiledPixiTrack {
         const { tileX, tileWidth } = this.getTilePosAndDimensions(
           tile.tileData.zoomLevel,
           tile.tileData.tilePos,
-          this.tilesetInfo.bins_per_dimension || this.tilesetInfo.tile_size
+          this.tilesetInfo.bins_per_dimension || this.tilesetInfo.tile_size,
         );
 
         const tileXScale = scaleLinear()
           .domain([
             0,
-            this.tilesetInfo.tile_size || this.tilesetInfo.bins_per_dimension
+            this.tilesetInfo.tile_size || this.tilesetInfo.bins_per_dimension,
           ])
           .range([tileX, tileX + tileWidth]);
 
         const start = Math.max(
           0,
-          Math.round(tileXScale.invert(this._xScale.invert(visible[0])))
+          Math.round(tileXScale.invert(this._xScale.invert(visible[0]))),
         );
         const end = Math.min(
           tile.tileData.dense.length,
-          Math.round(tileXScale.invert(this._xScale.invert(visible[1])))
+          Math.round(tileXScale.invert(this._xScale.invert(visible[1]))),
         );
 
         return tile.tileData.dense.slice(start, end);
@@ -372,7 +376,7 @@ class Tiled1DPixiTrack extends TiledPixiTrack {
     const tileWidth = tileProxy.calculateTileWidth(
       this.tilesetInfo,
       zoomLevel,
-      this.tilesetInfo.tile_size
+      this.tilesetInfo.tile_size,
     );
 
     const tilePos = this._xScale.invert(relPos) / tileWidth;

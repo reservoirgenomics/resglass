@@ -1,6 +1,6 @@
 # Release notes
 
-## Upcoming
+## Unreleased
 
 - Colors for rules
 - Ability to load genome position search box chromosome sizes from an arbitrary location
