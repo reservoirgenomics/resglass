@@ -9,7 +9,7 @@ export const HorizontalRuleMixin = Mixin(
   superclass =>
     class extends superclass {
       drawHorizontalRule(graphics) {
-        let stroke = colorToHex('black');
+        let stroke = colorToHex(this.options.color || 'black');
 
         if (this.highlighted) {
           stroke = colorToHex('red');
@@ -104,10 +104,7 @@ class HorizontalRule extends mix(PixiTrack).with(
 
     track.appendChild(output);
 
-    let stroke = 'black';
-    if (this.highlighted) {
-      stroke = 'red';
-    }
+    const stroke = this.options.color || 'black';
 
     const line = document.createElement('line');
     line.setAttribute('stroke', stroke);

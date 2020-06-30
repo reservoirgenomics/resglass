@@ -111,7 +111,10 @@ export const TRACKS_INFO = [
     orientation: 'whole',
     name: 'Horizontal Rule',
     thumbnail: null,
-    defaultOptions: {}
+    availableOptions: ['color'],
+    defaultOptions: {
+      color: 'black'
+    }
   },
   {
     type: 'vertical-rule',
@@ -120,7 +123,10 @@ export const TRACKS_INFO = [
     orientation: 'whole',
     name: 'Vertical Rule',
     thumbnail: null,
-    defaultOptions: {}
+    availableOptions: ['color'],
+    defaultOptions: {
+      color: 'black'
+    }
   },
   {
     type: 'cross-rule',
@@ -129,7 +135,10 @@ export const TRACKS_INFO = [
     orientation: 'whole',
     name: 'Cross Rule',
     thumbnail: null,
-    defaultOptions: {}
+    availableOptions: ['color'],
+    defaultOptions: {
+      color: 'black'
+    }
   },
   {
     type: 'simple-svg',
@@ -983,7 +992,14 @@ export const TRACKS_INFO = [
       'pointSize',
       'valueScaling',
       'trackBorderWidth',
-      'trackBorderColor'
+      'trackBorderColor',
+      'barOpacity',
+      'showMousePosition',
+      'showTooltip',
+      'aggregationMode',
+      'zeroLineVisible',
+      'zeroLineColor',
+      'zeroLineOpacity'
     ],
     defaultOptions: {
       labelColor: 'black',
@@ -1001,7 +1017,8 @@ export const TRACKS_INFO = [
       valueScaling: 'linear',
       trackBorderWidth: 0,
       trackBorderColor: 'black',
-      labelTextOpacity: 0.4
+      labelTextOpacity: 0.4,
+      barOpacity: 1
     }
   },
   {
@@ -1321,27 +1338,10 @@ export const TRACKS_INFO = [
   },
 
   {
-    type: 'vertical-2d-rectangle-domains',
-    datatype: ['2d-rectangle-domains'],
-    local: false,
-    orientation: '1d-vertical',
-    name: 'Vertical 2D Rectangle Domains',
-    thumbnail: svgArrowheadDomainsIcon,
-    availableOptions: [
-      'labelPosition',
-      'labelLeftMargin',
-      'labelRightMargin',
-      'labelTopMargin',
-      'labelBottomMargin',
-      'labelColor',
-      'labelTextOpacity',
-      'labelBackgroundOpacity',
-      'trackBorderWidth',
-      'trackBorderColor',
-      'rectangleDomainFillColor',
-      'rectangleDomainStrokeColor',
-      'rectangleDomainOpacity',
-      'minSquareSize'
+    type: 'linear-2d-rectangle-domains',
+    aliases: [
+      'horizontal-2d-rectangle-domains',
+      'vertical-2d-rectangle-domains'
     ],
     defaultOptions: {
       labelColor: 'black',
@@ -1846,69 +1846,7 @@ export const TRACKS_INFO = [
       showTexts: false,
       colorRange: ['#000000', '#652537', '#bf5458', '#fba273', '#ffffe0'],
       colorEncodingRange: false,
-      annotationHeight: 'scaled',
-      separatePlusMinusStrands: true
-    }
-  },
-  {
-    type: 'vertical-bedlike',
-    datatype: ['bedlike'],
-    local: false,
-    orientation: '1d-vertical',
-    name: 'BED-like track',
-    thumbnail: null,
-    availableOptions: [
-      'alternating',
-      'annotationHeight',
-      'annotationStyle',
-      'fillColor',
-      'fillOpacity',
-      'fontColor',
-      'fontSize',
-      'minusStrandColor',
-      'plusStrandColor',
-      'labelPosition',
-      'labelLeftMargin',
-      'labelRightMargin',
-      'labelTopMargin',
-      'labelBottomMargin',
-      'labelColor',
-      'labelTextOpacity',
-      'labelBackgroundOpacity',
-      'maxAnnotationHeight',
-      'minWidth',
-      'trackBorderWidth',
-      'trackBorderColor',
-      'valueColumn',
-      'colorEncoding',
-      'colorRange',
-      'colorEncodingRange',
-      'showTexts',
-      'axisPositionHorizontal',
-      'axisMargin'
-    ],
-    defaultOptions: {
-      alternating: false,
-      annotationStyle: 'box',
-      axisPositionHorizontal: 'right',
-      fillColor: 'blue',
-      fillOpacity: 0.3,
-      fontSize: '10',
-      labelColor: 'black',
-      labelPosition: 'hidden',
-      labelLeftMargin: 0,
-      labelRightMargin: 0,
-      labelTopMargin: 0,
-      labelBottomMargin: 0,
-      minWidth: 55,
-      maxAnnotationHeight: null,
-      trackBorderWidth: 0,
-      trackBorderColor: 'black',
-      valueColumn: null,
-      colorEncoding: null,
-      showTexts: false,
-      colorRange: ['#000000', '#652537', '#bf5458', '#fba273', '#ffffe0'],
-      colorEncodingRange: false,
+      separatePlusMinusStrands: true,
       annotationHeight: 16
     }
   },

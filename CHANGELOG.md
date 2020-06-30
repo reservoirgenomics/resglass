@@ -2,6 +2,10 @@
 
 ## Upcoming
 
+- Colors for rules
+- Ability to load genome position search box chromosome sizes from an arbitrary location
+- Plugin tracks can provide their own config menu options
+- Remove horizontal-_ and vertical-_ prefixes from track names
 - Load matrices with "None" data transform without crashing
 
 ## v1.9.5

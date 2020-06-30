@@ -9,7 +9,7 @@ export const VerticalRuleMixin = Mixin(
   superclass =>
     class extends superclass {
       drawVerticalRule(graphics) {
-        let stroke = colorToHex('black');
+        let stroke = colorToHex(this.options.color || 'black');
 
         if (this.highlighted) {
           stroke = colorToHex('red');
@@ -90,10 +90,7 @@ export default class VerticalRule extends mix(PixiTrack).with(
 
     track.appendChild(output);
 
-    let stroke = 'black';
-    if (this.highlighted) {
-      stroke = 'red';
-    }
+    const stroke = this.options.color || 'black';
 
     const line = document.createElement('line');
     line.setAttribute('stroke', stroke);

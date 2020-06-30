@@ -9,7 +9,8 @@ import { expect } from 'chai';
 import {
   mountHGComponent,
   removeHGComponent,
-  getTrackObjectFromHGC
+  getTrackObjectFromHGC,
+  changeOptions
 } from '../app/scripts/utils';
 
 configure({ adapter: new Adapter() });
@@ -55,6 +56,13 @@ describe('Minimal viewconfs', () => {
 
       expect(obj.xPosition).to.eql(100);
       expect(obj.yPosition).to.eql(100);
+    });
+
+    it('changes color', () => {
+      changeOptions(hgc, 'aa', 'a', { color: 'blue' });
+
+      const svg = hgc.instance().createSVGString();
+      expect(svg.indexOf('blue')).to.be.above(-1);
     });
 
     it('has the same range if a new track is added', () => {

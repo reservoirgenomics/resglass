@@ -19,6 +19,27 @@ import HiGlassComponent from '../HiGlassComponent';
 const TILE_LOADING_CHECK_INTERVAL = 100;
 
 /**
+ * Change the options of a track in higlass
+ * @param  hgc      enzyme wrapper for a HiGlassComponent
+ * @param  viewUid  The view uid
+ * @param  trackUid The track uid
+ * @param  options  An object of new options (e.g. { color: 'black'})
+ * @return          nothing
+ */
+export const changeOptions = (hgc, viewUid, trackUid, options) => {
+  for (const { viewId, trackId, track } of hgc.instance().iterateOverTracks()) {
+    if (viewId === viewUid && trackId === trackUid) {
+      track.options = {
+        ...track.options,
+        ...options
+      };
+    }
+  }
+
+  hgc.setState(hgc.instance().state);
+};
+
+/**
  * Check if there are any active transitions that we
  * need to wait on
  *
