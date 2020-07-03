@@ -1,4 +1,4 @@
-import { scaleLog, scaleLinear } from 'd3-scale';
+import { scaleLog, scaleLinear, scaleOrdinal } from 'd3-scale';
 import getAggregationFunction from './utils/get-aggregation-function';
 import selectedItemsToSize from './utils/selected-items-to-size';
 import DenseDataExtrema1D from './utils/DenseDataExtrema1D';
@@ -121,6 +121,10 @@ export function workerSetPix(
     valueScale = scaleLog()
       .range([254, 0])
       .domain(valueScaleDomain);
+  } else if (valueScaleType === 'categorical') {
+    valueScale = scaleOrdinal()
+      .domain(valueScaleDomain)
+      .range(colorScale);
   } else {
     if (valueScaleType !== 'linear') {
       console.warn(
@@ -151,6 +155,12 @@ export function workerSetPix(
   const tileWidth = Math.sqrt(size);
   const pixData = new Uint8ClampedArray(filteredSize * 4);
 
+  let dToRgbIdx = x => Math.max(0, Math.min(254, Math.floor(valueScale(x))));
+
+  if (valueScaleType === 'categorical') {
+    dToRgbIdx = x => x;
+  }
+
   /**
    * Set the ith element of the pixData array, using value d.
    * (well not really, since i is scaled to make space for each rgb value).
@@ -170,10 +180,7 @@ export function workerSetPix(
       !Number.isNaN(+d)
     ) {
       // values less than espilon are considered NaNs and made transparent (rgbIdx 255)
-      rgbIdx = Math.max(
-        0,
-        Math.min(254, Math.floor(valueScale(d + pseudocount)))
-      );
+      rgbIdx = dToRgbIdx(d + pseudocount);
     }
     // let rgbIdx = qScale(d); //Math.max(0, Math.min(255, Math.floor(valueScale(ct))))
     if (rgbIdx < 0 || rgbIdx > 255) {

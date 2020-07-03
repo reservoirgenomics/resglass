@@ -1,4 +1,6 @@
 import { format } from 'd3-format';
+import { scaleOrdinal } from 'd3-scale';
+import { rgb } from 'd3-color';
 
 import HeatmapTiledPixiTrack from './HeatmapTiledPixiTrack';
 
@@ -84,6 +86,25 @@ export default class HorizontalMultivecTrack extends HeatmapTiledPixiTrack {
 
     this.pMobile.scale.x = k;
     this.pMobile.scale.y = 1;
+  }
+
+  updateValueScale() {
+    if (!this.tilesetInfo) return null;
+
+    const categoryInfos = this.tilesetInfo.category_infos;
+    if (!categoryInfos) {
+      return super.updateValueScale();
+    }
+
+    this.limitedValueScale = scaleOrdinal()
+      .range(categoryInfos.map(x => x.color))
+      .domain(categoryInfos.map((x, i) => i));
+    this.colorScale = this.limitedValueScale.range().map(x => {
+      const r = rgb(x);
+      return [r.r, r.g, r.b, 255];
+    });
+
+    return ['categorical', this.limitedValueScale];
   }
 
   zoomed(newXScale, newYScale, k, tx) {
@@ -261,6 +282,7 @@ export default class HorizontalMultivecTrack extends HeatmapTiledPixiTrack {
     const fetchedTile = this.fetchedTiles[tileId];
 
     let value = '';
+    let rawValue = null;
 
     if (fetchedTile) {
       if (!this.tilesetInfo.shape) {
@@ -275,6 +297,7 @@ export default class HorizontalMultivecTrack extends HeatmapTiledPixiTrack {
         [posInTileY, posInTileY],
       */
       let index = null;
+
       if (this.tilesetInfo.shape) {
         // Accomodate data from vector sources
         if (Array.isArray(selectedRowIndex)) {
@@ -299,11 +322,27 @@ export default class HorizontalMultivecTrack extends HeatmapTiledPixiTrack {
           this.options.selectRowsAggregationMode
         );
         const values = index.map(i => fetchedTile.tileData.dense[i]);
-        value = format('.3f')(aggFunc(values));
+        rawValue = aggFunc(values);
+        value = format('.3f')(rawValue);
         value += '<br/>';
         value += `${index.length}-item ${this.options.selectRowsAggregationMode}`;
       } else {
-        value = format('.3f')(fetchedTile.tileData.dense[index]);
+        rawValue = fetchedTile.tileData.dense[index];
+        value = format('.3f')(rawValue);
+      }
+    }
+
+    if (
+      this.tilesetInfo.category_infos &&
+      this.tilesetInfo.category_infos[rawValue]
+    ) {
+      const name = this.tilesetInfo.category_infos[rawValue].name;
+      const color = this.tilesetInfo.category_infos[rawValue].color;
+
+      if (name && color) {
+        value += '<br/>';
+        value += `<svg width="10" height="10"><rect width="10" height="10" rx="2" ry="2"
+        style="fill:${color};stroke:black;stroke-width:2;"></svg> ${name}`;
       }
     }
 
@@ -330,8 +369,9 @@ export default class HorizontalMultivecTrack extends HeatmapTiledPixiTrack {
     if (!this.tilesetInfo) return '';
 
     const tilePos = this.getTilePosAtPosition(trackX, trackY);
+    const visibleValue = this.getVisibleData(trackX, trackY);
 
-    let output = `Data value: ${this.getVisibleData(trackX, trackY)}</br>`;
+    let output = `Data value: ${visibleValue}</br>`;
     output += `Zoom level: ${tilePos[0]} tile position: ${tilePos[1]}`;
 
     return output;
