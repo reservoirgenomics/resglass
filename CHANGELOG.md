@@ -1,37 +1,11 @@
 # Release notes
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-## Unreleased
-=======
-## Upcoming
-
-- Load matrices with "None" data transform without crashing
-
-## v1.9.5
->>>>>>> b5badcd2... Fixed loading of heatmap tracks with no data transform (#915)
-
-- Removed styles for naked td tag
-- Reader for text genbank data (i.e. not pulled from a url)
-
-## v1.9.4
-
-- Added the `resolveImmediately` parameter to the setViewConfig API call.
->>>>>>> ce96cb6c... Remove random td tag (#928)
 - Zooming can now be restricted by specifying `zoomLimits` in the viewconf.
 - Fixed bug where the track config menu improperly positioned when clicked twice.
-<<<<<<< HEAD
-<<<<<<< HEAD
 - Update the heatmap option interface to allow seeing the preview when a color picker is opened.
 - Display an error message on tiles with errors in them
 - Don't try to assign a color value scale if the colorEncoding is set to itemRgb. itemRgb means that the color is present directly in the annotation
 - Add an option to separate the + / - strand annotations in the bedlike track
-=======
->>>>>>> 31846471... Enable zoom limits (#882)
-=======
-- Update the heatmap option interface to allow seeing the preview when a color picker is opened.
->>>>>>> 1974a9c2... Update the color config view to prevent occlusion (#912)
 
 ## v1.9.3
 
