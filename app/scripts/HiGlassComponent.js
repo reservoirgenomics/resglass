@@ -4694,12 +4694,14 @@ class HiGlassComponent extends React.Component {
         const annotationTracks = looseTracks.filter(
           x =>
             x.type === 'horizontal-gene-annotations' ||
-            x.type === 'vertical-gene-annotations',
+            x.type === 'vertical-gene-annotations' ||
+            x.type === 'gene-annotations',
         );
         const chromSizesTracks = looseTracks.filter(
           x =>
             x.type === 'horizontal-chromosome-labels' ||
-            x.type === 'vertical-chromosome-labels',
+            x.type === 'vertical-chromosome-labels' ||
+            x.type === 'chromosome-labels',
         );
 
         const getGenomePositionSearchBox = (isFocused, onFocus) => (
