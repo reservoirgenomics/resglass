@@ -1,5 +1,27 @@
 # Release notes
 
+## Unreleased
+
+- Colors for rules
+- Ability to load genome position search box chromosome sizes from an arbitrary location
+- Plugin tracks can provide their own config menu options
+- Remove horizontal-_ and vertical-_ prefixes from track names
+- Load matrices with "None" data transform without crashing
+
+## v1.9.5
+
+- Removed styles for naked td tag
+
+## v1.9.4
+
+- Added the `resolveImmediately` parameter to the setViewConfig API call.
+- Zooming can now be restricted by specifying `zoomLimits` in the viewconf.
+- Fixed bug where the track config menu improperly positioned when clicked twice.
+- Update the heatmap option interface to allow seeing the preview when a color picker is opened.
+- Display an error message on tiles with errors in them
+- Don't try to assign a color value scale if the colorEncoding is set to itemRgb. itemRgb means that the color is present directly in the annotation
+- Add an option to separate the + / - strand annotations in the bedlike track
+
 ## v1.9.3
 
 - Consolidated track options of horizontal and vertical tracks

@@ -1,4 +1,4 @@
-import { scaleLog, scaleLinear } from 'd3-scale';
+import { scaleLog, scaleLinear, scaleOrdinal } from 'd3-scale';
 import getAggregationFunction from './utils/get-aggregation-function';
 import selectedItemsToSize from './utils/selected-items-to-size';
 import DenseDataExtrema1D from './utils/DenseDataExtrema1D';
@@ -121,6 +121,10 @@ export function workerSetPix(
     valueScale = scaleLog()
       .range([254, 0])
       .domain(valueScaleDomain);
+  } else if (valueScaleType === 'categorical') {
+    valueScale = scaleOrdinal()
+      .domain(valueScaleDomain)
+      .range(colorScale);
   } else {
     if (valueScaleType !== 'linear') {
       console.warn(
@@ -151,6 +155,12 @@ export function workerSetPix(
   const tileWidth = Math.sqrt(size);
   const pixData = new Uint8ClampedArray(filteredSize * 4);
 
+  let dToRgbIdx = x => Math.max(0, Math.min(254, Math.floor(valueScale(x))));
+
+  if (valueScaleType === 'categorical') {
+    dToRgbIdx = x => x;
+  }
+
   /**
    * Set the ith element of the pixData array, using value d.
    * (well not really, since i is scaled to make space for each rgb value).
@@ -170,10 +180,7 @@ export function workerSetPix(
       !Number.isNaN(+d)
     ) {
       // values less than espilon are considered NaNs and made transparent (rgbIdx 255)
-      rgbIdx = Math.max(
-        0,
-        Math.min(254, Math.floor(valueScale(d + pseudocount)))
-      );
+      rgbIdx = dToRgbIdx(d + pseudocount);
     }
     // let rgbIdx = qScale(d); //Math.max(0, Math.min(255, Math.floor(valueScale(ct))))
     if (rgbIdx < 0 || rgbIdx > 255) {
@@ -365,7 +372,13 @@ export function tileResponseToData(data, server, theseTileIds) {
     data[key].server = server;
     data[key].tileId = key;
     data[key].zoomLevel = +keyParts[1];
-    data[key].tilePos = keyParts.slice(2, keyParts.length).map(x => +x);
+
+    // slice from position 2 to exclude tileId and zoomLevel
+    // filter by NaN to exclude metadata portions of the tile request
+    data[key].tilePos = keyParts
+      .slice(2, keyParts.length)
+      .map(x => +x)
+      .filter(x => !Number.isNaN(x));
     data[key].tilesetUid = keyParts[0];
 
     if ('dense' in data[key]) {
@@ -392,7 +405,6 @@ export function tileResponseToData(data, server, theseTileIds) {
       data[key].denseDataExtrema = dde;
       data[key].minNonZero = dde.minNonZeroInTile;
       data[key].maxNonZero = dde.maxNonZeroInTile;
-
       /*
       if (data[key]['minNonZero'] === Number.MAX_SAFE_INTEGER &&
           data[key]['maxNonZero'] === Number.MIN_SAFE_INTEGER) {
@@ -432,5 +444,5 @@ export function workerGetTiles(outUrl, server, theseTileIds, authHeader, done) {
 
       // done.transfer(data, denses);
     })
-    .catch(err => console.warn('err:', err));
+    .catch(err => console.error('err:', err));
 }

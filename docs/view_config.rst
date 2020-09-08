@@ -207,6 +207,32 @@ assigned values of ``[0,1]]``.
         ]
     }
 
+zoomLimits
+^^^^^^^^^^
+
+The field contains limits that controll the extend to which zooming is possible within a view. In the example below, zooming in is not possible beyond 200bp. If one of the items in the array is `null`, zooming is unrestricted in the corresponding direction. If the field is not present in the viewconf, it defaults to unrestricted zooming.
+
+.. code-block:: javascript
+
+    {
+        views: [
+            {
+                  "uid": "AhI0wMP6ScybnFp6BmLuPQ",
+                  "initialXDomain": [
+                    973907089.1176914,
+                    1196247735.9596405
+                  ],
+                  "initialYDomain": [
+                    -12281154450.083118,
+                    -12145323104.213125
+                  ],
+                  "zoomLimits": [
+                    200,
+                    3400000000
+                  ],
+        ]
+    }
+
 trackSourceServers
 ^^^^^^^^^^^^^^^^^^
 
@@ -317,7 +343,7 @@ In addition to using ``tilesetUid`` or ``fileUrl`` to specify a data source, the
 Genbank files
 """""""""""""
 
-A Genbank file data source will load a complete genbank file from a remote URL and serve that as a ``gene-annotations`` datatype. See the `horizontal-gene-annotations section <track_types.html#gene-annotations>`_ for an example of a track type that can be used with Genbank files.
+A Genbank file data source will load a complete genbank file from a either text or remote URL and serve that as a ``gene-annotations`` datatype. See the `horizontal-gene-annotations section <track_types.html#gene-annotations>`_ for an example of a track type that can be used with Genbank files.
 
 .. code-block:: javascript
 
@@ -327,6 +353,18 @@ A Genbank file data source will load a complete genbank file from a remote URL a
       "url": "https://pkerp.s3.amazonaws.com/public/GCA_000010365.1_ASM1036v1_genomic.gbff.gz"
     }
   }
+
+The specify the Genbank as text, replace the ``url`` field with ``text``:
+
+.. code-block:: javascript
+
+  {
+    "data": {
+      "type": "genbank",
+      "text": "LOCUS       AP009180              159662 bp    DNA..."
+    }
+  }
+
 
 **Note** The Genbank data sources is limited in its detail. It currently only displays genes and the names of genes. More extensive support for gene annotations (e.g. exons) should be added in the `higlass/app/scripts/data-fetchers/genbank-fetcher.js` file.
 

@@ -132,6 +132,10 @@ function externalInitTile(track, tile, options) {
   tile.tileData = geneEntries.concat(fillerEntries);
 
   tile.tileData.forEach((td, i) => {
+    if (td.type === 'filler') {
+      return;
+    }
+
     const geneInfo = td.fields;
     const geneName = geneInfo[3];
     const geneId = track.geneId(geneInfo, td.type);
@@ -668,10 +672,12 @@ class HorizontalGeneAnnotationsTrack extends HorizontalTiled1DPixiTrack {
 
     renderMask(this, tile);
 
-    trackUtils.stretchRects(this, [
-      x => x.rectGraphics,
-      x => x.rectMaskGraphics
-    ]);
+    Object.values(this.fetchedTiles).forEach(t => {
+      trackUtils.stretchRects(this, t, [
+        x => x.rectGraphics,
+        x => x.rectMaskGraphics
+      ]);
+    });
 
     for (const text of Object.values(tile.texts)) {
       text.style = {
@@ -711,16 +717,15 @@ class HorizontalGeneAnnotationsTrack extends HorizontalTiled1DPixiTrack {
     this.geneAreaHeight = this.geneRectHeight;
     const fontSizeHalf = this.fontSize / 2;
 
-    trackUtils.stretchRects(this, [
-      x => x.rectGraphics,
-      x => x.rectMaskGraphics
-    ]);
-
     Object.values(this.fetchedTiles)
       // tile hasn't been drawn properly because we likely got some
       // bogus data from the server
       .filter(tile => tile.drawnAtScale)
       .forEach(tile => {
+        trackUtils.stretchRects(this, tile, [
+          x => x.rectGraphics,
+          x => x.rectMaskGraphics
+        ]);
         tile.textBgGraphics.clear();
         tile.textBgGraphics.beginFill(
           typeof this.options.labelBackgroundColor !== 'undefined'
@@ -736,9 +741,11 @@ class HorizontalGeneAnnotationsTrack extends HorizontalTiled1DPixiTrack {
         tile.tileData.forEach(td => {
           // tile probably hasn't been initialized yet
           if (!tile.texts) return;
+          if (td.type === 'filler') return;
 
           const geneInfo = td.fields;
           const geneName = geneInfo[3];
+
           const geneId = this.geneId(geneInfo, td.type);
 
           const text = tile.texts[geneId];
@@ -890,13 +897,11 @@ class HorizontalGeneAnnotationsTrack extends HorizontalTiled1DPixiTrack {
 
     for (const tile of this.visibleAndFetchedTiles()) {
       for (let i = 0; i < tile.allRects.length; i++) {
-        // console.log('tile.allRects:', tile.allRects);
         // copy the visible rects array
         if (tile.allRects[i][2].type === 'filler') {
           continue;
         }
         const rect = tile.allRects[i][0].slice(0);
-        // console.log('rect:', rect);
 
         const newArr = [];
         while (rect.length) {
@@ -914,7 +919,6 @@ class HorizontalGeneAnnotationsTrack extends HorizontalTiled1DPixiTrack {
         const pc = classifyPoint(newArr, point);
 
         if (pc === -1) {
-          // console.log('ar:', tile.allRects[i]);
           const gene = tile.allRects[i][2];
 
           return `

@@ -71,6 +71,10 @@ import LruCache from '../factories';
 // Services
 import * as services from '../services';
 
+// Chromosomes
+import ChromosomeInfo from '../ChromosomeInfo';
+import SearchField from '../SearchField';
+
 const libraries = {
   d3Array,
   d3Axis,
@@ -134,7 +138,13 @@ const factories = {
   LruCache
 };
 
+const chromosomes = {
+  ChromosomeInfo,
+  SearchField
+};
+
 export default {
+  chromosomes,
   libraries,
   tracks,
   factories,

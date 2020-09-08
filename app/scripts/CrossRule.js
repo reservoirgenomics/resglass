@@ -37,7 +37,7 @@ class CrossRule extends mix(PixiTrack).with(RuleMixin, VerticalRuleMixin) {
   }
 
   drawHorizontalRule(graphics) {
-    let stroke = colorToHex('black');
+    let stroke = colorToHex(this.options.color || 'black');
 
     if (this.highlighted) {
       stroke = colorToHex('red');
@@ -91,10 +91,7 @@ class CrossRule extends mix(PixiTrack).with(RuleMixin, VerticalRuleMixin) {
 
     track.appendChild(output);
 
-    let stroke = 'black';
-    if (this.highlighted) {
-      stroke = 'red';
-    }
+    const stroke = this.options.color || 'black';
 
     const verticalLine = document.createElement('line');
     verticalLine.setAttribute('stroke', stroke);

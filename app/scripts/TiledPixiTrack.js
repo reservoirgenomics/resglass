@@ -144,6 +144,7 @@ class TiledPixiTrack extends PixiTrack {
 
     // To indicate that this track is requiring a tileset info
     this.tilesetInfo = null;
+    this.tilesetInfoError = null;
     this.uuid = slugid.nice();
 
     // this needs to be above the tilesetInfo() call because if that
@@ -169,7 +170,6 @@ class TiledPixiTrack extends PixiTrack {
       if (this.tilesetInfo.chromsizes) {
         this.chromInfo = parseChromsizesRows(this.tilesetInfo.chromsizes);
       }
-
       if ('error' in this.tilesetInfo) {
         // no tileset info for this track
         console.warn(
@@ -178,12 +178,14 @@ class TiledPixiTrack extends PixiTrack {
           this.tilesetInfo.error
         );
 
+        this.tilesetInfoError = this.tilesetInfo.error;
+
+        this.setError(this.tilesetInfoError);
+
         // Fritz: Not sure why it's reset
         // this.trackNotFoundText = '';
-        this.errorTextText = this.tilesetInfo.error;
         this.tilesetInfo = null;
-        this.draw();
-        this.animate();
+
         return;
       }
 
@@ -215,6 +217,12 @@ class TiledPixiTrack extends PixiTrack {
       this.drawLabel(); // draw the label so that the current resolution is displayed
       this.animate();
     });
+  }
+
+  setError(error) {
+    this.errorTextText = error;
+    this.draw();
+    this.animate();
   }
 
   setFixedValueScaleMin(value) {
@@ -566,7 +574,9 @@ class TiledPixiTrack extends PixiTrack {
     const fetchedTileIDs = Object.keys(this.fetchedTiles);
 
     for (let i = 0; i < fetchedTileIDs.length; i++) {
-      this.updateTile(this.fetchedTiles[fetchedTileIDs[i]]);
+      const tile = this.fetchedTiles[fetchedTileIDs[i]];
+
+      this.updateTile(tile);
     }
   }
 
@@ -612,6 +622,9 @@ class TiledPixiTrack extends PixiTrack {
   }
 
   fetchNewTiles(toFetch) {
+    this.checkForErrors();
+    this.draw();
+
     if (toFetch.length > 0) {
       const toFetchList = [...new Set(toFetch.map(x => x.remoteId))];
 
@@ -718,6 +731,29 @@ class TiledPixiTrack extends PixiTrack {
     }
   }
 
+  checkForErrors() {
+    const errors = this.visibleAndFetchedTiles()
+      .map(
+        x =>
+          x.tileData && x.tileData.error && `${x.tileId}: ${x.tileData.error}`
+      )
+      .filter(x => x);
+
+    if (errors.length) {
+      this.errorTextText = errors.join('\n');
+    } else {
+      this.errorTextText = '';
+    }
+
+    if (this.tilesetInfoError) {
+      this.errorTextText = this.tilesetInfoError;
+
+      errors.push(this.tilesetInfoError);
+    }
+
+    return errors;
+  }
+
   draw() {
     if (this.delayDrawing) return;
 
@@ -744,11 +780,15 @@ class TiledPixiTrack extends PixiTrack {
         uuid: this.uuid
       });
     }
+
+    this.checkForErrors();
+
     super.draw();
 
-    Object.keys(this.fetchedTiles).forEach(tilesetUid =>
-      this.drawTile(this.fetchedTiles[tilesetUid])
-    );
+    Object.keys(this.fetchedTiles).forEach(tilesetUid => {
+      this.drawTile(this.fetchedTiles[tilesetUid]);
+    });
+    // console.log('errors:', errors);
 
     if (this.pubSub) {
       this.pubSub.publish('TiledPixiTrack.tilesDrawnEnd', {
