@@ -1,6 +1,5 @@
 import slugid from 'slugid';
 import { brush } from 'd3-brush';
-import { event } from 'd3-selection';
 
 import SVGTrack from './SVGTrack';
 
@@ -11,7 +10,7 @@ class ViewportTracker2D extends SVGTrack {
     const {
       registerViewportChanged,
       removeViewportChanged,
-      setDomainsCallback
+      setDomainsCallback,
     } = context;
 
     const uid = slugid.nice();
@@ -62,7 +61,7 @@ class ViewportTracker2D extends SVGTrack {
     this.draw();
   }
 
-  brushed() {
+  brushed(event) {
     /**
      * Should only be called  on active brushing, not in response to the
      * draw event
@@ -75,12 +74,12 @@ class ViewportTracker2D extends SVGTrack {
 
     const xDomain = [
       this._xScale.invert(s[0][0]),
-      this._xScale.invert(s[1][0])
+      this._xScale.invert(s[1][0]),
     ];
 
     const yDomain = [
       this._yScale.invert(s[0][1]),
-      this._yScale.invert(s[1][1])
+      this._yScale.invert(s[1][1]),
     ];
 
     if (!this.hasFromView) {
@@ -143,7 +142,7 @@ class ViewportTracker2D extends SVGTrack {
 
     const dest = [
       [x0, y0],
-      [x1, y1]
+      [x1, y1],
     ];
 
     // user hasn't actively brushed so we don't want to emit a
@@ -184,7 +183,7 @@ class ViewportTracker2D extends SVGTrack {
     const yDiff = yRange[1] - yRange[0];
     this.brush.extent([
       [xRange[0] - xDiff, yRange[0] - yDiff],
-      [xRange[1] + xDiff, yRange[1] + yDiff]
+      [xRange[1] + xDiff, yRange[1] + yDiff],
     ]);
     this.gBrush.call(this.brush);
 
