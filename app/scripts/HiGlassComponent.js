@@ -1173,8 +1173,6 @@ class HiGlassComponent extends React.Component {
   }
 
   setMouseTool(mouseTool) {
-    console.log('setting mouseTool', mouseTool);
-
     this.setState({
       mouseTool,
     });
@@ -4604,6 +4602,7 @@ class HiGlassComponent extends React.Component {
                 ? this.state.addTrackPosition
                 : null
             }
+            apiPublish={this.apiPublish}
             addTrackPositionMenuPosition={addTrackPositionMenuPosition}
             canvasElement={this.state.canvasElement}
             chooseTrackHandler={

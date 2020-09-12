@@ -82,6 +82,7 @@ class TiledPlot extends React.Component {
       }
     });
 
+    this.annotationUid = null;
     this.xScale = null;
     this.yScale = null;
 
@@ -91,6 +92,7 @@ class TiledPlot extends React.Component {
     this.trackToReplace = null;
     this.trackRenderer = null;
 
+    this.brushSelection = null;
     this.configTrackMenu = null;
     /*
     let trackOptions = this.props.editable ?
@@ -151,6 +153,10 @@ class TiledPlot extends React.Component {
     this.dragTimeout = null;
     this.previousPropsStr = '';
 
+    this.brushesCreated = {};
+
+    this.appZoomedBound = this.appZoomed.bind(this);
+    this.handleClickBound = this.handleClick.bind(this);
     this.contextMenuHandlerBound = this.contextMenuHandler.bind(this);
     this.handleNoTrackAddedBound = this.handleNoTrackAdded.bind(this);
     this.handleTracksAddedBound = this.handleTracksAdded.bind(this);
@@ -207,6 +213,56 @@ class TiledPlot extends React.Component {
     this.pubSubs.push(
       this.props.pubSub.subscribe('contextmenu', this.contextMenuHandlerBound),
     );
+    this.pubSubs.push(
+      this.props.pubSub.subscribe('app.zoom', this.appZoomedBound),
+    );
+    // this.pubSubs.push(
+    //   this.props.pubSub.subscribe('click', evt => {
+    //     if (this.brushEl) {
+    //       const pos = pointer(evt, this.brushEl);
+
+    //       console.log('click pos:', pos);
+    //       console.log('this.brushEl', this.brushEl.node());
+    //     }
+    //   }),
+    // );
+  }
+
+  appZoomed(event) {
+    if (this.brushCurrent && this.brushEl) {
+      if (this.brushType == 'horizontal') {
+        const newSelection = [
+          this.xScale(this.brushSelection[0]) + this.brushTrack.left,
+          this.xScale(this.brushSelection[1]) + this.brushTrack.left,
+        ];
+
+        this.brushEl.call(this.brushCurrent.move, newSelection);
+      }
+
+      if (this.brushType == 'vertical') {
+        const newSelection = [
+          this.yScale(this.brushSelection[0]) + this.brushTrack.top,
+          this.yScale(this.brushSelection[1]) + this.brushTrack.top,
+        ];
+
+        this.brushEl.call(this.brushCurrent.move, newSelection);
+      }
+
+      if (this.brushType == '2d') {
+        const newSelection = [
+          [
+            this.xScale(this.brushSelection[0][0]) + this.brushTrack.left,
+            this.yScale(this.brushSelection[0][1]) + this.brushTrack.top,
+          ],
+          [
+            this.xScale(this.brushSelection[1][0]) + this.brushTrack.left,
+            this.yScale(this.brushSelection[1][1]) + this.brushTrack.top,
+          ],
+        ];
+
+        this.brushEl.call(this.brushCurrent.move, newSelection);
+      }
+    }
   }
 
   clearOtherBrushes(myBrush) {
@@ -228,26 +284,89 @@ class TiledPlot extends React.Component {
     }
   }
 
+  handleClick(evt) {
+    const pos = pointer(evt, this.divTiledPlot);
+    let inside = false;
+
+    if (this.brushEl) {
+      const selection = this.brushSelectionRaw;
+
+      const track = this.brushTrack;
+
+      if (this.brushType === '2d') {
+        console.log('brushClick', pos);
+        console.log('brushSelection', this.brushSelectionRaw);
+
+        if (
+          pos[0] >= selection[0][0] &&
+          pos[0] <= selection[1][0] &&
+          pos[1] >= selection[0][1] &&
+          pos[1] <= selection[1][1]
+        ) {
+          inside = true;
+        }
+      } else if (this.brushType === 'horizontal') {
+        console.log('pos', pos);
+        console.log('track:', track);
+
+        if (
+          pos[0] >= selection[0] &&
+          pos[0] <= selection[1] &&
+          pos[1] >= track.top &&
+          pos[1] <= track.top + track.height
+        ) {
+          inside = true;
+        }
+      } else if (this.brushType === 'vertical') {
+        if (
+          pos[1] >= selection[0] &&
+          pos[1] <= selection[1] &&
+          pos[0] >= track.left &&
+          pos[0] <= track.left + track.width
+        ) {
+          inside = true;
+        }
+      }
+
+      if (!inside) {
+        this.brushEl.call(this.brushCurrent.move, null);
+        this.brushEl = null;
+        this.props.apiPublish('annotationRemoved');
+        this.annotationUid = null;
+      }
+    }
+  }
+
   enableBrushes() {
     const overlays = select(this.divTiledPlot)
       .selectAll('.brush-svg')
       .selectAll('.overlay');
-
-    console.log('overlays', overlays);
 
     overlays.style('pointer-events', 'all');
   }
 
   disableBrushes() {
     const overlays = select(this.divTiledPlot)
-      .selectAll('.brush-svg')
-      .selectAll('.overlay');
+      // .selectAll('.brush-svg')
+      .selectAll('.overlay')
+      .attr('pointer-events', 'none');
 
-    overlays.style('pointer-events', 'none');
+    const brushRects = select(this.divTiledPlot)
+      .selectAll('.brush-rect')
+      .attr('pointer-events', 'none');
+
+    select(this.divTiledPlot)
+      .selectAll('.selection')
+      .attr('pointer-events', 'all');
+
+    select(this.divTiledPlot)
+      .selectAll('.brush-svg')
+      .attr('pointer-events', 'none');
   }
 
   createBrushes(positionedTracks) {
     const brushes = {};
+    this.brushCurrent = null;
 
     for (const track of positionedTracks) {
       if (brushes[track.track.uid]) continue;
@@ -256,10 +375,70 @@ class TiledPlot extends React.Component {
 
       if (['top', 'bottom'].includes(track.track.position)) {
         myBrush = brushX();
+        myBrush.on('brush', event => {
+          if (!event.selection) {
+            return;
+          }
+          this.brushCurrent = myBrush;
+          this.brushType = 'horizontal';
+          this.brushTrack = track;
+          this.brushSelectionRaw = event.selection;
+          this.brushSelection = [
+            this.xScale.invert(event.selection[0] - track.left),
+            this.xScale.invert(event.selection[1] - track.left),
+          ];
+
+          apiPublish('annotationChanged', {
+            annotationUid: this.annotationUid,
+            extent: [this.brushSelection, [null, null]],
+          });
+        });
       } else if (['left', 'right'].includes(track.track.position)) {
         myBrush = brushY();
+        myBrush.on('brush', event => {
+          if (!event.selection) {
+            return;
+          }
+          this.brushCurrent = myBrush;
+          this.brushType = 'vertical';
+          this.brushTrack = track;
+          this.brushSelectionRaw = event.selection;
+          this.brushSelection = [
+            this.yScale.invert(event.selection[0] - track.top),
+            this.yScale.invert(event.selection[1] - track.top),
+          ];
+
+          apiPublish('annotationChanged', {
+            annotationUid: this.annotationUid,
+            extent: [[null, null], this.brushSelection],
+          });
+        });
       } else {
         myBrush = brush();
+        myBrush.on('brush', event => {
+          if (!event.selection) {
+            return;
+          }
+          this.brushCurrent = myBrush;
+          this.brushType = '2d';
+          this.brushTrack = track;
+          this.brushSelectionRaw = event.selection;
+          this.brushSelection = [
+            [
+              this.xScale.invert(event.selection[0][0] - track.left),
+              this.yScale.invert(event.selection[0][1] - track.top),
+            ],
+            [
+              this.xScale.invert(event.selection[1][0] - track.left),
+              this.yScale.invert(event.selection[1][1] - track.top),
+            ],
+          ];
+
+          apiPublish('annotationChanged', {
+            annotationUid: this.annotationUid,
+            extent: this.brushSelection,
+          });
+        });
       }
 
       // turn off d3-brush's control of the shift, meta, ctrl keys
@@ -269,7 +448,23 @@ class TiledPlot extends React.Component {
         [track.left + track.width, track.top + track.height],
       ]);
 
-      myBrush.on('brush', () => this.clearOtherBrushes(myBrush));
+      const tiledPlot = this;
+      const apiPublish = this.props.apiPublish;
+      myBrush.on('start', function(event) {
+        if (!tiledPlot.annotationUid) {
+          tiledPlot.annotationUid = slugid.nice();
+          track.annotationUid = tiledPlot.annotationUid;
+          apiPublish('annotationCreated', {
+            annotationUid: tiledPlot.annotationUid,
+            track: track.track,
+          });
+        }
+        tiledPlot.brushEl = select(this);
+      });
+
+      myBrush.on('end', evt => {
+        console.log('end');
+      });
 
       brushes[track.track.uid] = myBrush;
     }
@@ -278,8 +473,6 @@ class TiledPlot extends React.Component {
   }
 
   removeBrushes() {
-    console.log('removing brushes');
-
     select(this.divTiledPlot)
       .selectAll('.brush-svg')
       .remove();
@@ -289,7 +482,6 @@ class TiledPlot extends React.Component {
     const selection = select(this.divTiledPlot).selectAll('.horizontal-track');
 
     const positionedTracks = this.positionedTracks();
-    console.log('positionedTracks', positionedTracks);
 
     const brushes = this.createBrushes(positionedTracks);
     this.brushes = brushes;
@@ -311,15 +503,15 @@ class TiledPlot extends React.Component {
       .style('top', 0)
       .style('z-index', 101);
 
-    select(this.divTiledPlot)
+    const brushG = select(this.divTiledPlot)
       .select('.brush-svg')
       .selectAll('.brush')
       .data(positionedTracks, d => d.track.uid)
       .enter()
       .append('g')
-      .attr('class', 'brush')
-      .append('rect')
-      .attr('class', 'brush-rect');
+      .attr('class', 'brush');
+
+    const brushRect = brushG.append('rect').attr('class', 'brush-rect');
 
     select(this.divTiledPlot)
       .selectAll('.brush-svg')
@@ -335,13 +527,16 @@ class TiledPlot extends React.Component {
       .attr('width', d => d.width)
       .attr('height', d => d.height);
 
-    select(this.divTiledPlot)
-      .select('.brush-svg')
-      .selectAll('.brush')
-      .each(function(d) {
-        brushEls[d.track.uid] = select(this);
-        brushEls[d.track.uid].call(brushes[d.track.uid]);
-      });
+    brushG.each(function(d) {
+      brushEls[d.track.uid] = select(this);
+      brushEls[d.track.uid].call(brushes[d.track.uid]);
+    });
+
+    // select(this.divTiledPlot).on('click', () => console.log('yyclick'));
+    // select(this.divTiledPlot)
+    //   .select('.brush-svg')
+    //   .selectAll('.brush');
+
     // .attr('x', d => d.)
   }
 
@@ -385,14 +580,12 @@ class TiledPlot extends React.Component {
 
     if (!this.numTracks) this.tracksByUidInit = {};
 
-    console.log(nextProps.mouseTool);
     if (nextProps.mouseTool === MOUSE_TOOL_TRACK_SELECT) {
-      console.log('adding brushes');
       // this.enableBrushes();
       this.addBrushes();
     } else {
-      // this.disableBrushes();
-      this.removeBrushes();
+      this.disableBrushes();
+      // this.removeBrushes();
     }
 
     return toUpdate;
@@ -2465,6 +2658,7 @@ class TiledPlot extends React.Component {
           this.divTiledPlot = c;
         }}
         className="tiled-plot-div"
+        onClick={this.handleClickBound}
         style={{
           marginBottom: this.props.marginBottom,
           marginLeft: this.props.marginLeft,

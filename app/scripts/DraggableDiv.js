@@ -1,5 +1,5 @@
 import { drag } from 'd3-drag';
-import { event, mouse, select } from 'd3-selection';
+import { pointer, select } from 'd3-selection';
 import PropTypes from 'prop-types';
 import React from 'react';
 
@@ -47,7 +47,7 @@ class DraggableDiv extends React.Component {
       width: this.props.width,
       height: this.props.height,
       top: this.props.top,
-      left: this.props.left
+      left: this.props.left,
     };
 
     this.domBody = select('body').node();
@@ -67,94 +67,35 @@ class DraggableDiv extends React.Component {
   UNSAFE_componentWillReceiveProps(newProps) {
     if ('width' in newProps) {
       this.setState({
-        width: newProps.width
+        width: newProps.width,
       });
     }
 
     if ('height' in newProps) {
       this.setState({
-        height: newProps.height
+        height: newProps.height,
       });
     }
   }
 
   /* ---------------------------- Custom Methods ---------------------------- */
 
-  dragBottomFunc() {
-    const ms = mouse(this.domBody);
+  dragBottomFunc(evt) {
+    const ms = pointer(evt, this.domBody);
 
     let newHeight = this.dragStartHeight + (ms[1] - this.dragStartMousePos[1]);
     newHeight = newHeight > this.minHeight ? newHeight : this.minHeight;
 
     this.setState({
-      height: newHeight
+      height: newHeight,
     });
 
-    event.sourceEvent.stopPropagation();
+    evt.sourceEvent.stopPropagation();
     this.sizeChanged();
   }
 
-  dragLeftFunc() {
-    const ms = mouse(this.domBody);
-
-    let newWidth = this.dragStartWidth - (ms[0] - this.dragStartMousePos[0]);
-    newWidth = newWidth > this.minWidth ? newWidth : this.minWidth;
-
-    let newLeft = this.dragStartLeft + ms[0] - this.dragStartMousePos[0];
-    newLeft =
-      newWidth > this.minWidth
-        ? newLeft
-        : this.dragStartLeft + this.dragStartWidth - this.minWidth;
-
-    this.setState({
-      left: newLeft,
-      width: newWidth
-    });
-
-    event.sourceEvent.stopPropagation();
-    this.sizeChanged();
-  }
-
-  dragTopFunc() {
-    const ms = mouse(this.domBody);
-
-    let newHeight = this.dragStartHeight - (ms[1] - this.dragStartMousePos[1]);
-    newHeight = newHeight > this.minHeight ? newHeight : this.minHeight;
-
-    let newTop = this.dragStartTop + ms[1] - this.dragStartMousePos[1];
-    newTop =
-      newHeight > this.minHeight
-        ? newTop
-        : this.dragStartTop + this.dragStartHeight - this.minHeight;
-
-    this.setState({
-      top: newTop,
-      height: newHeight
-    });
-
-    event.sourceEvent.stopPropagation();
-    this.sizeChanged();
-  }
-
-  dragRightFunc() {
-    const ms = mouse(this.domBody);
-
-    let newWidth = this.dragStartWidth + (ms[0] - this.dragStartMousePos[0]);
-    newWidth = newWidth > this.minWidth ? newWidth : this.minWidth;
-
-    this.setState({
-      width: newWidth
-    });
-
-    event.sourceEvent.stopPropagation();
-    this.sizeChanged();
-  }
-
-  dragBottomLeftFunc() {
-    const ms = mouse(this.domBody);
-
-    let newHeight = this.dragStartHeight + (ms[1] - this.dragStartMousePos[1]);
-    newHeight = newHeight > this.minHeight ? newHeight : this.minHeight;
+  dragLeftFunc(evt) {
+    const ms = pointer(evt, this.domBody);
 
     let newWidth = this.dragStartWidth - (ms[0] - this.dragStartMousePos[0]);
     newWidth = newWidth > this.minWidth ? newWidth : this.minWidth;
@@ -168,15 +109,74 @@ class DraggableDiv extends React.Component {
     this.setState({
       left: newLeft,
       width: newWidth,
-      height: newHeight
     });
 
-    event.sourceEvent.stopPropagation();
+    evt.sourceEvent.stopPropagation();
     this.sizeChanged();
   }
 
-  dragBottomRightFunc() {
-    const ms = mouse(this.domBody);
+  dragTopFunc(evt) {
+    const ms = pointer(evt, this.domBody);
+
+    let newHeight = this.dragStartHeight - (ms[1] - this.dragStartMousePos[1]);
+    newHeight = newHeight > this.minHeight ? newHeight : this.minHeight;
+
+    let newTop = this.dragStartTop + ms[1] - this.dragStartMousePos[1];
+    newTop =
+      newHeight > this.minHeight
+        ? newTop
+        : this.dragStartTop + this.dragStartHeight - this.minHeight;
+
+    this.setState({
+      top: newTop,
+      height: newHeight,
+    });
+
+    evt.sourceEvent.stopPropagation();
+    this.sizeChanged();
+  }
+
+  dragRightFunc(evt) {
+    const ms = pointer(evt, this.domBody);
+
+    let newWidth = this.dragStartWidth + (ms[0] - this.dragStartMousePos[0]);
+    newWidth = newWidth > this.minWidth ? newWidth : this.minWidth;
+
+    this.setState({
+      width: newWidth,
+    });
+
+    evt.sourceEvent.stopPropagation();
+    this.sizeChanged();
+  }
+
+  dragBottomLeftFunc(evt) {
+    const ms = pointer(evt, this.domBody);
+
+    let newHeight = this.dragStartHeight + (ms[1] - this.dragStartMousePos[1]);
+    newHeight = newHeight > this.minHeight ? newHeight : this.minHeight;
+
+    let newWidth = this.dragStartWidth - (ms[0] - this.dragStartMousePos[0]);
+    newWidth = newWidth > this.minWidth ? newWidth : this.minWidth;
+
+    let newLeft = this.dragStartLeft + ms[0] - this.dragStartMousePos[0];
+    newLeft =
+      newWidth > this.minWidth
+        ? newLeft
+        : this.dragStartLeft + this.dragStartWidth - this.minWidth;
+
+    this.setState({
+      left: newLeft,
+      width: newWidth,
+      height: newHeight,
+    });
+
+    evt.sourceEvent.stopPropagation();
+    this.sizeChanged();
+  }
+
+  dragBottomRightFunc(evt) {
+    const ms = pointer(evt, this.domBody);
 
     let newWidth = this.dragStartWidth + (ms[0] - this.dragStartMousePos[0]);
     newWidth = newWidth > this.minWidth ? newWidth : this.minWidth;
@@ -186,15 +186,15 @@ class DraggableDiv extends React.Component {
 
     this.setState({
       width: newWidth,
-      height: newHeight
+      height: newHeight,
     });
 
-    event.sourceEvent.stopPropagation();
+    evt.sourceEvent.stopPropagation();
     this.sizeChanged();
   }
 
-  dragTopRightFunc() {
-    const ms = mouse(this.domBody);
+  dragTopRightFunc(evt) {
+    const ms = pointer(evt, this.domBody);
 
     let newHeight = this.dragStartHeight - (ms[1] - this.dragStartMousePos[1]);
     newHeight = newHeight > this.minHeight ? newHeight : this.minHeight;
@@ -211,15 +211,15 @@ class DraggableDiv extends React.Component {
     this.setState({
       top: newTop,
       width: newWidth,
-      height: newHeight
+      height: newHeight,
     });
 
-    event.sourceEvent.stopPropagation();
+    evt.sourceEvent.stopPropagation();
     this.sizeChanged();
   }
 
-  dragTopLeftFunc() {
-    const ms = mouse(this.domBody);
+  dragTopLeftFunc(evt) {
+    const ms = pointer(evt, this.domBody);
 
     let newWidth = this.dragStartWidth - (ms[0] - this.dragStartMousePos[0]);
     newWidth = newWidth > this.minWidth ? newWidth : this.minWidth;
@@ -243,16 +243,16 @@ class DraggableDiv extends React.Component {
       top: newTop,
       left: newLeft,
       width: newWidth,
-      height: newHeight
+      height: newHeight,
     });
 
-    event.sourceEvent.stopPropagation();
+    evt.sourceEvent.stopPropagation();
 
     this.sizeChanged();
   }
 
-  dragStart() {
-    this.dragStartMousePos = mouse(this.domBody);
+  dragStart(evt) {
+    this.dragStartMousePos = pointer(evt, this.domBody);
 
     this.dragStartWidth = this.state.width;
     this.dragStartHeight = this.state.height;
@@ -260,7 +260,7 @@ class DraggableDiv extends React.Component {
     this.dragStartTop = this.state.top;
     this.dragStartLeft = this.state.left;
 
-    event.sourceEvent.stopPropagation();
+    evt.sourceEvent.stopPropagation();
   }
 
   sizeChanged() {
@@ -287,7 +287,7 @@ class DraggableDiv extends React.Component {
       left: this.state.left,
       width: this.state.width,
       height: this.state.height,
-      opacity: this.props.opacity
+      opacity: this.props.opacity,
     };
 
     const resizeWidth = 24;
@@ -295,19 +295,19 @@ class DraggableDiv extends React.Component {
 
     const horizStyle = {
       left: this.state.width / 2 - resizeWidth / 2,
-      width: resizeWidth
+      width: resizeWidth,
     };
 
     const vertStyle = {
       top: this.state.height / 2 - resizeHeight / 2,
-      height: resizeHeight
+      height: resizeHeight,
     };
 
     const styles = {
       bottom: { ...horizStyle, bottom: 1 },
       top: { ...horizStyle, top: 1 },
       left: { ...vertStyle, left: 1 },
-      right: { ...vertStyle, right: 1 }
+      right: { ...vertStyle, right: 1 },
     };
 
     const resizeHandles = [...this.props.resizeHandles].map(x => (
@@ -354,7 +354,7 @@ DraggableDiv.propTypes = {
   trackRotated: PropTypes.func,
   uid: PropTypes.string,
   width: PropTypes.number,
-  theme: PropTypes.symbol
+  theme: PropTypes.symbol,
 };
 
 export default withTheme(DraggableDiv);

@@ -696,6 +696,14 @@ const createApi = function api(context, pubSub) {
             apiPubSub.unsubscribe('annotationCreated', callback);
             break;
 
+          case 'annotationChanged':
+            apiPubSub.unsubscribe('annotationChanged', callback);
+            break;
+
+          case 'annotationRemoved':
+            apiPubSub.unsubscribe('annotationRemoved', callback);
+            break;
+
           case 'click':
             apiPubSub.unsubscribe('click', callback);
             break;
@@ -904,6 +912,12 @@ const createApi = function api(context, pubSub) {
         switch (event) {
           case 'annotationCreated':
             return apiPubSub.subscribe('annotationCreated', callback);
+
+          case 'annotationChanged':
+            return apiPubSub.subscribe('annotationChanged', callback);
+
+          case 'annotationRemoved':
+            return apiPubSub.subscribe('annotationRemoved', callback);
 
           case 'click':
             return apiPubSub.subscribe('click', callback);
