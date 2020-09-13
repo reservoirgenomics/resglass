@@ -2,15 +2,10 @@ import { queue } from 'd3-queue';
 import { select } from 'd3-selection';
 import React from 'react';
 import slugid from 'slugid';
-import {
-  FormGroup,
-  Glyphicon,
-  DropdownButton,
-  MenuItem,
-} from 'react-bootstrap';
+import { FormGroup, Glyphicon } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
-import { ZOOM_TRANSITION_DURATION , THEME_DARK } from './configs';
+import { ZOOM_TRANSITION_DURATION, THEME_DARK } from './configs';
 import Autocomplete from './Autocomplete';
 import ChromosomeInfo from './ChromosomeInfo';
 import SearchField from './SearchField';
@@ -20,7 +15,7 @@ import PopupMenu from './PopupMenu';
 import { tileProxy } from './services';
 
 // Utils
-import { scalesCenterAndK, dictKeys } from './utils';
+import { scalesCenterAndK } from './utils';
 import withPubSub from './hocs/with-pub-sub';
 
 // Styles
@@ -36,7 +31,8 @@ class GenomePositionSearchBox extends React.Component {
     this.searchField = null;
     this.autocompleteMenu = null;
 
-    (this.xScale = null), (this.yScale = null);
+    this.xScale = null;
+    this.yScale = null;
     // this.props.zoomDispatch.on('zoom.' + this.uid, this.zoomed.bind(this))
 
     /*
@@ -177,7 +173,8 @@ class GenomePositionSearchBox extends React.Component {
   }
 
   scalesChanged(xScale, yScale) {
-    (this.xScale = xScale), (this.yScale = yScale);
+    this.xScale = xScale;
+    this.yScale = yScale;
 
     // make sure that this component is loaded first
     this.setPositionText();
@@ -212,7 +209,7 @@ class GenomePositionSearchBox extends React.Component {
   autocompleteKeyPress(event) {
     const ENTER_KEY_CODE = 13;
 
-    if (event.keyCode == ENTER_KEY_CODE) {
+    if (event.keyCode === ENTER_KEY_CODE) {
       this.buttonClick();
     }
   }
@@ -240,11 +237,11 @@ class GenomePositionSearchBox extends React.Component {
           (genePosition.txEnd - genePosition.txStart) / 4,
         );
 
-        if (dashParts.length == 1) {
+        if (dashParts.length === 1) {
           // no range, just a position
           dashParts[j] = `${genePosition.chr}:${genePosition.txStart -
             extension}-${genePosition.txEnd + extension}`;
-        } else if (j == 0) {
+        } else if (j === 0) {
           // first part of a range
 
           dashParts[j] = `${genePosition.chr}:${genePosition.txStart -
@@ -271,21 +268,21 @@ class GenomePositionSearchBox extends React.Component {
 
   replaceGenesWithPositions(finished) {
     // replace any gene names in the input with their corresponding positions
-    const value_parts = this.positionText.split(/[ -]/);
+    const valueParts = this.positionText.split(/[ -]/);
     let q = queue();
 
-    for (let i = 0; i < value_parts.length; i++) {
-      if (value_parts[i].length == 0) {
+    for (let i = 0; i < valueParts.length; i++) {
+      if (valueParts[i].length === 0) {
         continue;
       }
 
-      const [chr, pos, retPos] = this.searchField.parsePosition(value_parts[i]);
+      const [, , retPos] = this.searchField.parsePosition(valueParts[i]);
 
-      if (retPos == null || isNaN(retPos)) {
+      if (retPos == null || Number.isNaN(retPos)) {
         // not a chromsome position, let's see if it's a gene name
         const url = `${this.props.autocompleteServer}/suggest/?d=${
           this.props.autocompleteId
-        }&ac=${value_parts[i].toLowerCase()}`;
+        }&ac=${valueParts[i].toLowerCase()}`;
         q = q.defer(tileProxy.json, url);
       }
     }
@@ -321,13 +318,14 @@ class GenomePositionSearchBox extends React.Component {
       const searchFieldValue = this.positionText; // ReactDOM.findDOMNode( this.refs.searchFieldText ).value;
 
       if (this.searchField != null) {
+        // eslint-disable-next-line prefer-const
         let [range1, range2] = this.searchField.searchPosition(
           searchFieldValue,
         );
 
         if (
-          (range1 && (isNaN(range1[0]) || isNaN(range1[1]))) ||
-          (range2 && (isNaN(range2[0]) || isNaN(range2[1])))
+          (range1 && (Number.isNaN(range1[0]) || Number.isNaN(range1[1]))) ||
+          (range2 && (Number.isNaN(range2[0]) || Number.isNaN(range2[1])))
         ) {
           return;
         }
@@ -419,12 +417,12 @@ class GenomePositionSearchBox extends React.Component {
 
     // change the part that was selected
     for (let i = 0; i < parts.length; i++) {
-      const dash_parts = parts[i].split('-');
-      if (partCount > dash_parts.length - 1) {
-        partCount -= dash_parts.length;
+      const dashParts = parts[i].split('-');
+      if (partCount > dashParts.length - 1) {
+        partCount -= dashParts.length;
       } else {
-        dash_parts[partCount] = objct.geneName;
-        parts[i] = dash_parts.join('-');
+        dashParts[partCount] = objct.geneName;
+        parts[i] = dashParts.join('-');
         break;
       }
     }
@@ -461,15 +459,16 @@ class GenomePositionSearchBox extends React.Component {
 
   handleRenderMenu(items) {
     return (
-      <PopupMenu children={items}>
+      <PopupMenu>
         <div
-          children={items}
           style={{
             left: this.menuPosition.left,
             top: this.menuPosition.top,
           }}
           styleName="styles.genome-position-search-bar-suggestions"
-        />
+        >
+          {items}
+        </div>
       </PopupMenu>
     );
   }
@@ -501,11 +500,11 @@ class GenomePositionSearchBox extends React.Component {
   }
 
   render() {
-    const assemblyMenuItems = this.state.availableAssemblies.map(x => (
-      <MenuItem eventKey={x} key={x}>
-        {x}
-      </MenuItem>
-    ));
+    // const assemblyMenuItems = this.state.availableAssemblies.map(x => (
+    //   <MenuItem eventKey={x} key={x}>
+    //     {x}
+    //   </MenuItem>
+    // ));
 
     let className = this.state.isFocused
       ? 'styles.genome-position-search-focus'
@@ -515,20 +514,25 @@ class GenomePositionSearchBox extends React.Component {
       ? 'styles.genome-position-search-bar-button-focus'
       : 'styles.genome-position-search-bar-button';
 
-    const classNameIcon = this.state.isFocused
-      ? 'styles.genome-position-search-bar-icon-focus'
-      : 'styles.genome-position-search-bar-icon';
+    // const classNameIcon = this.state.isFocused
+    //   ? 'styles.genome-position-search-bar-icon-focus'
+    //   : 'styles.genome-position-search-bar-icon';
 
     if (this.props.theme === THEME_DARK)
       className += ' styles.genome-position-search-dark';
 
     return (
       <FormGroup
+        ref={c => {
+          this.gpsbForm = c;
+        }}
         bsSize="small"
         styleName={className}
-        ref={c => (this.gpsbForm = c)}
       >
         <Autocomplete
+          ref={c => {
+            this.autocompleteMenu = c;
+          }}
           getItemValue={item => item.geneName}
           inputProps={{
             className: styles['genome-position-search-bar'],
@@ -545,11 +549,10 @@ class GenomePositionSearchBox extends React.Component {
           onMenuVisibilityChange={this.handleMenuVisibilityChange.bind(this)}
           onSelect={(value, objct) => this.geneSelected(value, objct)}
           onSubmit={this.searchFieldSubmit.bind(this)}
-          ref={c => (this.autocompleteMenu = c)}
           renderItem={(item, isHighlighted) => (
             <div
-              id={item.refseqid}
               key={item.refseqid}
+              id={item.refseqid}
               style={
                 isHighlighted ? this.styles.highlightedItem : this.styles.item
               }
@@ -567,6 +570,7 @@ class GenomePositionSearchBox extends React.Component {
         <button
           onClick={this.buttonClick.bind(this)}
           styleName={classNameButton}
+          type="button"
         >
           <Glyphicon glyph="search" />
         </button>
@@ -579,12 +583,14 @@ GenomePositionSearchBox.propTypes = {
   autocompleteId: PropTypes.string,
   autocompleteServer: PropTypes.string,
   chromInfoId: PropTypes.string,
+  chromInfoServer: PropTypes.string,
   isFocused: PropTypes.bool,
   onFocus: PropTypes.func,
   onSelectedAssemblyChanged: PropTypes.func,
   registerViewportChangedListener: PropTypes.func,
   removeViewportChangedListener: PropTypes.func,
   setCenters: PropTypes.func,
+  theme: PropTypes.string,
   trackSourceServers: PropTypes.array,
   twoD: PropTypes.bool,
 };
