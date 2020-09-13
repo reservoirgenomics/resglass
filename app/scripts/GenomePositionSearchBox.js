@@ -551,8 +551,8 @@ class GenomePositionSearchBox extends React.Component {
           onSubmit={this.searchFieldSubmit.bind(this)}
           renderItem={(item, isHighlighted) => (
             <div
-              key={item.refseqid}
-              id={item.refseqid}
+              key={item.geneName}
+              id={item.geneName}
               style={
                 isHighlighted ? this.styles.highlightedItem : this.styles.item
               }
