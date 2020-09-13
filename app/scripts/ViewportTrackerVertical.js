@@ -1,5 +1,4 @@
 import { brushY } from 'd3-brush';
-import { event } from 'd3-selection';
 import slugid from 'slugid';
 
 import SVGTrack from './SVGTrack';
@@ -10,7 +9,7 @@ class ViewportTrackerVertical extends SVGTrack {
     const {
       registerViewportChanged,
       removeViewportChanged,
-      setDomainsCallback
+      setDomainsCallback,
     } = context;
 
     const uid = slugid.nice();
@@ -56,7 +55,7 @@ class ViewportTrackerVertical extends SVGTrack {
     this.draw();
   }
 
-  brushed() {
+  brushed(event) {
     /**
      * Should only be called  on active brushing, not in response to the
      * draw event
@@ -154,7 +153,7 @@ class ViewportTrackerVertical extends SVGTrack {
     const yDiff = yRange[1] - yRange[0];
     this.brush.extent([
       [xRange[0], yRange[0] - yDiff],
-      [xRange[1], yRange[1] + yDiff]
+      [xRange[1], yRange[1] + yDiff],
     ]);
     this.gBrush.call(this.brush);
 

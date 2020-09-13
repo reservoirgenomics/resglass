@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { brushY } from 'd3-brush';
-import { select, event } from 'd3-selection';
+import { select } from 'd3-selection';
 import slugid from 'slugid';
 
 import ListWrapper from './ListWrapper';
@@ -47,7 +47,7 @@ class VerticalTiledPlot extends React.Component {
       ) {
         this.moveBrush(
           nextProps.rangeSelection[0] ? nextProps.rangeSelection[0] : null,
-          true
+          true,
         );
       }
       this.rangeSelectionTriggeredEnd = false;
@@ -60,7 +60,7 @@ class VerticalTiledPlot extends React.Component {
         nextProps.rangeSelection[accessor]
           ? nextProps.rangeSelection[accessor]
           : null,
-        nextProps.rangeSelectionEnd
+        nextProps.rangeSelectionEnd,
       );
       return this.state !== nextState;
     }
@@ -77,7 +77,7 @@ class VerticalTiledPlot extends React.Component {
 
   /* --------------------------- Getter / Setter ---------------------------- */
 
-  get sourceEvent() {
+  sourceEvent(event) {
     return event && event.sourceEvent;
   }
 
@@ -98,17 +98,17 @@ class VerticalTiledPlot extends React.Component {
 
     resetD3BrushStyle(
       this.brushEl,
-      stylesTrack['track-range-selection-group-brush-selection']
+      stylesTrack['track-range-selection-group-brush-selection'],
     );
   }
 
-  brushed() {
+  brushed(event) {
     // Need to reassign variable to check after reset
     const rangeSelectionMoved = this.rangeSelectionMoved;
     this.rangeSelectionMoved = false;
 
     if (
-      !this.sourceEvent ||
+      !this.sourceEvent(event) ||
       !this.props.onRangeSelection ||
       rangeSelectionMoved
     )
@@ -118,13 +118,13 @@ class VerticalTiledPlot extends React.Component {
     this.props.onRangeSelection(event.selection);
   }
 
-  brushStarted() {
-    if (!this.sourceEvent || !event.selection) return;
+  brushStarted(event) {
+    if (!this.sourceEvent(event) || !event.selection) return;
 
     this.props.onRangeSelectionStart();
   }
 
-  brushedEnded() {
+  brushedEnded(event) {
     if (!this.props.is1dRangeSelection) return;
 
     const rangeSelectionMovedEnd = this.rangeSelectionMovedEnd;
@@ -133,7 +133,7 @@ class VerticalTiledPlot extends React.Component {
     // Brush end event with a selection
     if (
       event.selection &&
-      event.sourceEvent &&
+      event.sourceEvent(event) &&
       this.props.onRangeSelection &&
       !rangeSelectionMovedEnd
     ) {
@@ -156,7 +156,7 @@ class VerticalTiledPlot extends React.Component {
     const relRange = rangeSelection
       ? [
           this.props.scale(rangeSelection[0]),
-          this.props.scale(rangeSelection[1])
+          this.props.scale(rangeSelection[1]),
         ]
       : null;
 
@@ -204,7 +204,7 @@ class VerticalTiledPlot extends React.Component {
             }}
             style={{
               height: this.props.height,
-              width
+              width,
             }}
             styleName={rangeSelectorClass}
             xmlns="http://www.w3.org/2000/svg"
@@ -227,7 +227,7 @@ class VerticalTiledPlot extends React.Component {
             uid: d.uid || slugid.nice(),
             height: this.props.height,
             width: d.width,
-            value: d.value
+            value: d.value,
           }))}
           onAddSeries={this.props.onAddSeries}
           onCloseTrack={this.props.onCloseTrack}
@@ -267,7 +267,7 @@ VerticalTiledPlot.propTypes = {
   resizeHandles: PropTypes.object,
   scale: PropTypes.func,
   tracks: PropTypes.array,
-  tracksControlAlignLeft: PropTypes.bool
+  tracksControlAlignLeft: PropTypes.bool,
 };
 
 export default VerticalTiledPlot;
