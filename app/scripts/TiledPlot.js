@@ -83,6 +83,7 @@ class TiledPlot extends React.Component {
     });
 
     this.annotationUid = null;
+    this.annotationCreatedNotified = false;
     this.xScale = null;
     this.yScale = null;
 
@@ -213,9 +214,7 @@ class TiledPlot extends React.Component {
     this.pubSubs.push(
       this.props.pubSub.subscribe('contextmenu', this.contextMenuHandlerBound),
     );
-    this.pubSubs.push(
-      this.props.pubSub.subscribe('app.zoom', this.appZoomedBound),
-    );
+
     // this.pubSubs.push(
     //   this.props.pubSub.subscribe('click', evt => {
     //     if (this.brushEl) {
@@ -228,9 +227,9 @@ class TiledPlot extends React.Component {
     // );
   }
 
-  appZoomed(event) {
+  appZoomed() {
     if (this.brushCurrent && this.brushEl) {
-      if (this.brushType == 'horizontal') {
+      if (this.brushType === 'horizontal') {
         const newSelection = [
           this.xScale(this.brushSelection[0]) + this.brushTrack.left,
           this.xScale(this.brushSelection[1]) + this.brushTrack.left,
@@ -239,7 +238,7 @@ class TiledPlot extends React.Component {
         this.brushEl.call(this.brushCurrent.move, newSelection);
       }
 
-      if (this.brushType == 'vertical') {
+      if (this.brushType === 'vertical') {
         const newSelection = [
           this.yScale(this.brushSelection[0]) + this.brushTrack.top,
           this.yScale(this.brushSelection[1]) + this.brushTrack.top,
@@ -248,7 +247,7 @@ class TiledPlot extends React.Component {
         this.brushEl.call(this.brushCurrent.move, newSelection);
       }
 
-      if (this.brushType == '2d') {
+      if (this.brushType === '2d') {
         const newSelection = [
           [
             this.xScale(this.brushSelection[0][0]) + this.brushTrack.left,
@@ -294,9 +293,6 @@ class TiledPlot extends React.Component {
       const track = this.brushTrack;
 
       if (this.brushType === '2d') {
-        console.log('brushClick', pos);
-        console.log('brushSelection', this.brushSelectionRaw);
-
         if (
           pos[0] >= selection[0][0] &&
           pos[0] <= selection[1][0] &&
@@ -306,9 +302,6 @@ class TiledPlot extends React.Component {
           inside = true;
         }
       } else if (this.brushType === 'horizontal') {
-        console.log('pos', pos);
-        console.log('track:', track);
-
         if (
           pos[0] >= selection[0] &&
           pos[0] <= selection[1] &&
@@ -333,6 +326,7 @@ class TiledPlot extends React.Component {
         this.brushEl = null;
         this.props.apiPublish('annotationRemoved');
         this.annotationUid = null;
+        this.annotationCreatedNotified = false;
       }
     }
   }
@@ -346,12 +340,12 @@ class TiledPlot extends React.Component {
   }
 
   disableBrushes() {
-    const overlays = select(this.divTiledPlot)
+    select(this.divTiledPlot)
       // .selectAll('.brush-svg')
       .selectAll('.overlay')
       .attr('pointer-events', 'none');
 
-    const brushRects = select(this.divTiledPlot)
+    select(this.divTiledPlot)
       .selectAll('.brush-rect')
       .attr('pointer-events', 'none');
 
@@ -367,6 +361,8 @@ class TiledPlot extends React.Component {
   createBrushes(positionedTracks) {
     const brushes = {};
     this.brushCurrent = null;
+
+    const apiPublish = this.props.apiPublish;
 
     for (const track of positionedTracks) {
       if (brushes[track.track.uid]) continue;
@@ -449,21 +445,22 @@ class TiledPlot extends React.Component {
       ]);
 
       const tiledPlot = this;
-      const apiPublish = this.props.apiPublish;
       myBrush.on('start', function(event) {
         if (!tiledPlot.annotationUid) {
           tiledPlot.annotationUid = slugid.nice();
           track.annotationUid = tiledPlot.annotationUid;
-          apiPublish('annotationCreated', {
-            annotationUid: tiledPlot.annotationUid,
-            track: track.track,
-          });
         }
         tiledPlot.brushEl = select(this);
       });
 
       myBrush.on('end', evt => {
-        console.log('end');
+        if (!this.annotationCreatedNotified) {
+          apiPublish('annotationCreated', {
+            annotationUid: tiledPlot.annotationUid,
+            track: track.track,
+          });
+          this.annotationCreatedNotified = true;
+        }
       });
 
       brushes[track.track.uid] = myBrush;
@@ -479,6 +476,11 @@ class TiledPlot extends React.Component {
   }
 
   addBrushes() {
+    if (this.annotationUid) {
+      // we already have a selection, no need to create a new one
+      return;
+    }
+
     const selection = select(this.divTiledPlot).selectAll('.horizontal-track');
 
     const positionedTracks = this.positionedTracks();
@@ -753,6 +755,8 @@ class TiledPlot extends React.Component {
   handleScalesChanged(x, y) {
     this.xScale = x;
     this.yScale = y;
+
+    this.appZoomed();
 
     this.props.onScalesChanged(x, y);
   }
