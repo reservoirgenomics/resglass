@@ -324,7 +324,7 @@ class TiledPlot extends React.Component {
       if (!inside) {
         this.brushEl.call(this.brushCurrent.move, null);
         this.brushEl = null;
-        this.props.apiPublish('annotationRemoved');
+        this.props.apiPublish('annotationRemoved', this.annotationUid);
         this.annotationUid = null;
         this.annotationCreatedNotified = false;
       }
@@ -363,6 +363,7 @@ class TiledPlot extends React.Component {
     this.brushCurrent = null;
 
     const apiPublish = this.props.apiPublish;
+    const tiledPlot = this;
 
     for (const track of positionedTracks) {
       if (brushes[track.track.uid]) continue;
@@ -389,6 +390,16 @@ class TiledPlot extends React.Component {
             extent: [this.brushSelection, [null, null]],
           });
         });
+
+        myBrush.on('end', evt => {
+          if (!this.annotationCreatedNotified) {
+            apiPublish('annotationCreated', {
+              annotationUid: tiledPlot.annotationUid,
+              track: track.track,
+              extent: [this.brushSelection, [null, null]],
+            });
+          }
+        });
       } else if (['left', 'right'].includes(track.track.position)) {
         myBrush = brushY();
         myBrush.on('brush', event => {
@@ -408,6 +419,16 @@ class TiledPlot extends React.Component {
             annotationUid: this.annotationUid,
             extent: [[null, null], this.brushSelection],
           });
+        });
+
+        myBrush.on('end', evt => {
+          if (!this.annotationCreatedNotified) {
+            apiPublish('annotationCreated', {
+              annotationUid: tiledPlot.annotationUid,
+              track: track.track,
+              extent: [[null, null], this.brushSelection],
+            });
+          }
         });
       } else {
         myBrush = brush();
@@ -435,6 +456,17 @@ class TiledPlot extends React.Component {
             extent: this.brushSelection,
           });
         });
+
+        myBrush.on('end', evt => {
+          if (!this.annotationCreatedNotified) {
+            apiPublish('annotationCreated', {
+              annotationUid: tiledPlot.annotationUid,
+              track: track.track,
+              extent: this.brushSelection,
+            });
+            this.annotationCreatedNotified = true;
+          }
+        });
       }
 
       // turn off d3-brush's control of the shift, meta, ctrl keys
@@ -444,23 +476,12 @@ class TiledPlot extends React.Component {
         [track.left + track.width, track.top + track.height],
       ]);
 
-      const tiledPlot = this;
       myBrush.on('start', function(event) {
         if (!tiledPlot.annotationUid) {
           tiledPlot.annotationUid = slugid.nice();
           track.annotationUid = tiledPlot.annotationUid;
         }
         tiledPlot.brushEl = select(this);
-      });
-
-      myBrush.on('end', evt => {
-        if (!this.annotationCreatedNotified) {
-          apiPublish('annotationCreated', {
-            annotationUid: tiledPlot.annotationUid,
-            track: track.track,
-          });
-          this.annotationCreatedNotified = true;
-        }
       });
 
       brushes[track.track.uid] = myBrush;
