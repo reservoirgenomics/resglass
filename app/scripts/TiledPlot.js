@@ -396,6 +396,7 @@ class TiledPlot extends React.Component {
             apiPublish('annotationCreated', {
               annotationUid: tiledPlot.annotationUid,
               track: track.track,
+              viewUid: this.props.uid,
               extent: [this.brushSelection, [null, null]],
             });
           }
@@ -426,6 +427,7 @@ class TiledPlot extends React.Component {
             apiPublish('annotationCreated', {
               annotationUid: tiledPlot.annotationUid,
               track: track.track,
+              viewUid: this.props.uid,
               extent: [[null, null], this.brushSelection],
             });
           }
@@ -462,6 +464,7 @@ class TiledPlot extends React.Component {
             apiPublish('annotationCreated', {
               annotationUid: tiledPlot.annotationUid,
               track: track.track,
+              viewUid: this.props.uid,
               extent: this.brushSelection,
             });
             this.annotationCreatedNotified = true;
@@ -502,8 +505,6 @@ class TiledPlot extends React.Component {
       return;
     }
 
-    const selection = select(this.divTiledPlot).selectAll('.horizontal-track');
-
     const positionedTracks = this.positionedTracks();
 
     const brushes = this.createBrushes(positionedTracks);
@@ -533,8 +534,6 @@ class TiledPlot extends React.Component {
       .enter()
       .append('g')
       .attr('class', 'brush');
-
-    const brushRect = brushG.append('rect').attr('class', 'brush-rect');
 
     select(this.divTiledPlot)
       .selectAll('.brush-svg')

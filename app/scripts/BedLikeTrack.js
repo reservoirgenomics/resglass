@@ -60,6 +60,8 @@ const clickFunc = (evt, track) => {
     evt.data.global.y - track.pMain.position.y,
   ];
 
+  const payloads = [];
+
   for (const rect of drawnRects) {
     const arr = rect[0].slice(0);
 
@@ -80,12 +82,16 @@ const clickFunc = (evt, track) => {
     // console.log('poly:', poly);
 
     if (classifyPoint(poly, point) === -1) {
-      track.pubSub.publish('app.click', {
-        type: 'bedlike',
-        event: evt,
-        payload: rect[1].value,
-      });
+      payloads.push(rect[1].value);
     }
+  }
+
+  if (payloads.length) {
+    track.pubSub.publish('app.click', {
+      type: 'bedlike',
+      event: evt,
+      payload: payloads,
+    });
   }
 
   // track.pubSub.publish('app.click', {
@@ -194,11 +200,6 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
         .map(x => x.tileData)
         .flat(),
     );
-
-    if (!this.uniqueSegments.length) {
-      // probably a mismatch between visible and fetched tiles
-      this.uniqueSegments = this.prevUniqueSegments;
-    }
 
     let plusStrandRows = [];
     let minusStrandRows = [];
@@ -601,7 +602,7 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
     const rowScale = scaleBand()
       .domain(range(maxRows))
       .range([startY, endY])
-      .paddingOuter(0.1)
+      .paddingOuter(0)
       .paddingInner(0.3);
 
     this.allVisibleRects();
@@ -729,7 +730,6 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
         text.position.x = this._xScale(txMiddle);
         text.position.y = rectY + rectHeight / 2;
         text.nominalY = rectY + rectHeight / 2;
-        // console.log('rendering text:', text.position.x, text.position.y);
 
         const fontColor =
           this.options.fontColor !== undefined
@@ -763,10 +763,6 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
   render() {
     const maxPlusRows = this.plusStrandRows ? this.plusStrandRows.length : 1;
     const maxMinusRows = this.minusStrandRows ? this.minusStrandRows.length : 1;
-
-    if (!this.uniqueSegments.length) {
-      return;
-    }
 
     this.prevVertY = this.vertY;
 
