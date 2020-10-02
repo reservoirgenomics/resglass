@@ -314,6 +314,7 @@ class HiGlassComponent extends React.Component {
 
     // Bound functions
     this.appClickHandlerBound = this.appClickHandler.bind(this);
+    this.canvasClickHandlerBound = this.canvasClickHandler.bind(this);
     this.keyDownHandlerBound = this.keyDownHandler.bind(this);
     this.keyUpHandlerBound = this.keyUpHandler.bind(this);
     this.resizeHandlerBound = this.resizeHandler.bind(this);
@@ -4391,6 +4392,47 @@ class HiGlassComponent extends React.Component {
     this.apiPublish('click', data);
   }
 
+  /** Handle click events on the canvas. The canvas is preferrable
+   * to the top level div because the canvas's events aren't forwarded
+   * so we only receive one click event
+   */
+  canvasClickHandler(evt) {
+    const nativeEvent = evt.nativeEvent || evt;
+    const absX = nativeEvent.clientX;
+    const absY = nativeEvent.clientY;
+
+    const hoveredTiledPlot = this.getTiledPlotAtPosition(absX, absY);
+
+    const relPos = pointer(nativeEvent, this.topDiv);
+    relPos[1] += this.scrollTop;
+
+    const hoveredTracks = hoveredTiledPlot
+      ? hoveredTiledPlot
+          .listTracksAtPosition(relPos[0], relPos[1], true)
+          .map(track => track.originalTrack || track)
+      : [];
+
+    const hoveredTrack = hoveredTracks.find(
+      track => !track.isAugmentationTrack,
+    );
+
+    const relTrackPos = hoveredTrack
+      ? [
+          relPos[0] - hoveredTrack.position[0],
+          relPos[1] - hoveredTrack.position[1],
+        ]
+      : relPos;
+
+    const relTrackX =
+      hoveredTrack && hoveredTrack.flipText ? relTrackPos[1] : relTrackPos[0];
+    const relTrackY =
+      hoveredTrack && hoveredTrack.flipText ? relTrackPos[0] : relTrackPos[1];
+
+    for (const track of hoveredTracks) {
+      track.click(relTrackX, relTrackY, evt);
+    }
+  }
+
   /**
    * Handle mousemove and zoom events.
    */
@@ -4468,8 +4510,6 @@ class HiGlassComponent extends React.Component {
     // The event forwarder wasn't written for React's SyntheticEvent
     const nativeEvent = evt.nativeEvent || evt;
 
-    const isTargetCanvas = evt.target === this.canvasElement;
-
     if (!hasParent(nativeEvent.target, this.topDiv)) {
       // ignore events that don't come from within the
       // HiGlass container
@@ -4487,7 +4527,7 @@ class HiGlassComponent extends React.Component {
 
     // Find the tracks at the wheel position
     if (this.apiStack.wheel && this.apiStack.wheel.length > 0) {
-      const relPos = clientPoint(this.topDiv, nativeEvent);
+      const relPos = pointer(nativeEvent, this.topDiv);
       // We need to add the scrollTop
       relPos[1] += this.scrollTop;
       const hoveredTracks = hoveredTiledPlot
@@ -4527,6 +4567,7 @@ class HiGlassComponent extends React.Component {
       this.apiPublish('wheel', evtToPublish);
     }
 
+    const isTargetCanvas = evt.target === this.canvasElement;
     if (nativeEvent.forwarded || isTargetCanvas) {
       evt.stopPropagation();
       evt.preventDefault();
@@ -4943,6 +4984,7 @@ class HiGlassComponent extends React.Component {
             <ThemeProvider value={this.theme}>
               {this.state.modal}
               <canvas
+                onClick={this.canvasClickHandlerBound}
                 key={this.uid}
                 ref={c => {
                   this.canvasElement = c;

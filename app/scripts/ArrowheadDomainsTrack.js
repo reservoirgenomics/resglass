@@ -1,6 +1,8 @@
 import createPubSub from 'pub-sub-es';
 
 import classifyPoint from 'robust-point-in-polygon';
+import polygonArea from 'area-polygon';
+import { polyToPoly, uniqueify } from './BedLikeTrack';
 import TiledPixiTrack from './TiledPixiTrack';
 
 // Services
@@ -8,19 +10,7 @@ import { tileProxy } from './services';
 
 // Utils
 import { colorToHex } from './utils';
-
-const polyToPoly = (poly, kx, px, ky, py) => {
-  const newArr = [];
-  let counter = 0;
-
-  while (counter < poly.length) {
-    const [x, y] = poly[counter];
-    newArr.push([x * kx + px, y * ky + py]);
-    counter += 1;
-  }
-
-  return newArr;
-};
+import { GLOBALS } from './configs';
 
 /**
  * Event handler for when gene annotations are clicked on.
@@ -35,29 +25,39 @@ const clickFunc = (evt, track, g) => {
   const payloads = [];
 
   for (const drawnRect of drawnRects) {
+    console.log('drawnRect:', drawnRect);
+    // copy the rect because polyToPoly is destructive
+    const rect = drawnRect[0].slice(0);
+
     const poly = polyToPoly(
-      [
-        [drawnRect.x, drawnRect.y],
-        [drawnRect.x + drawnRect.width, drawnRect.y], // ur
-        [drawnRect.x + drawnRect.width, drawnRect.y + drawnRect.height], // ll
-        [drawnRect.x, drawnRect.y + drawnRect.height], // lr
-      ],
+      rect,
       g.scale.x,
       g.position.x,
       g.scale.y,
       g.position.y,
     );
+    const area = polygonArea(poly);
 
     if (classifyPoint(poly, point) === -1) {
-      payloads.push(drawnRect.value);
+      const payload = drawnRect[1];
+      payload.area = area;
+
+      payloads.push(payload);
     }
   }
+
+  payloads.sort((a, b) => a.area - b.area);
+  if (payloads.length) {
+    track.selected = payloads[0].value.uid;
+  }
+  console.log('payloads:', payloads);
+  console.log('track.selected:', track.selected);
 
   if (payloads.length) {
     track.pubSub.publish('app.click', {
       type: '2d-rectangle-domains',
       event: evt,
-      payload: payloads,
+      payload: payloads.map(x => x[1]),
     });
   }
 
@@ -70,6 +70,7 @@ const clickFunc = (evt, track, g) => {
 function drawAnnotation(
   track,
   graphics,
+  fill,
   td,
   minSquareSize,
   xMin,
@@ -113,7 +114,22 @@ function drawAnnotation(
     }
   }
 
-  track.drawnRects[uid] = drawnRect;
+  track.drawnRects[uid] = [
+    [
+      drawnRect.x,
+      drawnRect.y,
+      drawnRect.x + drawnRect.width,
+      drawnRect.y, // ur
+      drawnRect.x + drawnRect.width,
+      drawnRect.y + drawnRect.height, // ll
+      drawnRect.x,
+      drawnRect.y + drawnRect.height, // lr
+    ],
+    {
+      value: td,
+      fill,
+    },
+  ];
 
   const dRxMax = drawnRect.x + drawnRect.width;
   const dRyMax = drawnRect.y + drawnRect.height;
@@ -163,6 +179,9 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
     this.publish = publish;
     this.subscribe = subscribe;
     this.unsubscribe = unsubscribe;
+
+    this.rectGraphics = new GLOBALS.PIXI.Graphics();
+    this.pMain.addChild(this.rectGraphics);
   }
 
   rerender(options, force) {
@@ -171,6 +190,27 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
     for (const tile of this.visibleAndFetchedTiles()) {
       this.drawTile(tile);
     }
+
+    this.drawnRects = {};
+    this.updateExistingGraphics();
+  }
+
+  updateExistingGraphics() {
+    const errors = this.checkForErrors();
+
+    if (errors.length > 0) {
+      this.draw();
+      return;
+    }
+
+    this.uniqueSegments = uniqueify(
+      this.visibleAndFetchedTiles()
+        .map(x => x.tileData)
+        .flat(),
+    );
+
+    console.log('ueg', this.uniqueSegments);
+    this.render();
   }
 
   /*
@@ -289,12 +329,13 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
     this.drawnRects = {};
 
     super.draw();
+    this.render();
   }
 
-  drawTile(tile) {
-    const graphics = tile.graphics;
+  render() {
+    const graphics = this.rectGraphics;
 
-    if (!graphics) {
+    if (!graphics || !this.uniqueSegments) {
       return;
     }
 
@@ -302,6 +343,7 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
     graphics.interactive = true;
     graphics.buttonMode = true;
     graphics.mouseup = evt => clickFunc(evt, this, graphics);
+    // graphics.mouseover = evt => console.log('hover');
 
     const stroke = colorToHex(
       this.options.rectangleDomainStrokeColor || 'black',
@@ -340,15 +382,16 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
     const yMin = this._yScale.range()[0];
     const yMax = this._yScale.range()[1];
 
-    if (!tile.tileData.length) return;
+    if (!this.uniqueSegments.length) return;
 
     // line needs to be scaled down so that it doesn't become huge
-    tile.tileData
+    this.uniqueSegments
       .filter(td => !(td.uid in this.drawnRects))
       .forEach(td => {
         drawAnnotation(
           this,
           graphics,
+          fill,
           td,
           minSquareSize,
           xMin,
@@ -363,6 +406,7 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
           drawAnnotation(
             this,
             graphics,
+            fill,
             td,
             minSquareSize,
             xMin,
@@ -409,7 +453,7 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
           output.appendChild(gTile);
 
           if (uid in this.drawnRects) {
-            const rect = this.drawnRects[uid];
+            const rect = this.drawnRects[uid][1];
 
             const r = document.createElement('rect');
             r.setAttribute('x', rect.x);

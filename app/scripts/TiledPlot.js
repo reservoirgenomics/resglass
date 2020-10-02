@@ -322,13 +322,17 @@ class TiledPlot extends React.Component {
       }
 
       if (!inside) {
-        this.brushEl.call(this.brushCurrent.move, null);
-        this.brushEl = null;
-        this.props.apiPublish('annotationRemoved', this.annotationUid);
-        this.annotationUid = null;
-        this.annotationCreatedNotified = false;
+        this.cancelBrushes();
       }
     }
+  }
+
+  cancelBrushes() {
+    this.brushEl.call(this.brushCurrent.move, null);
+    this.brushEl = null;
+    this.props.apiPublish('annotationRemoved', this.annotationUid);
+    this.annotationUid = null;
+    this.annotationCreatedNotified = false;
   }
 
   enableBrushes() {

@@ -39,7 +39,7 @@ const TEXT_STYLE = {
   dropShadowBlur: 2,
 };
 
-const polyToPoly = (poly, kx, px, ky, py) => {
+export const polyToPoly = (poly, kx, px, ky, py) => {
   const newArr = [];
 
   while (poly.length) {
@@ -124,14 +124,14 @@ const scaleScalableGraphics = (graphics, xScale, drawnAtScale) => {
   graphics.position.x = -posOffset * tileK;
 };
 
-function uniqueify(elements) {
+export const uniqueify = elements => {
   const byUid = {};
   for (let i = 0; i < elements.length; i++) {
     byUid[elements[i].uid] = elements[i];
   }
 
   return Object.values(byUid);
-}
+};
 
 class BedLikeTrack extends HorizontalTiled1DPixiTrack {
   constructor(context, options) {
@@ -194,7 +194,6 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
       return;
     }
 
-    this.prevUniqueSegments = this.uniqueSegments;
     this.uniqueSegments = uniqueify(
       this.visibleAndFetchedTiles()
         .map(x => x.tileData)
@@ -601,9 +600,9 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
 
     const rowScale = scaleBand()
       .domain(range(maxRows))
-      .range([startY, endY])
-      .paddingOuter(0)
-      .paddingInner(0.3);
+      .range([startY, endY]);
+    // .paddingOuter(0.2);
+    // .paddingInner(0.3)
 
     this.allVisibleRects();
     let allRects = null;
