@@ -2,6 +2,7 @@ import boxIntersect from 'box-intersect';
 import { median, range } from 'd3-array';
 import { scaleBand, scaleLinear } from 'd3-scale';
 import classifyPoint from 'robust-point-in-polygon';
+import polygonArea from 'area-polygon';
 import { zoomIdentity } from 'd3-zoom';
 
 import HorizontalTiled1DPixiTrack from './HorizontalTiled1DPixiTrack';
@@ -39,6 +40,7 @@ const TEXT_STYLE = {
   dropShadowBlur: 2,
 };
 
+/** Scale a polygon * */
 export const polyToPoly = (poly, kx, px, ky, py) => {
   const newArr = [];
 
@@ -50,45 +52,61 @@ export const polyToPoly = (poly, kx, px, ky, py) => {
   return newArr;
 };
 
-/**
- * Event handler for when gene annotations are clicked on.
+/** Find out which rects are under a point.
+ *
+ * @param  {track} The track object
+ * @param  {x} x position to check (relative to track)
+ * @param  {y} y position to check (relative to track)
+ * @return {[]} An array of drawnRects that are under that point
  */
-const clickFunc = (evt, track) => {
+export const rectsAtPoint = (track, x, y) => {
   const drawnRects = Object.values(track.drawnRects);
+  const point = [x, y];
+  const payloads = [];
+  const g = track.rectGraphics;
+
+  for (const drawnRect of drawnRects) {
+    // copy the rect because polyToPoly is destructive
+    const rect = drawnRect[0].slice(0);
+
+    const poly = polyToPoly(
+      rect,
+      g.scale.x,
+      g.position.x,
+      g.scale.y,
+      g.position.y,
+    );
+    const area = polygonArea(poly);
+
+    if (classifyPoint(poly, point) === -1) {
+      const payload = drawnRect[1];
+      payload.area = area;
+
+      payloads.push(payload);
+    }
+  }
+
+  return payloads;
+};
+
+/**
+ * Event handler for when an item is clicked on
+ */
+export const clickFunc = (evt, track, trackType) => {
   const point = [
     evt.data.global.x - track.pMain.position.x,
     evt.data.global.y - track.pMain.position.y,
   ];
 
-  const payloads = [];
+  const payloads = rectsAtPoint(track, point[0], point[1]);
 
-  for (const rect of drawnRects) {
-    const arr = rect[0].slice(0);
-
-    const poly = polyToPoly(
-      arr,
-      track.rectGraphics.scale.x,
-      track.rectGraphics.position.x,
-      track.rectGraphics.scale.y,
-      track.rectGraphics.position.y,
-    );
-
-    // console.log('-------');
-    // for (const vert of poly) {
-    //   console.log('vert', vert);
-    // }
-    // console.log('point', point);
-    // console.log('-------');
-    // console.log('poly:', poly);
-
-    if (classifyPoint(poly, point) === -1) {
-      payloads.push(rect[1].value);
-    }
-  }
+  payloads.sort((a, b) => a.area - b.area);
 
   if (payloads.length) {
+    track.selectRect(payloads[0].value.uid);
+
     track.pubSub.publish('app.click', {
-      type: 'bedlike',
+      type: trackType,
       event: evt,
       payload: payloads,
     });
@@ -155,6 +173,8 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
 
     this.pMain.addChild(this.rectGraphics);
     this.pMain.addChild(this.textGraphics);
+
+    this.selectedRect = null;
 
     this.textWidths = {};
     this.textHeights = {};
@@ -244,6 +264,31 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
 
     this.updateTexts();
     this.render();
+  }
+
+  selectRect(uid) {
+    this.selectedRect = uid;
+
+    this.render();
+    this.animate();
+  }
+
+  /**
+   * @param  {x} x position of the evt relative to the track
+   * @param  {y} y position of the evt relative to the track
+   */
+  click(x, y) {
+    const rects = rectsAtPoint(this, x, y);
+
+    if (!rects.length) {
+      this.selectRect(null);
+    }
+  }
+
+  /** There was a click outside the track so unselect the
+   * the current selection */
+  clickOutside() {
+    this.selectRect(null);
   }
 
   updateTexts() {
@@ -681,7 +726,13 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
         }
 
         const opacity = this.options.fillOpacity || 0.3;
-        this.rectGraphics.lineStyle(1, colorToHex(fill), opacity);
+
+        if (this.selectedRect === td.uid) {
+          this.rectGraphics.lineStyle(3, 0, 0.75);
+        } else {
+          this.rectGraphics.lineStyle(1, colorToHex(fill), opacity);
+        }
+
         this.rectGraphics.beginFill(colorToHex(fill), opacity);
 
         let rectY = yMiddle - rectHeight / 2;
@@ -770,7 +821,7 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
 
     this.rectGraphics.interactive = true;
     this.rectGraphics.buttonMode = true;
-    this.rectGraphics.mouseup = evt => clickFunc(evt, this);
+    this.rectGraphics.mouseup = evt => clickFunc(evt, this, 'bedlike');
     // store the scale at while the tile was drawn at so that
     // we only resize it when redrawing
 

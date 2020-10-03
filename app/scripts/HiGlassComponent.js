@@ -4428,6 +4428,18 @@ class HiGlassComponent extends React.Component {
     const relTrackY =
       hoveredTrack && hoveredTrack.flipText ? relTrackPos[0] : relTrackPos[1];
 
+    for (const track of this.iterateOverTracks()) {
+      const trackObj = getTrackObjById(
+        this.tiledPlots,
+        track.viewId,
+        track.trackId,
+      );
+
+      if (!trackObj.respondsToPosition(relPos[0], relPos[1])) {
+        trackObj.clickOutside();
+      }
+    }
+
     for (const track of hoveredTracks) {
       track.click(relTrackX, relTrackY, evt);
     }
@@ -4643,8 +4655,8 @@ class HiGlassComponent extends React.Component {
                 ? this.state.addTrackPosition
                 : null
             }
-            apiPublish={this.apiPublish}
             addTrackPositionMenuPosition={addTrackPositionMenuPosition}
+            apiPublish={this.apiPublish}
             canvasElement={this.state.canvasElement}
             chooseTrackHandler={
               this.state.chooseTrackHandler
@@ -4984,11 +4996,11 @@ class HiGlassComponent extends React.Component {
             <ThemeProvider value={this.theme}>
               {this.state.modal}
               <canvas
-                onClick={this.canvasClickHandlerBound}
                 key={this.uid}
                 ref={c => {
                   this.canvasElement = c;
                 }}
+                onClick={this.canvasClickHandlerBound}
                 styleName="styles.higlass-canvas"
               />
               <div

@@ -1,8 +1,6 @@
 import createPubSub from 'pub-sub-es';
 
-import classifyPoint from 'robust-point-in-polygon';
-import polygonArea from 'area-polygon';
-import { polyToPoly, uniqueify } from './BedLikeTrack';
+import { rectsAtPoint, clickFunc, uniqueify } from './BedLikeTrack';
 import TiledPixiTrack from './TiledPixiTrack';
 
 // Services
@@ -12,64 +10,12 @@ import { tileProxy } from './services';
 import { colorToHex } from './utils';
 import { GLOBALS } from './configs';
 
-/**
- * Event handler for when gene annotations are clicked on.
- */
-const clickFunc = (evt, track, g) => {
-  const drawnRects = Object.values(track.drawnRects);
-  const point = [
-    evt.data.global.x - track.pMain.position.x,
-    evt.data.global.y - track.pMain.position.y,
-  ];
-
-  const payloads = [];
-
-  for (const drawnRect of drawnRects) {
-    console.log('drawnRect:', drawnRect);
-    // copy the rect because polyToPoly is destructive
-    const rect = drawnRect[0].slice(0);
-
-    const poly = polyToPoly(
-      rect,
-      g.scale.x,
-      g.position.x,
-      g.scale.y,
-      g.position.y,
-    );
-    const area = polygonArea(poly);
-
-    if (classifyPoint(poly, point) === -1) {
-      const payload = drawnRect[1];
-      payload.area = area;
-
-      payloads.push(payload);
-    }
-  }
-
-  payloads.sort((a, b) => a.area - b.area);
-  if (payloads.length) {
-    track.selected = payloads[0].value.uid;
-  }
-  console.log('payloads:', payloads);
-  console.log('track.selected:', track.selected);
-
-  if (payloads.length) {
-    track.pubSub.publish('app.click', {
-      type: '2d-rectangle-domains',
-      event: evt,
-      payload: payloads.map(x => x[1]),
-    });
-  }
-
-  // track.pubSub.publish('app.click', {
-  //   type: 'bedlike',
-  //   event,
-  // });
-};
-
 function drawAnnotation(
   track,
   graphics,
+  origStrokeWidth,
+  origStroke,
+  origStrokeOpacity,
   fill,
   td,
   minSquareSize,
@@ -143,6 +89,12 @@ function drawAnnotation(
   ) {
     if (drawnRect.width > minThres || drawnRect.height > minThres) {
       // console.log('x', drawnRect.x, 'y', drawnRect.y, 'xMin:', xMin, 'xMax', xMax);
+
+      if (track.selectedRect === td.uid) {
+        graphics.lineStyle(origStrokeWidth + 2, 0, 0.75);
+      } else {
+        graphics.lineStyle(origStrokeWidth, origStroke, origStrokeOpacity);
+      }
       graphics.drawPolygon([
         drawnRect.x,
         drawnRect.y, // ul
@@ -182,6 +134,7 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
 
     this.rectGraphics = new GLOBALS.PIXI.Graphics();
     this.pMain.addChild(this.rectGraphics);
+    this.selectedRect = null;
   }
 
   rerender(options, force) {
@@ -209,8 +162,32 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
         .flat(),
     );
 
-    console.log('ueg', this.uniqueSegments);
     this.render();
+  }
+
+  selectRect(uid) {
+    this.selectedRect = uid;
+
+    this.render();
+    this.animate();
+  }
+
+  /**
+   * @param  {x} x position of the evt relative to the track
+   * @param  {y} y position of the evt relative to the track
+   */
+  click(x, y) {
+    const rects = rectsAtPoint(this, x, y);
+
+    if (!rects.length) {
+      this.selectRect(null);
+    }
+  }
+
+  /** There was a click outside the track so unselect the
+   * the current selection */
+  clickOutside() {
+    this.selectRect(null);
   }
 
   /*
@@ -342,23 +319,24 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
     graphics.clear();
     graphics.interactive = true;
     graphics.buttonMode = true;
-    graphics.mouseup = evt => clickFunc(evt, this, graphics);
+    graphics.mouseup = evt => clickFunc(evt, this, '2d-rectangle-domains');
     // graphics.mouseover = evt => console.log('hover');
 
-    const stroke = colorToHex(
+    const origStroke = colorToHex(
       this.options.rectangleDomainStrokeColor || 'black',
     );
     const fill = colorToHex(this.options.rectangleDomainFillColor || 'grey');
 
-    graphics.lineStyle(
+    const origStrokeWidth =
       typeof this.options.rectangleDomainStrokeWidth !== 'undefined'
         ? this.options.rectangleDomainStrokeWidth
-        : 1,
-      stroke,
+        : 1;
+    const origStrokeOpacity =
       typeof this.options.rectangleDomainStrokeOpacity !== 'undefined'
         ? this.options.rectangleDomainStrokeOpacity
-        : 1,
-    );
+        : 1;
+
+    graphics.lineStyle(origStrokeWidth, origStroke, origStrokeOpacity);
     graphics.beginFill(
       fill,
       typeof this.options.rectangleDomainFillOpacity !== 'undefined'
@@ -391,6 +369,9 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
         drawAnnotation(
           this,
           graphics,
+          origStrokeWidth,
+          origStroke,
+          origStrokeOpacity,
           fill,
           td,
           minSquareSize,
@@ -406,6 +387,9 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
           drawAnnotation(
             this,
             graphics,
+            origStrokeWidth,
+            origStroke,
+            origStrokeOpacity,
             fill,
             td,
             minSquareSize,

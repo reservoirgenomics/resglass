@@ -86,6 +86,9 @@ class Track {
    * position */
   click(x, y, evt) {}
 
+  /** There was a click event outside the track * */
+  clickOutside() {}
+
   setDimensions(newDimensions) {
     this.dimensions = newDimensions;
 
