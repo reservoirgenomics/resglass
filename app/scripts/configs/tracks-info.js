@@ -1347,7 +1347,7 @@ export const TRACKS_INFO = [
       colorRange: ['#000000', '#652537', '#bf5458', '#fba273', '#ffffe0'],
       colorEncodingRange: false,
       separatePlusMinusStrands: true,
-      annotationHeight: 16,
+      annotationHeight: 'scaled',
     },
   },
   {

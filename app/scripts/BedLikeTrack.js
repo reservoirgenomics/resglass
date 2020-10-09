@@ -89,35 +89,6 @@ export const rectsAtPoint = (track, x, y) => {
   return payloads;
 };
 
-/**
- * Event handler for when an item is clicked on
- */
-export const clickFunc = (evt, track, trackType) => {
-  const point = [
-    evt.data.global.x - track.pMain.position.x,
-    evt.data.global.y - track.pMain.position.y,
-  ];
-
-  const payloads = rectsAtPoint(track, point[0], point[1]);
-
-  payloads.sort((a, b) => a.area - b.area);
-
-  if (payloads.length) {
-    track.selectRect(payloads[0].value.uid);
-
-    track.pubSub.publish('app.click', {
-      type: trackType,
-      event: evt,
-      payload: payloads,
-    });
-  }
-
-  // track.pubSub.publish('app.click', {
-  //   type: 'bedlike',
-  //   event,
-  // });
-};
-
 const hashFunc = function(s) {
   let hash = 0;
   if (s.length === 0) {
@@ -215,7 +186,7 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
     }
 
     this.uniqueSegments = uniqueify(
-      this.visibleAndFetchedTiles()
+      Object.values(this.fetchedTiles)
         .map(x => x.tileData)
         .flat(),
     );
@@ -271,18 +242,6 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
 
     this.render();
     this.animate();
-  }
-
-  /**
-   * @param  {x} x position of the evt relative to the track
-   * @param  {y} y position of the evt relative to the track
-   */
-  click(x, y) {
-    const rects = rectsAtPoint(this, x, y);
-
-    if (!rects.length) {
-      this.selectRect(null);
-    }
   }
 
   /** There was a click outside the track so unselect the
@@ -768,7 +727,9 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
 
         td.yMiddle = yMiddle;
 
-        if (!this.options.showTexts) continue;
+        if (!this.options.showTexts) {
+          continue;
+        }
 
         // don't draw too many texts so they don't bog down the frame rate
         if (i >= (+this.options.maxTexts || MAX_TEXTS)) continue;
@@ -819,9 +780,6 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
     const oldRectGraphics = this.rectGraphics;
     this.rectGraphics = new GLOBALS.PIXI.Graphics();
 
-    this.rectGraphics.interactive = true;
-    this.rectGraphics.buttonMode = true;
-    this.rectGraphics.mouseup = evt => clickFunc(evt, this, 'bedlike');
     // store the scale at while the tile was drawn at so that
     // we only resize it when redrawing
 
@@ -1007,31 +965,35 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
           return;
         }
 
-        const chrOffset = +td.chrOffset;
-        const txStart = +geneInfo[1] + chrOffset;
-        const txEnd = +geneInfo[2] + chrOffset;
-        const txMiddle = (txStart + txEnd) / 2;
+        if (!this.options.showTexts) {
+          text.visible = false;
+        } else {
+          const chrOffset = +td.chrOffset;
+          const txStart = +geneInfo[1] + chrOffset;
+          const txEnd = +geneInfo[2] + chrOffset;
+          const txMiddle = (txStart + txEnd) / 2;
 
-        text.position.x = this._xScale(txMiddle);
-        text.position.y =
-          text.nominalY * (this.vertK * this.prevK) + this.vertY;
+          text.position.x = this._xScale(txMiddle);
+          text.position.y =
+            text.nominalY * (this.vertK * this.prevK) + this.vertY;
 
-        text.visible = true;
-        // TODO, change the line below to true if texts are desired in the future
-        // text.visible = false;
-        const TEXT_MARGIN = 3;
-        this.allBoxes.push([
-          text.position.x - TEXT_MARGIN,
-          text.position.y - this.textHeights[td.uid] / 2,
-          text.position.x + this.textWidths[td.uid] + TEXT_MARGIN,
-          text.position.y + this.textHeights[td.uid] / 2,
-        ]);
-        this.allTexts.push({
-          importance: td.importance,
-          text,
-          caption: geneName,
-          strand: geneInfo[5],
-        });
+          text.visible = true;
+          // TODO, change the line below to true if texts are desired in the future
+          // text.visible = false;
+          const TEXT_MARGIN = 3;
+          this.allBoxes.push([
+            text.position.x - TEXT_MARGIN,
+            text.position.y - this.textHeights[td.uid] / 2,
+            text.position.x + this.textWidths[td.uid] + TEXT_MARGIN,
+            text.position.y + this.textHeights[td.uid] / 2,
+          ]);
+          this.allTexts.push({
+            importance: td.importance,
+            text,
+            caption: geneName,
+            strand: geneInfo[5],
+          });
+        }
       });
     }
 
