@@ -2,7 +2,6 @@ import boxIntersect from 'box-intersect';
 import { median, range } from 'd3-array';
 import { scaleBand, scaleLinear } from 'd3-scale';
 import classifyPoint from 'robust-point-in-polygon';
-import polygonArea from 'area-polygon';
 import { zoomIdentity } from 'd3-zoom';
 
 import HorizontalTiled1DPixiTrack from './HorizontalTiled1DPixiTrack';
@@ -50,43 +49,6 @@ export const polyToPoly = (poly, kx, px, ky, py) => {
   }
 
   return newArr;
-};
-
-/** Find out which rects are under a point.
- *
- * @param  {track} The track object
- * @param  {x} x position to check (relative to track)
- * @param  {y} y position to check (relative to track)
- * @return {[]} An array of drawnRects that are under that point
- */
-export const rectsAtPoint = (track, x, y) => {
-  const drawnRects = Object.values(track.drawnRects);
-  const point = [x, y];
-  const payloads = [];
-  const g = track.rectGraphics;
-
-  for (const drawnRect of drawnRects) {
-    // copy the rect because polyToPoly is destructive
-    const rect = drawnRect[0].slice(0);
-
-    const poly = polyToPoly(
-      rect,
-      g.scale.x,
-      g.position.x,
-      g.scale.y,
-      g.position.y,
-    );
-    const area = polygonArea(poly);
-
-    if (classifyPoint(poly, point) === -1) {
-      const payload = drawnRect[1];
-      payload.area = area;
-
-      payloads.push(payload);
-    }
-  }
-
-  return payloads;
 };
 
 const hashFunc = function(s) {

@@ -1,6 +1,8 @@
 import createPubSub from 'pub-sub-es';
 
-import { rectsAtPoint, clickFunc, uniqueify } from './BedLikeTrack';
+import { uniqueify } from './BedLikeTrack';
+import { rectsAtPoint, clickFunc } from './Annotations1dTrack';
+
 import TiledPixiTrack from './TiledPixiTrack';
 
 // Services

@@ -2,7 +2,7 @@
 import {
   MIN_HORIZONTAL_HEIGHT,
   MIN_VERTICAL_WIDTH,
-  TRACKS_INFO_BY_TYPE
+  TRACKS_INFO_BY_TYPE,
 } from '../configs';
 
 /**
@@ -43,7 +43,7 @@ const fillInMinWidths = tracks => {
           track.height =
             (trackInfo && trackInfo.defaultHeight) || MIN_HORIZONTAL_HEIGHT;
         }
-      })
+      }),
     );
 
   verticalLocations
@@ -65,7 +65,7 @@ const fillInMinWidths = tracks => {
           track.width =
             (trackInfo && trackInfo.defaultWidth) || MIN_VERTICAL_WIDTH;
         }
-      })
+      }),
     );
 
   return tracks;
