@@ -3962,6 +3962,25 @@ class HiGlassComponent extends React.Component {
       }
 
       visitPositionedTracks(v.tracks, track => {
+        if (this.state && this.state.views && this.state.views[v.uid]) {
+          // This whole song and dance is to ensure that if the higlass
+          // viewer is reinstantiated all of the tileset info meta that
+          // is stored with the track gets passed on.
+          // Necessary to make sure that the "Zoom Limit" option still
+          // functions.
+          const existingTrack = getTrackByUid(
+            this.state.views[v.uid].tracks,
+            track.uid,
+          );
+
+          if (existingTrack) {
+            track.maxZoom = existingTrack.maxZoom;
+            track.resolutions = existingTrack.resolutions;
+            track.binsPerDimension = existingTrack.binsPerDimension;
+            track.maxWidth = existingTrack.maxWidth;
+          }
+        }
+
         if (!track.uid) track.uid = slugid.nice();
 
         this.addCallbacks(v.uid, track);
