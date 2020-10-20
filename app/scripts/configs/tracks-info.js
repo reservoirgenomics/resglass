@@ -938,6 +938,8 @@ export const TRACKS_INFO = [
     thumbnail: svgArrowheadDomainsIcon,
     availableOptions: [
       'flipDiagonal',
+      'fontColor',
+      'fontSize',
       'labelPosition',
       'labelLeftMargin',
       'labelRightMargin',
@@ -952,9 +954,12 @@ export const TRACKS_INFO = [
       'rectangleDomainStrokeColor',
       'rectangleDomainOpacity',
       'minSquareSize',
+      'showTexts',
     ],
     defaultOptions: {
       flipDiagonal: 'none',
+      fontColor: 'black',
+      fontSize: '10',
       labelColor: 'black',
       labelPosition: 'hidden',
       labelLeftMargin: 0,
@@ -967,6 +972,7 @@ export const TRACKS_INFO = [
       rectangleDomainStrokeColor: 'black',
       rectangleDomainOpacity: 0.6,
       minSquareSize: 'none',
+      showTexts: false,
     },
   },
   {

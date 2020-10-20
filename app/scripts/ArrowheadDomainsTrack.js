@@ -1,6 +1,6 @@
 import createPubSub from 'pub-sub-es';
 
-import { uniqueify } from './BedLikeTrack';
+import { uniqueify, TextManager } from './BedLikeTrack';
 import { rectsAtPoint, clickFunc } from './Annotations1dTrack';
 
 import TiledPixiTrack from './TiledPixiTrack';
@@ -137,6 +137,13 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
     this.rectGraphics = new GLOBALS.PIXI.Graphics();
     this.pMain.addChild(this.rectGraphics);
     this.selectedRect = null;
+
+    this.vertY = 0;
+    this.vertK = 1;
+    this.prevY = 0;
+    this.prevK = 1;
+
+    this.textManager = new TextManager(this);
   }
 
   rerender(options, force) {
@@ -164,6 +171,11 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
         .flat(),
     );
 
+    this.textManager.updateTexts();
+
+    this.uniqueSegments.forEach(td =>
+      this.textManager.updateSingleText(td, 0, 0, td.fields[6]),
+    );
     this.render();
   }
 
@@ -318,6 +330,8 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
       return;
     }
 
+    this.textManager.startDraw();
+
     graphics.clear();
     graphics.interactive = true;
     graphics.buttonMode = true;
@@ -385,6 +399,16 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
           this.options.flipDiagonal === 'yes',
         );
 
+        this.textManager.lightUpdateSingleText(
+          td,
+          this._xScale((td.xStart + td.xEnd) / 2),
+          this._yScale((td.yStart + td.yEnd) / 2),
+          {
+            importance: td.importance,
+            caption: td[6],
+          },
+        );
+
         if (this.options.flipDiagonal && this.options.flipDiagonal === 'copy') {
           drawAnnotation(
             this,
@@ -404,6 +428,7 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
           );
         }
       });
+    this.textManager.hideOverlaps();
   }
 
   exportSVG() {

@@ -84,7 +84,7 @@ export const uniqueify = elements => {
   return Object.values(byUid);
 };
 
-class TextManager {
+export class TextManager {
   constructor(track) {
     this.track = track;
     this.texts = {};
@@ -102,18 +102,14 @@ class TextManager {
 
   hideOverlaps() {
     const [allBoxes, allTexts] = [this.allBoxes, this.allTexts];
-    console.log('hiding overlaps', allBoxes);
     // Calculate overlaps from the bounding boxes of the texts
-    // console.trace('hiding overlaps');
 
     boxIntersect(allBoxes, (i, j) => {
       if (allTexts[i].importance > allTexts[j].importance) {
         if (allTexts[i].text.visible) {
           allTexts[j].text.visible = false;
-          console.log('hiding:', j, 'visible:', i);
         }
       } else if (allTexts[j].text.visible) {
-        console.log('hiding:', i, 'visible:', j);
         allTexts[i].text.visible = false;
       }
     });
@@ -132,8 +128,6 @@ class TextManager {
 
     const TEXT_MARGIN = 3;
 
-    console.log('xMiddle:', xMiddle, 'yMiddle', yMiddle);
-
     text.position.x = xMiddle;
     text.position.y = yMiddle;
 
@@ -151,7 +145,7 @@ class TextManager {
     });
   }
 
-  updateSingleText(td, xMiddle, yMiddle) {
+  updateSingleText(td, xMiddle, yMiddle, textText) {
     if (!this.texts[td.uid]) return;
 
     const text = this.texts[td.uid];
@@ -170,6 +164,7 @@ class TextManager {
       fill: fontColor,
       fontSize: +this.track.options.fontSize || TEXT_STYLE.fontSize,
     };
+    text.text = textText;
 
     if (!(td.uid in this.textWidths)) {
       text.updateTransform();
@@ -194,6 +189,7 @@ class TextManager {
         (this.track.dimensions[1] - this.track.vertY) /
           (this.track.vertK * this.track.prevK),
       ];
+
       const yRangeWidth = yRange[1] - yRange[0];
       yRange = [yRange[0] - yRangeWidth * 0.8, yRange[1] + yRangeWidth * 0.8];
 
@@ -201,16 +197,11 @@ class TextManager {
         x => !x.yMiddle || (x.yMiddle > yRange[0] && x.yMiddle < yRange[1]),
       );
 
-      console.log('uniqueSegments', this.track.uniqueSegments);
-      console.log('relevantSegments', relevantSegments);
-
       if (!relevantSegments.length) {
         return;
       }
 
       relevantSegments.forEach((td, i) => {
-        const geneInfo = td.fields;
-
         // don't draw too many texts so they don't bog down the frame rate
         if (i >= (+this.track.options.maxTexts || MAX_TEXTS)) {
           return;
@@ -224,7 +215,6 @@ class TextManager {
           this.textGraphics.addChild(text);
         }
 
-        text.text = geneInfo[3];
         text.style = {
           ...TEXT_STYLE,
           fontSize: +this.track.options.fontSize || TEXT_STYLE.fontSize,
@@ -327,11 +317,6 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
     });
 
     this.uniqueSegments.sort((a, b) => b.importance - a.importance);
-    // console.log(
-    //   'this.uniqueSegments',
-    //   this.uniqueSegments.map(x => x.importance)
-    // );
-    // tile.tileData = tile.tileData.slice(0, MAX_TILE_ENTRIES);
 
     if (!this.options || !this.options.valueColumn) {
       // no value column so we can break entries up into separate
@@ -799,6 +784,7 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
           td,
           this._xScale(txMiddle),
           rectY + rectHeight / 2,
+          td.fields[3],
         );
       }
     }
@@ -1205,16 +1191,6 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
         this.rectGraphics.scale.y,
         this.rectGraphics.position.y,
       );
-
-      // console.log('mo point:', point);
-
-      // console.log('-----------');
-      // for (let vert of newArr) {
-      //   console.log('mo vert:', vert);
-      // }
-      // console.log('-------------');
-
-      // console.log('newArr:', newArr);
 
       const pc = classifyPoint(newArr, point);
 
