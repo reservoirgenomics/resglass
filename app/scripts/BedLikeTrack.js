@@ -84,17 +84,185 @@ export const uniqueify = elements => {
   return Object.values(byUid);
 };
 
+class TextManager {
+  constructor(track) {
+    this.track = track;
+    this.texts = {};
+
+    // store a list of already created texts so that we don't
+    // have to recreate new ones each time
+    this.textsList = [];
+
+    this.textWidths = {};
+    this.textHeights = {};
+
+    this.textGraphics = new GLOBALS.PIXI.Graphics();
+    this.track.pMain.addChild(this.textGraphics);
+  }
+
+  hideOverlaps() {
+    const [allBoxes, allTexts] = [this.allBoxes, this.allTexts];
+    console.log('hiding overlaps', allBoxes);
+    // Calculate overlaps from the bounding boxes of the texts
+    // console.trace('hiding overlaps');
+
+    boxIntersect(allBoxes, (i, j) => {
+      if (allTexts[i].importance > allTexts[j].importance) {
+        if (allTexts[i].text.visible) {
+          allTexts[j].text.visible = false;
+          console.log('hiding:', j, 'visible:', i);
+        }
+      } else if (allTexts[j].text.visible) {
+        console.log('hiding:', i, 'visible:', j);
+        allTexts[i].text.visible = false;
+      }
+    });
+  }
+
+  startDraw() {
+    this.allBoxes = [];
+    this.allTexts = [];
+  }
+
+  lightUpdateSingleText(td, xMiddle, yMiddle, textInfo) {
+    if (!this.texts[td.uid]) return;
+    if (!this.track.options.showTexts) return;
+
+    const text = this.texts[td.uid];
+
+    const TEXT_MARGIN = 3;
+
+    console.log('xMiddle:', xMiddle, 'yMiddle', yMiddle);
+
+    text.position.x = xMiddle;
+    text.position.y = yMiddle;
+
+    text.visible = true;
+    this.allBoxes.push([
+      text.position.x - TEXT_MARGIN,
+      text.position.y - this.textHeights[td.uid] / 2,
+      text.position.x + this.textWidths[td.uid] + TEXT_MARGIN,
+      text.position.y + this.textHeights[td.uid] / 2,
+    ]);
+
+    this.allTexts.push({
+      text,
+      ...textInfo,
+    });
+  }
+
+  updateSingleText(td, xMiddle, yMiddle) {
+    if (!this.texts[td.uid]) return;
+
+    const text = this.texts[td.uid];
+
+    text.position.x = xMiddle;
+    text.position.y = yMiddle;
+    text.nominalY = yMiddle;
+
+    const fontColor =
+      this.track.options.fontColor !== undefined
+        ? colorToHex(this.track.options.fontColor)
+        : 'black';
+
+    text.style = {
+      ...TEXT_STYLE,
+      fill: fontColor,
+      fontSize: +this.track.options.fontSize || TEXT_STYLE.fontSize,
+    };
+
+    if (!(td.uid in this.textWidths)) {
+      text.updateTransform();
+      const textWidth = text.getBounds().width;
+      const textHeight = text.getBounds().height;
+
+      // the text size adjustment compensates for the extra
+      // size that the show gives it
+      const TEXT_SIZE_ADJUSTMENT = 5;
+
+      this.textWidths[td.uid] = textWidth;
+      this.textHeights[td.uid] = textHeight - TEXT_SIZE_ADJUSTMENT;
+    }
+  }
+
+  updateTexts() {
+    if (this.track.options.showTexts) {
+      this.texts = {};
+
+      let yRange = [
+        (0 - this.track.vertY) / (this.track.vertK * this.track.prevK),
+        (this.track.dimensions[1] - this.track.vertY) /
+          (this.track.vertK * this.track.prevK),
+      ];
+      const yRangeWidth = yRange[1] - yRange[0];
+      yRange = [yRange[0] - yRangeWidth * 0.8, yRange[1] + yRangeWidth * 0.8];
+
+      const relevantSegments = this.track.uniqueSegments.filter(
+        x => !x.yMiddle || (x.yMiddle > yRange[0] && x.yMiddle < yRange[1]),
+      );
+
+      console.log('uniqueSegments', this.track.uniqueSegments);
+      console.log('relevantSegments', relevantSegments);
+
+      if (!relevantSegments.length) {
+        return;
+      }
+
+      relevantSegments.forEach((td, i) => {
+        const geneInfo = td.fields;
+
+        // don't draw too many texts so they don't bog down the frame rate
+        if (i >= (+this.track.options.maxTexts || MAX_TEXTS)) {
+          return;
+        }
+
+        let text = this.textsList[i];
+
+        if (!text) {
+          text = new GLOBALS.PIXI.Text();
+          this.textsList.push(text);
+          this.textGraphics.addChild(text);
+        }
+
+        text.text = geneInfo[3];
+        text.style = {
+          ...TEXT_STYLE,
+          fontSize: +this.track.options.fontSize || TEXT_STYLE.fontSize,
+        };
+
+        // geneInfo[3] is the gene symbol
+
+        if (this.flipText) {
+          text.scale.x = -1;
+        }
+
+        text.anchor.x = 0.5;
+        text.anchor.y = 0.5;
+
+        this.texts[td.uid] = text;
+      });
+
+      while (
+        this.textsList.length >
+        Math.min(
+          relevantSegments.length,
+          +this.track.options.maxTexts || MAX_TEXTS,
+        )
+      ) {
+        const text = this.textsList.pop();
+        this.textGraphics.removeChild(text);
+      }
+    }
+  }
+}
+
 class BedLikeTrack extends HorizontalTiled1DPixiTrack {
   constructor(context, options) {
     super(context, options);
 
     this.valueScaleTransform = zoomIdentity;
 
-    this.texts = {};
-
-    // store a list of already created texts so that we don't
-    // have to recreate new ones each time
-    this.textsList = [];
+    this.textManager = new TextManager(this);
 
     this.vertY = 1;
     this.vertK = 0;
@@ -102,15 +270,9 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
     this.prevK = 1;
 
     this.rectGraphics = new GLOBALS.PIXI.Graphics();
-    this.textGraphics = new GLOBALS.PIXI.Graphics();
-
     this.pMain.addChild(this.rectGraphics);
-    this.pMain.addChild(this.textGraphics);
 
     this.selectedRect = null;
-
-    this.textWidths = {};
-    this.textHeights = {};
 
     this.uniqueSegments = [];
   }
@@ -195,7 +357,7 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
     this.plusStrandRows = plusStrandRows;
     this.minusStrandRows = minusStrandRows;
 
-    this.updateTexts();
+    this.textManager.updateTexts();
     this.render();
   }
 
@@ -210,69 +372,6 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
    * the current selection */
   clickOutside() {
     this.selectRect(null);
-  }
-
-  updateTexts() {
-    if (this.options.showTexts) {
-      this.texts = {};
-
-      let yRange = [
-        (0 - this.vertY) / (this.vertK * this.prevK),
-        (this.dimensions[1] - this.vertY) / (this.vertK * this.prevK),
-      ];
-      const yRangeWidth = yRange[1] - yRange[0];
-      yRange = [yRange[0] - yRangeWidth * 0.8, yRange[1] + yRangeWidth * 0.8];
-
-      const relevantSegments = this.uniqueSegments.filter(
-        x => !x.yMiddle || (x.yMiddle > yRange[0] && x.yMiddle < yRange[1]),
-      );
-
-      if (!relevantSegments.length) {
-        return;
-      }
-
-      relevantSegments.forEach((td, i) => {
-        const geneInfo = td.fields;
-
-        // don't draw too many texts so they don't bog down the frame rate
-        if (i >= (+this.options.maxTexts || MAX_TEXTS)) {
-          return;
-        }
-
-        let text = this.textsList[i];
-
-        if (!text) {
-          text = new GLOBALS.PIXI.Text();
-          this.textsList.push(text);
-          this.textGraphics.addChild(text);
-        }
-
-        text.text = geneInfo[3];
-        text.style = {
-          ...TEXT_STYLE,
-          fontSize: +this.options.fontSize || TEXT_STYLE.fontSize,
-        };
-
-        // geneInfo[3] is the gene symbol
-
-        if (this.flipText) {
-          text.scale.x = -1;
-        }
-
-        text.anchor.x = 0.5;
-        text.anchor.y = 0.5;
-
-        this.texts[td.uid] = text;
-      });
-
-      while (
-        this.textsList.length >
-        Math.min(relevantSegments.length, +this.options.maxTexts || MAX_TEXTS)
-      ) {
-        const text = this.textsList.pop();
-        this.textGraphics.removeChild(text);
-      }
-    }
   }
 
   initTile(tile) {}
@@ -696,41 +795,15 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
         // don't draw too many texts so they don't bog down the frame rate
         if (i >= (+this.options.maxTexts || MAX_TEXTS)) continue;
 
-        if (!this.texts[td.uid]) continue;
-
-        const text = this.texts[td.uid];
-
-        text.position.x = this._xScale(txMiddle);
-        text.position.y = rectY + rectHeight / 2;
-        text.nominalY = rectY + rectHeight / 2;
-
-        const fontColor =
-          this.options.fontColor !== undefined
-            ? colorToHex(this.options.fontColor)
-            : fill;
-
-        text.style = {
-          ...TEXT_STYLE,
-          fill: fontColor,
-          fontSize: +this.options.fontSize || TEXT_STYLE.fontSize,
-        };
-
-        if (!(geneInfo[3] in this.textWidths)) {
-          text.updateTransform();
-          const textWidth = text.getBounds().width;
-          const textHeight = text.getBounds().height;
-
-          // the text size adjustment compensates for the extra
-          // size that the show gives it
-          const TEXT_SIZE_ADJUSTMENT = 5;
-
-          this.textWidths[td.uid] = textWidth;
-          this.textHeights[td.uid] = textHeight - TEXT_SIZE_ADJUSTMENT;
-        }
+        this.textManager.updateSingleText(
+          td,
+          this._xScale(txMiddle),
+          rectY + rectHeight / 2,
+        );
       }
     }
 
-    this.updateTexts();
+    this.textManager.updateTexts();
   }
 
   render() {
@@ -899,8 +972,7 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
   draw() {
     super.draw();
 
-    this.allTexts = [];
-    this.allBoxes = [];
+    this.textManager.startDraw();
 
     // these values control vertical scaling and they
     // need to be set in the draw method otherwise when
@@ -921,74 +993,21 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
       this.uniqueSegments.forEach(td => {
         const geneInfo = td.fields;
         const geneName = geneInfo[3];
-        const text = this.texts[td.uid];
 
-        if (!text) {
-          return;
-        }
+        const xMiddle = this._xScale((td.xStart + td.xEnd) / 2);
+        const yMiddle =
+          this.textManager.texts[td.uid].nominalY * (this.vertK * this.prevK) +
+          this.vertY;
 
-        if (!this.options.showTexts) {
-          text.visible = false;
-        } else {
-          const chrOffset = +td.chrOffset;
-          const txStart = +geneInfo[1] + chrOffset;
-          const txEnd = +geneInfo[2] + chrOffset;
-          const txMiddle = (txStart + txEnd) / 2;
-
-          text.position.x = this._xScale(txMiddle);
-          text.position.y =
-            text.nominalY * (this.vertK * this.prevK) + this.vertY;
-
-          text.visible = true;
-          // TODO, change the line below to true if texts are desired in the future
-          // text.visible = false;
-          const TEXT_MARGIN = 3;
-          this.allBoxes.push([
-            text.position.x - TEXT_MARGIN,
-            text.position.y - this.textHeights[td.uid] / 2,
-            text.position.x + this.textWidths[td.uid] + TEXT_MARGIN,
-            text.position.y + this.textHeights[td.uid] / 2,
-          ]);
-          this.allTexts.push({
-            importance: td.importance,
-            text,
-            caption: geneName,
-            strand: geneInfo[5],
-          });
-        }
+        this.textManager.lightUpdateSingleText(td, xMiddle, yMiddle, {
+          importance: td.importance,
+          caption: geneName,
+          strand: geneInfo[5],
+        });
       });
     }
 
-    this.hideOverlaps(this.allBoxes, this.allTexts);
-  }
-
-  hideOverlaps(allBoxes, allTexts) {
-    // Calculate overlaps from the bounding boxes of the texts
-    // console.trace('hiding overlaps');
-
-    boxIntersect(allBoxes, (i, j) => {
-      if (allTexts[i].importance > allTexts[j].importance) {
-        if (allTexts[i].text.visible) {
-          allTexts[j].text.visible = false;
-          // console.log('hiding:', j, 'visible:', i);
-        }
-      } else if (allTexts[j].text.visible) {
-        // console.log('hiding:', i, 'visible:', j);
-        allTexts[i].text.visible = false;
-      }
-    });
-
-    // for (let i = 0; i < this.allTexts.length; i++) {
-    //   if (this.allTexts[i].text.visible) {
-    //     console.log(
-    //       'i',
-    //       i,
-    //       this.allTexts[i].text.visible,
-    //       this.allTexts[i].text.position.x,
-    //       this.allTexts[i].text.position.y
-    //     );
-    //   }
-    // }
+    this.textManager.hideOverlaps();
   }
 
   setPosition(newPosition) {
@@ -1065,8 +1084,8 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
 
         gTile.appendChild(r);
 
-        if (this.texts[td.uid]) {
-          const text = this.texts[td.uid];
+        if (this.textManager.texts[td.uid]) {
+          const text = this.textManager.texts[td.uid];
 
           if (!text.visible) {
             return;
