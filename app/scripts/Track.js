@@ -84,7 +84,13 @@ class Track {
 
   /** Capture click events. x and y are relative to the track
    * position */
-  click(x, y, evt) {}
+  click(x, y, evt) {
+    this.pubSub.publish('app.click', {
+      type: 'generic',
+      event: null,
+      payload: null,
+    });
+  }
 
   /** There was a click event outside the track * */
   clickOutside() {}

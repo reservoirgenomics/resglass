@@ -1,7 +1,7 @@
 import createPubSub from 'pub-sub-es';
 
 import { uniqueify, TextManager } from './BedLikeTrack';
-import { rectsAtPoint, clickFunc } from './Annotations1dTrack';
+import { rectsAtPoint } from './Annotations1dTrack';
 
 import TiledPixiTrack from './TiledPixiTrack';
 
@@ -193,8 +193,16 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
   click(x, y) {
     const rects = rectsAtPoint(this, x, y);
 
+    this.pubSub.publish('app.click', {
+      type: '2d-annotations',
+      event: null,
+      payload: rects,
+    });
+
     if (!rects.length) {
       this.selectRect(null);
+    } else {
+      this.selectRect(rects[0].value.uid);
     }
   }
 
@@ -333,10 +341,6 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
     this.textManager.startDraw();
 
     graphics.clear();
-    graphics.interactive = true;
-    graphics.buttonMode = true;
-    graphics.mouseup = evt => clickFunc(evt, this, '2d-rectangle-domains');
-    // graphics.mouseover = evt => console.log('hover');
 
     const origStroke = colorToHex(
       this.options.rectangleDomainStrokeColor || 'black',

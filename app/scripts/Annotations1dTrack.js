@@ -48,35 +48,6 @@ export const rectsAtPoint = (track, x, y) => {
   return payloads;
 };
 
-/**
- * Event handler for when an item is clicked on
- */
-export const clickFunc = (evt, track, trackType) => {
-  const point = [
-    evt.data.global.x - track.pMain.position.x,
-    evt.data.global.y - track.pMain.position.y,
-  ];
-
-  const payloads = rectsAtPoint(track, point[0], point[1]);
-
-  payloads.sort((a, b) => a.area - b.area);
-
-  if (payloads.length) {
-    track.selectRect(payloads[0].value.uid);
-
-    track.pubSub.publish('app.click', {
-      type: trackType,
-      event: evt,
-      payload: payloads,
-    });
-  }
-
-  // track.pubSub.publish('app.click', {
-  //   type: 'bedlike',
-  //   event,
-  // });
-};
-
 class Annotations1dTrack extends BedLikeTrack {
   constructor(context, options, isVertical) {
     super(context, options);
@@ -89,17 +60,21 @@ class Annotations1dTrack extends BedLikeTrack {
   click(x, y) {
     const rects = rectsAtPoint(this, x, y);
 
+    this.pubSub.publish('app.click', {
+      type: '1d-annotations',
+      event: null,
+      payload: rects,
+    });
+
     if (!rects.length) {
       this.selectRect(null);
+    } else {
+      this.selectRect(rects[0].value.uid);
     }
   }
 
   render() {
     super.render();
-
-    this.rectGraphics.interactive = true;
-    this.rectGraphics.buttonMode = true;
-    this.rectGraphics.mouseup = evt => clickFunc(evt, this, 'bedlike');
   }
 }
 
