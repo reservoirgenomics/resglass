@@ -192,6 +192,7 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
    */
   click(x, y) {
     const rects = rectsAtPoint(this, x, y);
+    rects.sort((a, b) => a.area - b.area);
 
     this.pubSub.publish('app.click', {
       type: '2d-annotations',
