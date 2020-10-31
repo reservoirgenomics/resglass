@@ -981,15 +981,18 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
         const geneName = geneInfo[3];
 
         const xMiddle = this._xScale((td.xStart + td.xEnd) / 2);
-        const yMiddle =
-          this.textManager.texts[td.uid].nominalY * (this.vertK * this.prevK) +
-          this.vertY;
+        if (this.textManager.texts[td.uid]) {
+          const yMiddle =
+            this.textManager.texts[td.uid].nominalY *
+              (this.vertK * this.prevK) +
+            this.vertY;
 
-        this.textManager.lightUpdateSingleText(td, xMiddle, yMiddle, {
-          importance: td.importance,
-          caption: geneName,
-          strand: geneInfo[5],
-        });
+          this.textManager.lightUpdateSingleText(td, xMiddle, yMiddle, {
+            importance: td.importance,
+            caption: geneName,
+            strand: geneInfo[5],
+          });
+        }
       });
     }
 

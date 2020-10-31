@@ -732,7 +732,7 @@ class TiledPixiTrack extends PixiTrack {
   }
 
   checkForErrors() {
-    const errors = this.visibleAndFetchedTiles()
+    const errors = Object.values(this.fetchedTiles)
       .map(
         x =>
           x.tileData && x.tileData.error && `${x.tileId}: ${x.tileData.error}`,
