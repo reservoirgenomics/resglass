@@ -40,7 +40,7 @@ const geneClickFunc = (event, track, payload) => {
   track.pubSub.publish('app.click', {
     type: 'gene-annotation',
     event,
-    payload
+    payload,
   });
 };
 
@@ -101,7 +101,7 @@ function externalInitTile(track, tile, options) {
     minusStrandColor,
     maxGeneEntries,
     maxFillerEntries,
-    maxTexts
+    maxTexts,
   } = options;
   // create texts
   tile.texts = {};
@@ -155,7 +155,7 @@ function externalInitTile(track, tile, options) {
     const text = new GLOBALS.PIXI.Text(geneName, {
       fontSize: `${fontSize}px`,
       fontFamily,
-      fill: colorToHex(fill)
+      fill: colorToHex(fill),
     });
     text.interactive = true;
 
@@ -182,7 +182,7 @@ function renderRects(
   color,
   alpha,
   centerY,
-  height
+  height,
 ) {
   const topY = centerY - height / 2;
   const FILLER_PADDING = 0;
@@ -205,7 +205,7 @@ function renderRects(
       xScale(td.xStart) - FILLER_PADDING,
       topY + height,
       xScale(td.xStart) - FILLER_PADDING,
-      topY
+      topY,
     ];
 
     graphics.interactive = true;
@@ -228,7 +228,7 @@ function drawExons(
   chrOffset,
   centerY,
   height,
-  strand
+  strand,
 ) {
   const topY = centerY - height / 2;
 
@@ -252,7 +252,7 @@ function drawExons(
     xStartPos + width,
     yMiddle + EXON_LINE_HEIGHT / 2,
     xStartPos,
-    yMiddle + EXON_LINE_HEIGHT / 2
+    yMiddle + EXON_LINE_HEIGHT / 2,
   ];
   graphics.drawPolygon(poly);
   polys.push(poly);
@@ -273,7 +273,7 @@ function drawExons(
         j + GENE_MINI_TRIANGLE_HEIGHT / 2,
         yMiddle,
         j,
-        yMiddle + GENE_MINI_TRIANGLE_HEIGHT / 2
+        yMiddle + GENE_MINI_TRIANGLE_HEIGHT / 2,
       ];
     } else {
       poly = [
@@ -282,7 +282,7 @@ function drawExons(
         j - GENE_MINI_TRIANGLE_HEIGHT / 2,
         yMiddle,
         j,
-        yMiddle + GENE_MINI_TRIANGLE_HEIGHT / 2
+        yMiddle + GENE_MINI_TRIANGLE_HEIGHT / 2,
       ];
     }
 
@@ -298,7 +298,7 @@ function drawExons(
     const xStart = track._xScale(exonStart);
     const localWidth = Math.max(
       1,
-      track._xScale(exonEnd) - track._xScale(exonStart)
+      track._xScale(exonEnd) - track._xScale(exonStart),
     );
 
     // we're not going to draw rectangles over the arrowhead
@@ -320,7 +320,7 @@ function drawExons(
         Math.min(xStart, maxX),
         topY + height,
         Math.min(xStart, maxX),
-        topY
+        topY,
       ];
     } else {
       minX = xStartPos + pointerWidth;
@@ -334,7 +334,7 @@ function drawExons(
         Math.max(xStart, minX),
         topY + height,
         Math.max(xStart, minX),
-        topY
+        topY,
       ];
     }
 
@@ -355,7 +355,7 @@ function renderGeneSymbols(
   color,
   alpha,
   centerY,
-  height
+  height,
 ) {
   const topY = centerY - height / 2;
 
@@ -384,7 +384,7 @@ function renderGeneSymbols(
         pointerEnd,
         topY + track.geneRectHeight / 2,
         pointerStart,
-        topY + track.geneRectHeight
+        topY + track.geneRectHeight,
       ];
     } else {
       const pointerStart = Math.min(xEnd, xStart + pointerWidth);
@@ -396,7 +396,7 @@ function renderGeneSymbols(
         pointerEnd,
         topY + track.geneRectHeight / 2,
         pointerStart,
-        topY + track.geneRectHeight
+        topY + track.geneRectHeight,
       ];
     }
 
@@ -414,7 +414,7 @@ function renderGeneExons(
   color,
   alpha,
   centerY,
-  height
+  height,
 ) {
   genes.forEach(gene => {
     const geneInfo = gene.fields;
@@ -441,8 +441,8 @@ function renderGeneExons(
         chrOffset, // not used for now because we have just one chromosome
         centerY,
         height,
-        gene.strand || gene.fields[5]
-      ).map(x => [x, gene.strand, gene])
+        gene.strand || gene.fields[5],
+      ).map(x => [x, gene.strand, gene]),
     );
   });
 }
@@ -456,7 +456,7 @@ function renderGenes(
   color,
   alpha,
   centerY,
-  height
+  height,
 ) {
   renderGeneSymbols(
     genes,
@@ -467,7 +467,7 @@ function renderGenes(
     color,
     alpha,
     centerY,
-    height
+    height,
   );
   renderGeneExons(
     genes,
@@ -478,7 +478,7 @@ function renderGenes(
     color,
     alpha,
     centerY,
-    height
+    height,
   );
 }
 
@@ -488,7 +488,7 @@ function renderGenes(
 function renderMask(track, tile) {
   const { tileX, tileWidth } = trackUtils.getTilePosAndDimensions(
     track.tilesetInfo,
-    tile.tileId
+    tile.tileId,
   );
 
   tile.rectMaskGraphics.clear();
@@ -544,7 +544,7 @@ class HorizontalGeneAnnotationsTrack extends HorizontalTiled1DPixiTrack {
       minusStrandColor: this.options.minusStrandColor,
       maxGeneEntries: MAX_GENE_ENTRIES,
       maxFillerEntries: MAX_FILLER_ENTRIES,
-      maxTexts: MAX_TEXTS
+      maxTexts: MAX_TEXTS,
     });
 
     this.renderTile(tile);
@@ -605,24 +605,24 @@ class HorizontalGeneAnnotationsTrack extends HorizontalTiled1DPixiTrack {
     const GENE_ALPHA = 0.3;
 
     fill['+'] = colorToHex(
-      this.options.plusStrandColor || DEFAULT_PLUS_STRAND_COLOR
+      this.options.plusStrandColor || DEFAULT_PLUS_STRAND_COLOR,
     );
     fill['-'] = colorToHex(
-      this.options.minusStrandColor || DEFAULT_MINUS_STRAND_COLOR
+      this.options.minusStrandColor || DEFAULT_MINUS_STRAND_COLOR,
     );
 
     let plusFillerRects = tile.tileData.filter(
-      td => td.type === 'filler' && td.strand === '+'
+      td => td.type === 'filler' && td.strand === '+',
     );
     let minusFillerRects = tile.tileData.filter(
-      td => td.type === 'filler' && td.strand === '-'
+      td => td.type === 'filler' && td.strand === '-',
     );
 
     const plusGenes = tile.tileData.filter(
-      td => td.type !== 'filler' && (td.strand === '+' || td.fields[5] === '+')
+      td => td.type !== 'filler' && (td.strand === '+' || td.fields[5] === '+'),
     );
     const minusGenes = tile.tileData.filter(
-      td => td.type !== 'filler' && (td.strand === '-' || td.fields[5] === '-')
+      td => td.type !== 'filler' && (td.strand === '-' || td.fields[5] === '-'),
     );
 
     flagOverlappingFillers(plusGenes, plusFillerRects);
@@ -648,7 +648,7 @@ class HorizontalGeneAnnotationsTrack extends HorizontalTiled1DPixiTrack {
       fill['+'],
       FILLER_RECT_ALPHA,
       plusStrandCenterY,
-      this.geneRectHeight
+      this.geneRectHeight,
     ];
     const minusRenderContext = [
       this,
@@ -658,7 +658,7 @@ class HorizontalGeneAnnotationsTrack extends HorizontalTiled1DPixiTrack {
       fill['-'],
       FILLER_RECT_ALPHA,
       minusStrandCenterY,
-      this.geneRectHeight
+      this.geneRectHeight,
     ];
 
     renderRects(plusFillerRects, ...plusRenderContext);
@@ -675,7 +675,7 @@ class HorizontalGeneAnnotationsTrack extends HorizontalTiled1DPixiTrack {
     Object.values(this.fetchedTiles).forEach(t => {
       trackUtils.stretchRects(this, t, [
         x => x.rectGraphics,
-        x => x.rectMaskGraphics
+        x => x.rectMaskGraphics,
       ]);
     });
 
@@ -686,8 +686,8 @@ class HorizontalGeneAnnotationsTrack extends HorizontalTiled1DPixiTrack {
         fill: colorToHex(
           text.strand === '-'
             ? this.options.minusStrandColor || DEFAULT_MINUS_STRAND_COLOR
-            : this.options.plusStrandColor || DEFAULT_PLUS_STRAND_COLOR
-        )
+            : this.options.plusStrandColor || DEFAULT_PLUS_STRAND_COLOR,
+        ),
       };
     }
   }
@@ -698,7 +698,7 @@ class HorizontalGeneAnnotationsTrack extends HorizontalTiled1DPixiTrack {
     const xZoomLevel = tileProxy.calculateZoomLevel(
       this._xScale,
       this.tilesetInfo.min_pos[0],
-      this.tilesetInfo.max_pos[0]
+      this.tilesetInfo.max_pos[0],
     );
 
     let zoomLevel = Math.min(xZoomLevel, this.maxZoom);
@@ -724,13 +724,13 @@ class HorizontalGeneAnnotationsTrack extends HorizontalTiled1DPixiTrack {
       .forEach(tile => {
         trackUtils.stretchRects(this, tile, [
           x => x.rectGraphics,
-          x => x.rectMaskGraphics
+          x => x.rectMaskGraphics,
         ]);
         tile.textBgGraphics.clear();
         tile.textBgGraphics.beginFill(
           typeof this.options.labelBackgroundColor !== 'undefined'
             ? colorToHex(this.options.labelBackgroundColor)
-            : WHITE_HEX
+            : WHITE_HEX,
         );
 
         // move the texts
@@ -806,7 +806,7 @@ class HorizontalGeneAnnotationsTrack extends HorizontalTiled1DPixiTrack {
                 textYMiddle - fontSizeHalf - 1,
                 text.position.x + tile.textHeights[geneId] / 2 + TEXT_MARGIN,
                 textYMiddle + fontSizeHalf - 1,
-                geneName
+                geneName,
               ]);
             } else {
               this.allBoxes.push([
@@ -814,7 +814,7 @@ class HorizontalGeneAnnotationsTrack extends HorizontalTiled1DPixiTrack {
                 textYMiddle - fontSizeHalf - 1,
                 text.position.x + tile.textWidths[geneId] / 2 + TEXT_MARGIN,
                 textYMiddle + fontSizeHalf - 1,
-                geneName
+                geneName,
               ]);
             }
 
@@ -822,7 +822,7 @@ class HorizontalGeneAnnotationsTrack extends HorizontalTiled1DPixiTrack {
               importance: +geneInfo[4],
               text,
               caption: geneName,
-              strand: geneInfo[5]
+              strand: geneInfo[5],
             });
 
             allTiles.push(tile.textBgGraphics);
@@ -846,7 +846,7 @@ class HorizontalGeneAnnotationsTrack extends HorizontalTiled1DPixiTrack {
           minX - width / 2,
           minY - height / 2,
           width,
-          height
+          height,
         );
       }
     });
@@ -947,7 +947,7 @@ class HorizontalGeneAnnotationsTrack extends HorizontalTiled1DPixiTrack {
     const output = document.createElement('g');
     output.setAttribute(
       'transform',
-      `translate(${this.position[0]},${this.position[1]})`
+      `translate(${this.position[0]},${this.position[1]})`,
     );
 
     track.appendChild(output);
@@ -961,7 +961,7 @@ class HorizontalGeneAnnotationsTrack extends HorizontalTiled1DPixiTrack {
           `translate(${tile.rectGraphics.position.x},
           ${tile.rectGraphics.position.y})
           scale(${tile.rectGraphics.scale.x},
-          ${tile.rectGraphics.scale.y})`
+          ${tile.rectGraphics.scale.y})`,
         );
 
         tile.allRects.forEach(rect => {
@@ -1017,7 +1017,7 @@ class HorizontalGeneAnnotationsTrack extends HorizontalTiled1DPixiTrack {
         g.appendChild(t);
         g.setAttribute(
           'transform',
-          `translate(${text.text.x},${text.text.y})scale(${text.text.scale.x},1)`
+          `translate(${text.text.x},${text.text.y})scale(${text.text.scale.x},1)`,
         );
         output.appendChild(g);
       });

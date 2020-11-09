@@ -286,6 +286,7 @@ export const TRACKS_INFO = [
       'trackBorderWidth',
       'trackBorderColor',
       'heatmapValueScaling',
+      'zeroValueColor',
     ],
   },
   {
