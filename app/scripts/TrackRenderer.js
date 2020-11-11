@@ -135,7 +135,7 @@ class TrackRenderer extends React.Component {
     // catch any zooming behavior within all of the tracks in this plot
     // this.zoomTransform = zoomIdentity();
     this.zoomBehavior = zoom()
-      .filter(() => {
+      .filter(event => {
         if (event.target.classList.contains('no-zoom')) {
           return false;
         }
@@ -1166,7 +1166,7 @@ class TrackRenderer extends React.Component {
     if (trackOrientation && event.sourceEvent) {
       // if somebody is holding down the shift key and is zooming over
       // a 1d track, try to apply value scale zooming
-      if (event.shiftKey || this.valueScaleZooming) {
+      if (event.altKey || this.valueScaleZooming) {
         if (event.sourceEvent.deltaY !== undefined) {
           this.valueScaleZoom(event, trackOrientation);
           return;
@@ -1269,7 +1269,7 @@ class TrackRenderer extends React.Component {
     if (event.sourceEvent) {
       this.zoomStartPos = pointer(event.sourceEvent, this.props.canvasElement);
 
-      if (event.sourceEvent.shiftKey) {
+      if (event.sourceEvent.altKey) {
         this.valueScaleZooming = true;
       }
     }
