@@ -520,6 +520,11 @@ class HorizontalGeneAnnotationsTrack extends HorizontalTiled1DPixiTrack {
     this.animate = animate;
     this.options = options;
 
+    // we're setting these functions to null so that value scale
+    // locking doesn't try to get values from them
+    this.minRawValue = null;
+    this.maxRawValue = null;
+
     this.fontSize = +this.options.fontSize || FONT_SIZE;
     this.geneLabelPos = this.options.geneLabelPosition || GENE_LABEL_POS;
     this.geneRectHeight =
