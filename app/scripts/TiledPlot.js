@@ -227,6 +227,52 @@ class TiledPlot extends React.Component {
     // );
   }
 
+  /** Get the data in the selection */
+  getTracksData(positionedTracks, extent) {
+    let tracks = [];
+
+    const allTrackObjs = this.listAllTrackObjects();
+
+    // get a list of viewconf track defs
+    for (const track of positionedTracks) {
+      if (track.track.contents) {
+        tracks = [...tracks, ...track.track.contents];
+      } else {
+        tracks = [...tracks, track.track];
+      }
+    }
+
+    // console.log('extent:', extent);
+
+    const trackDatas = {};
+
+    // get data
+    for (const track of tracks) {
+      if (track.type === 'heatmap') {
+        // console.log('trackDefObjs', this.trackRenderer.trackDefObjects);
+
+        const trackObj = allTrackObjs.filter(x => x.id === track.uid)[0];
+
+        const x1 = trackObj._xScale(extent[0][0]);
+        const x2 = trackObj._xScale(extent[1][0]);
+
+        const y1 = trackObj._yScale(extent[0][1]);
+        const y2 = trackObj._yScale(extent[1][1]);
+
+        const height = y2 - y1;
+        const width = x2 - x1;
+
+        const data = trackObj.getVisibleRectangleData(x1, y1, height, width);
+        const sumValue = data.data.reduce((a, b) => a + b, 0);
+        const mean = sumValue / data.data.length;
+
+        trackDatas[track.uid] = { mean };
+      }
+    }
+
+    return trackDatas;
+  }
+
   appZoomed() {
     if (this.brushCurrent && this.brushEl) {
       if (this.brushType === 'horizontal') {
@@ -457,19 +503,31 @@ class TiledPlot extends React.Component {
             ],
           ];
 
+          const tracksData = this.getTracksData(
+            positionedTracks.filter(t => t.track.position === 'center'),
+            this.brushSelection,
+          );
+
           apiPublish('annotationChanged', {
             annotationUid: this.annotationUid,
             extent: this.brushSelection,
+            data: tracksData,
           });
         });
 
         myBrush.on('end', evt => {
+          const tracksData = this.getTracksData(
+            positionedTracks.filter(t => t.track.position === 'center'),
+            this.brushSelection,
+          );
+
           if (!this.annotationCreatedNotified) {
             apiPublish('annotationCreated', {
               annotationUid: tiledPlot.annotationUid,
               track: track.track,
               viewUid: this.props.uid,
               extent: this.brushSelection,
+              data: tracksData,
             });
             this.annotationCreatedNotified = true;
           }
