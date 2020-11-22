@@ -266,7 +266,7 @@ class TiledPlot extends React.Component {
         const sumValue = data.data.reduce((a, b) => a + b, 0);
         const mean = sumValue / data.data.length;
 
-        trackDatas[track.uid] = { mean };
+        trackDatas[track.uid] = { name: track.options.name, mean };
       }
     }
 
