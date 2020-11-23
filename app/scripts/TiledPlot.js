@@ -1,5 +1,6 @@
 import { select, pointer } from 'd3-selection';
 import { brush, brushX, brushY } from 'd3-brush';
+import { format } from 'd3-format';
 
 import slugid from 'slugid';
 import React from 'react';
@@ -379,6 +380,15 @@ class TiledPlot extends React.Component {
     this.props.apiPublish('annotationRemoved', this.annotationUid);
     this.annotationUid = null;
     this.annotationCreatedNotified = false;
+
+    this.removeBrushText();
+  }
+
+  removeBrushText() {
+    select(this.divTiledPlot)
+      .selectAll('.brush-svg')
+      .selectAll('.data-values')
+      .remove();
   }
 
   enableBrushes() {
@@ -508,6 +518,30 @@ class TiledPlot extends React.Component {
             this.brushSelection,
           );
 
+          const dataValues = Object.values(tracksData)
+            .filter(x => x.mean !== undefined)
+            .map(x => x.mean);
+
+          if (dataValues.length) {
+            const selection = select(this.divTiledPlot)
+              .selectAll('.brush-svg')
+              .selectAll('.data-values')
+              .data(dataValues);
+
+            selection
+              .enter()
+              .append('text')
+              .classed('data-values', true);
+
+            const numFormat = format('.3f');
+
+            select(this.divTiledPlot)
+              .selectAll('.data-values')
+              .attr('x', event.selection[0][0])
+              .attr('y', event.selection[0][1])
+              .text(x => `mean: ${numFormat(x)}`);
+          }
+
           apiPublish('annotationChanged', {
             annotationUid: this.annotationUid,
             extent: this.brushSelection,
@@ -516,10 +550,14 @@ class TiledPlot extends React.Component {
         });
 
         myBrush.on('end', evt => {
-          const tracksData = this.getTracksData(
-            positionedTracks.filter(t => t.track.position === 'center'),
-            this.brushSelection,
-          );
+          let tracksData = {};
+
+          if (this.brushSelection && this.brushSelection[0].length) {
+            tracksData = this.getTracksData(
+              positionedTracks.filter(t => t.track.position === 'center'),
+              this.brushSelection,
+            );
+          }
 
           if (!this.annotationCreatedNotified) {
             apiPublish('annotationCreated', {
@@ -530,6 +568,8 @@ class TiledPlot extends React.Component {
               data: tracksData,
             });
             this.annotationCreatedNotified = true;
+          } else if (!evt.selection) {
+            this.removeBrushText();
           }
         });
       }
