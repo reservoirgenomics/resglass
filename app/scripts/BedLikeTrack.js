@@ -28,6 +28,7 @@ const FONT_SIZE = 14;
 // the label text should have a white outline so that it's more
 // visible against a similar colored background
 const TEXT_STYLE = {
+  align: 'center',
   fontSize: `${FONT_SIZE}px`,
   fontFamily: 'Arial',
   stroke: 'white',

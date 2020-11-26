@@ -1,4 +1,5 @@
 import createPubSub from 'pub-sub-es';
+import { format } from 'd3-format';
 
 import { uniqueify, TextManager } from './BedLikeTrack';
 import { rectsAtPoint } from './Annotations1dTrack';
@@ -11,6 +12,25 @@ import { tileProxy } from './services';
 // Utils
 import { colorToHex } from './utils';
 import { GLOBALS } from './configs';
+
+/** Get the text to be displayed for this annotation.
+ * Usually it's just the name but it can also include
+ * metadata */
+function annoText(td) {
+  let text = td.fields[6];
+
+  const numFormat = format('.3f');
+
+  if (td.meta) {
+    for (const meta of td.meta) {
+      if (meta.mean) {
+        text += `\nMean: ${numFormat(meta.mean)}`;
+      }
+    }
+  }
+
+  return text;
+}
 
 function drawAnnotation(
   track,
@@ -179,7 +199,7 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
     this.textManager.updateTexts();
 
     this.uniqueSegments.forEach(td =>
-      this.textManager.updateSingleText(td, 0, 0, td.fields[6]),
+      this.textManager.updateSingleText(td, 0, 0, annoText(td)),
     );
     this.render();
   }
@@ -415,7 +435,7 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
           this._yScale((td.yStart + td.yEnd) / 2),
           {
             importance: td.importance,
-            caption: td[6],
+            caption: annoText(td),
           },
         );
 
