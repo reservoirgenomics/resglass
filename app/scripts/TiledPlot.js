@@ -550,6 +550,8 @@ class TiledPlot extends React.Component {
             annotationUid: this.annotationUid,
             extent: this.brushSelection,
             data: tracksData,
+            track: track.track,
+            viewUid: this.props.uid,
           });
         });
 
