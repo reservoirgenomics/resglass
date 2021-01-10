@@ -5,6 +5,7 @@ import { uniqueify, TextManager } from './BedLikeTrack';
 import { rectsAtPoint } from './Annotations1dTrack';
 
 import TiledPixiTrack from './TiledPixiTrack';
+import { calculateZoomLevel } from './HeatmapTiledPixiTrack';
 
 // Services
 import { tileProxy } from './services';
@@ -110,8 +111,6 @@ function drawAnnotation(
     (dRyMax > yMin && dRyMax < yMax)
   ) {
     if (drawnRect.width > minThres || drawnRect.height > minThres) {
-      // console.log('x', drawnRect.x, 'y', drawnRect.y, 'xMin:', xMin, 'xMax', xMax);
-
       if (track.selectedRect === td.uid) {
         graphics.lineStyle(origStrokeWidth + 2, 0, 0.75);
       } else {
@@ -260,21 +259,7 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
   }
 
   calculateZoomLevel() {
-    const xZoomLevel = tileProxy.calculateZoomLevel(
-      this._xScale,
-      this.tilesetInfo.min_pos[0],
-      this.tilesetInfo.max_pos[0],
-    );
-    const yZoomLevel = tileProxy.calculateZoomLevel(
-      this._xScale,
-      this.tilesetInfo.min_pos[1],
-      this.tilesetInfo.max_pos[1],
-    );
-
-    let zoomLevel = Math.max(xZoomLevel, yZoomLevel);
-    zoomLevel = Math.min(zoomLevel, this.maxZoom);
-
-    return zoomLevel;
+    return calculateZoomLevel(this);
   }
 
   /**
@@ -302,23 +287,46 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
     this.zoomLevel = this.calculateZoomLevel();
     // this.zoomLevel = 0;
 
-    this.xTiles = tileProxy.calculateTiles(
-      this.zoomLevel,
-      this._xScale,
-      this.tilesetInfo.min_pos[0],
-      this.tilesetInfo.max_pos[0],
-      this.tilesetInfo.max_zoom,
-      this.tilesetInfo.max_width,
-    );
+    if (this.tilesetInfo.resolutions) {
+      const sortedResolutions = this.tilesetInfo.resolutions
+        .map(x => +x)
+        .sort((a, b) => b - a);
 
-    this.yTiles = tileProxy.calculateTiles(
-      this.zoomLevel,
-      this._yScale,
-      this.tilesetInfo.min_pos[1],
-      this.tilesetInfo.max_pos[1],
-      this.tilesetInfo.max_zoom,
-      this.tilesetInfo.max_width,
-    );
+      this.xTiles = tileProxy.calculateTilesFromResolution(
+        sortedResolutions[this.zoomLevel],
+        this._xScale,
+        this.tilesetInfo.min_pos[0],
+        this.tilesetInfo.max_pos[0],
+      );
+      this.yTiles = tileProxy.calculateTilesFromResolution(
+        sortedResolutions[this.zoomLevel],
+        this._yScale,
+        this.tilesetInfo.min_pos[0],
+        this.tilesetInfo.max_pos[0],
+      );
+    } else {
+      this.xTiles = tileProxy.calculateTiles(
+        this.zoomLevel,
+        this._xScale,
+        this.tilesetInfo.min_pos[0],
+        this.tilesetInfo.max_pos[0],
+        this.tilesetInfo.max_zoom,
+        this.tilesetInfo.max_width,
+      );
+
+      this.yTiles = tileProxy.calculateTiles(
+        this.zoomLevel,
+        this._yScale,
+        this.options.reverseYAxis
+          ? -this.tilesetInfo.max_pos[1]
+          : this.tilesetInfo.min_pos[1],
+        this.options.reverseYAxis
+          ? -this.tilesetInfo.min_pos[1]
+          : this.tilesetInfo.max_pos[1],
+        this.tilesetInfo.max_zoom,
+        this.tilesetInfo.max_width1 || this.tilesetInfo.max_width,
+      );
+    }
 
     const rows = this.xTiles;
     const cols = this.yTiles;
