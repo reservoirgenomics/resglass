@@ -32,11 +32,11 @@ class LeftTrackModifier {
         'transform',
         `translate(${this.moveToOrigin.position.x},${this.moveToOrigin.position.y})
                              rotate(90)
-                             scale(${this.moveToOrigin.scale.x},${this.moveToOrigin.scale.y})`
+                             scale(${this.moveToOrigin.scale.x},${this.moveToOrigin.scale.y})`,
       );
       this.originalTrack.gMain.attr(
         'transform',
-        `translate(${this.originalTrack.pBase.position.x},${this.originalTrack.pBase.position.y})`
+        `translate(${this.originalTrack.pBase.position.x},${this.originalTrack.pBase.position.y})`,
       );
     }
   }
@@ -74,11 +74,11 @@ class LeftTrackModifier {
         'transform',
         `translate(${this.moveToOrigin.position.x},${this.moveToOrigin.position.y})
                                  rotate(90)
-                                 scale(${this.moveToOrigin.scale.x},${this.moveToOrigin.scale.y})`
+                                 scale(${this.moveToOrigin.scale.x},${this.moveToOrigin.scale.y})`,
       );
       this.originalTrack.gMain.attr(
         'transform',
-        `translate(${this.originalTrack.pBase.position.x},${this.originalTrack.pBase.position.y})`
+        `translate(${this.originalTrack.pBase.position.x},${this.originalTrack.pBase.position.y})`,
       );
     }
   }
@@ -139,6 +139,10 @@ class LeftTrackModifier {
     return this.originalTrack.getMouseOverHtml(trackY, trackX);
   }
 
+  clickOutside() {
+    this.originalTrack.clickOutside();
+  }
+
   draw() {
     this.originalTrack.draw();
   }
@@ -150,7 +154,7 @@ class LeftTrackModifier {
     tx = 0,
     ty = 0,
     xPositionOffset = 0,
-    yPositionOffset = 0
+    yPositionOffset = 0,
   ) {
     this.xScale(newXScale);
     this.yScale(newYScale);
@@ -216,14 +220,14 @@ class LeftTrackModifier {
       'transform',
       `translate(${this.moveToOrigin.position.x},${this.moveToOrigin.position.y})
                              rotate(90)
-                             scale(${this.moveToOrigin.scale.x},${this.moveToOrigin.scale.y})`
+                             scale(${this.moveToOrigin.scale.x},${this.moveToOrigin.scale.y})`,
     );
 
     if (this.originalTrack.exportSVG) {
       const g = document.createElement('g');
       g.setAttribute(
         'transform',
-        `translate(${this.originalTrack.pBase.position.x}, ${this.originalTrack.pBase.position.y})`
+        `translate(${this.originalTrack.pBase.position.x}, ${this.originalTrack.pBase.position.y})`,
       );
 
       g.appendChild(this.originalTrack.exportSVG()[0]);
