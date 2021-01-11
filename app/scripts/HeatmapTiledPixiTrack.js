@@ -45,6 +45,10 @@ const COLORBAR_AREA_WIDTH =
   BRUSH_WIDTH +
   BRUSH_MARGIN;
 
+const binsPerTile = track => {
+  return track.tilesetInfo.bins_per_dimension || BINS_PER_TILE;
+};
+
 export const calculateZoomLevel = track => {
   const minX = track.tilesetInfo.min_pos[0];
   const maxX = track.tilesetInfo.max_pos[0];
@@ -74,14 +78,14 @@ export const calculateZoomLevel = track => {
       track._xScale,
       track.tilesetInfo.min_pos[0],
       track.tilesetInfo.max_pos[0],
-      track.binsPerTile(),
+      binsPerTile(track),
     );
 
     const yZoomLevel = tileProxy.calculateZoomLevel(
       track._xScale,
       track.tilesetInfo.min_pos[1],
       track.tilesetInfo.max_pos[1],
-      track.binsPerTile(),
+      binsPerTile(track),
     );
 
     zoomLevel = Math.max(xZoomLevel, yZoomLevel);
@@ -454,8 +458,8 @@ class HeatmapTiledPixiTrack extends TiledPixiTrack {
   tileDataToCanvas(pixData) {
     const canvas = document.createElement('canvas');
 
-    canvas.width = this.binsPerTile();
-    canvas.height = this.binsPerTile();
+    canvas.width = binsPerTile(this);
+    canvas.height = binsPerTile(this);
 
     const ctx = canvas.getContext('2d');
 
@@ -1010,10 +1014,6 @@ class HeatmapTiledPixiTrack extends TiledPixiTrack {
     this.dataLensSize = this.dataLensPadding * 2 + 1;
   }
 
-  binsPerTile() {
-    return this.tilesetInfo.bins_per_dimension || BINS_PER_TILE;
-  }
-
   /**
    * Get the data in the visible rectangle
    *
@@ -1036,11 +1036,11 @@ class HeatmapTiledPixiTrack extends TiledPixiTrack {
     const calculatedWidth = tileProxy.calculateTileWidth(
       this.tilesetInfo,
       zoomLevel,
-      this.binsPerTile(),
+      binsPerTile(this),
     );
 
     // BP resolution of a tile's bin (i.e., numbe of base pairs per bin / pixel)
-    const tileRes = calculatedWidth / this.binsPerTile();
+    const tileRes = calculatedWidth / binsPerTile(this);
 
     // the data domain of the currently visible region
     const xDomain = [this._xScale.invert(x), this._xScale.invert(x + width)];
@@ -1091,7 +1091,7 @@ class HeatmapTiledPixiTrack extends TiledPixiTrack {
       } = this.getTilePosAndDimensions(
         tile.tileData.zoomLevel,
         tilePos,
-        this.binsPerTile(),
+        binsPerTile(this),
       );
 
       // calculate the tile's position in bins
@@ -1151,10 +1151,10 @@ class HeatmapTiledPixiTrack extends TiledPixiTrack {
     super.initTile(tile);
 
     // prepare the data for fast retrieval in getVisibleRectangleData
-    if (tile.tileData.dense.length === this.binsPerTile() ** 2) {
+    if (tile.tileData.dense.length === binsPerTile(this) ** 2) {
       tile.dataArray = ndarray(Array.from(tile.tileData.dense), [
-        this.binsPerTile(),
-        this.binsPerTile(),
+        binsPerTile(this),
+        binsPerTile(this),
       ]);
 
       // Recompute DenseDataExtrema for diagonal tiles which have been mirrored
@@ -1419,9 +1419,9 @@ class HeatmapTiledPixiTrack extends TiledPixiTrack {
 
     const numSubsets = Math.min(
       NUM_PRECOMP_SUBSETS_PER_2D_TTILE,
-      this.binsPerTile(),
+      binsPerTile(this),
     );
-    const subsetSize = this.binsPerTile() / numSubsets;
+    const subsetSize = binsPerTile(this) / numSubsets;
 
     const upperLeftTile = this.visibleAndFetchedTiles().filter(
       tile => tile.tileId === minTilePosition[2],
@@ -1454,11 +1454,11 @@ class HeatmapTiledPixiTrack extends TiledPixiTrack {
     } = this.getTilePosAndDimensions(
       tile.tileData.zoomLevel,
       tilePos,
-      this.binsPerTile(),
+      binsPerTile(this),
     );
 
     const tileXScale = scaleLinear()
-      .domain([0, this.binsPerTile()])
+      .domain([0, binsPerTile(this)])
       .range([tileX, tileX + tileWidth]);
 
     const startX = Math.max(
@@ -1467,12 +1467,12 @@ class HeatmapTiledPixiTrack extends TiledPixiTrack {
     );
 
     const endX = Math.min(
-      this.binsPerTile(),
+      binsPerTile(this),
       Math.round(tileXScale.invert(this._xScale.invert(visibleX[1]))),
     );
 
     const tileYScale = scaleLinear()
-      .domain([0, this.binsPerTile()])
+      .domain([0, binsPerTile(this)])
       .range([tileY, tileY + tileHeight]);
 
     const startY = Math.max(
@@ -1481,7 +1481,7 @@ class HeatmapTiledPixiTrack extends TiledPixiTrack {
     );
 
     const endY = Math.min(
-      this.binsPerTile(),
+      binsPerTile(this),
       Math.round(tileYScale.invert(this._yScale.invert(visibleY[1]))),
     );
 
@@ -1811,7 +1811,7 @@ class HeatmapTiledPixiTrack extends TiledPixiTrack {
     /**
      * Get the tile's position in its coordinate system.
      */
-    const binsPerTile = binsPerTileIn || this.binsPerTile();
+    const _binsPerTile = binsPerTileIn || binsPerTile(this);
 
     if (this.tilesetInfo.resolutions) {
       const sortedResolutions = this.tilesetInfo.resolutions
@@ -1820,11 +1820,11 @@ class HeatmapTiledPixiTrack extends TiledPixiTrack {
 
       const chosenResolution = sortedResolutions[zoomLevel];
 
-      const tileWidth = chosenResolution * binsPerTile;
+      const tileWidth = chosenResolution * _binsPerTile;
       const tileHeight = tileWidth;
 
-      const tileX = chosenResolution * binsPerTile * tilePos[0];
-      const tileY = chosenResolution * binsPerTile * tilePos[1];
+      const tileX = chosenResolution * _binsPerTile * tilePos[0];
+      const tileY = chosenResolution * _binsPerTile * tilePos[1];
 
       return {
         tileX,
