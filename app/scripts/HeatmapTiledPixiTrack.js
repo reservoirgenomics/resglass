@@ -93,7 +93,7 @@ export const calculateZoomLevel = track => {
   }
 
   if (track.options && track.options.maxZoom) {
-    if (this.options.maxZoom >= 0) {
+    if (track.options.maxZoom >= 0) {
       zoomLevel = Math.min(track.options.maxZoom, zoomLevel);
     } else {
       console.error('Invalid maxZoom on track:', track);
