@@ -136,6 +136,10 @@ class LeftTrackModifier {
   }
 
   getMouseOverHtml(trackX, trackY) {
+    if (!this.originalTrack.getMouseOverHtml) {
+      return '';
+    }
+
     return this.originalTrack.getMouseOverHtml(trackY, trackX);
   }
 
