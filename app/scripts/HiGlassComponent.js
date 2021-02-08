@@ -4031,8 +4031,12 @@ class HiGlassComponent extends React.Component {
     this.apiPublish('rangeSelection', range);
   }
 
-  offViewChange(listenerId) {
-    this.viewChangeListener.splice(listenerId, 1);
+  offViewChange(callback) {
+    const index = this.viewChangeListener.indexOf(callback);
+
+    if (index > -1) {
+      this.viewChangeListener.splice(index, 1);
+    }
   }
 
   onViewChange(callback) {
