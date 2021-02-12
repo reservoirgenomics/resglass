@@ -171,6 +171,15 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
   }
 
   rerender(options, force) {
+    if (options.projectUid !== this.options.projectUid) {
+      // we're filtering by a new project id so we have to
+      // re-fetch the tiles
+      this.options = options;
+      this.fetchedTiles = {};
+      this.refreshTiles();
+      return;
+    }
+
     super.rerender(options, force);
 
     for (const tile of this.visibleAndFetchedTiles()) {
@@ -242,7 +251,7 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
    */
   tileToLocalId(tile) {
     // tile contains [zoomLevel, xPos, yPos]
-    return `${tile.join('.')}`;
+    return this.tileToRemoteId(tile);
   }
 
   /**
@@ -250,7 +259,13 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
    */
   tileToRemoteId(tile) {
     // tile contains [zoomLevel, xPos, yPos]
-    return `${tile.join('.')}`;
+    let tileId = `${tile.join('.')}`;
+
+    if (this.options.projectUid) {
+      tileId = `${tileId}.ui=${this.options.projectUid}`;
+    }
+
+    return tileId;
   }
 
   localToRemoteId(remoteId) {
@@ -466,6 +481,7 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
           );
         }
       });
+    this.textManager.updateTexts();
     this.textManager.hideOverlaps();
   }
 
