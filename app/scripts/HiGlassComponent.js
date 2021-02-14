@@ -1578,7 +1578,10 @@ class HiGlassComponent extends React.Component {
         this.canvasElement.width,
         this.canvasElement.height,
       );
-      img.src = `data:image/svg+xml;base64,${btoa(svgString)}`;
+
+      img.src = `data:image/svg+xml;base64,${btoa(
+        unescape(encodeURIComponent(svgString)),
+      )}`;
       img.onload = () => {
         const targetCanvas = document.createElement('canvas');
         // TODO: I have no idea why dimensions are doubled!

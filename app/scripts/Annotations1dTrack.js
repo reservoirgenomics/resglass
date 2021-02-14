@@ -1,15 +1,7 @@
-import { color } from 'd3-color';
 import polygonArea from 'area-polygon';
 import classifyPoint from 'robust-point-in-polygon';
 
 import BedLikeTrack, { polyToPoly } from './BedLikeTrack';
-
-// Maximum delay in ms between mousedown and mouseup that is registered as a
-// click. Note we need to use mousedown and mouseup as PIXI doesn't recognize
-// click events with out current setup. Since most UIs treat long clicks as
-// either something special or a cancelation we follow best practices and
-// implement a threshold on the delay as well.
-import { GLOBALS, MAX_CLICK_DELAY } from './configs';
 
 /** Find out which rects are under a point.
  *
@@ -51,6 +43,43 @@ export const rectsAtPoint = (track, x, y) => {
 class Annotations1dTrack extends BedLikeTrack {
   constructor(context, options, isVertical) {
     super(context, options);
+  }
+
+  rerender(options, force) {
+    if (options.projectUid !== this.options.projectUid) {
+      // we're filtering by a new project id so we have to
+      // re-fetch the tiles
+      this.options = options;
+      this.fetchedTiles = {};
+      this.refreshTiles();
+      return;
+    }
+
+    super.rerender(options, force);
+  }
+
+  /*
+   * The local tile identifier
+   */
+  tileToLocalId(tile) {
+    // tile contains [zoomLevel, xPos, yPos]
+    return this.tileToRemoteId(tile);
+  }
+
+  /**
+   * The tile identifier used on the server
+   */
+  tileToRemoteId(tile) {
+    // tile contains [zoomLevel, xPos, yPos]
+    let tileId = `${tile.join('.')}`;
+
+    if (this.options.projectUid) {
+      // include the projectUid in the options
+      // (resgen feature)
+      tileId = `${tileId}.ui=${this.options.projectUid}`;
+    }
+
+    return tileId;
   }
 
   /**
