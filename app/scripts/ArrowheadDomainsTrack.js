@@ -198,6 +198,10 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
       return;
     }
 
+    if (!this.areAllVisibleTilesLoaded()) {
+      return;
+    }
+
     this.uniqueSegments = uniqueify(
       this.visibleAndFetchedTiles()
         .map(x => x.tileData)

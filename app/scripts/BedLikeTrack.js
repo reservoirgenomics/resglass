@@ -198,9 +198,11 @@ export class TextManager {
         x => !x.yMiddle || (x.yMiddle > yRange[0] && x.yMiddle < yRange[1]),
       );
 
-      if (!relevantSegments.length) {
-        return;
-      }
+      // console.log('relevantSegments:', relevantSegments);
+
+      // if (!relevantSegments.length) {
+      //   return;
+      // }
 
       relevantSegments.forEach((td, i) => {
         // don't draw too many texts so they don't bog down the frame rate
