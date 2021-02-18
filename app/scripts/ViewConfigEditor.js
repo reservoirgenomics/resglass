@@ -12,13 +12,22 @@ import { timeout } from './utils';
 
 import '../styles/ViewConfigEditor.module.scss';
 
+/** Only highlight for shorter viewconfs because it's laggy for
+ * longer ones */
+const myHighlight = code => {
+  if (code.length < 40000) {
+    return highlight(code, languages.json);
+  }
+  return code;
+};
+
 class ViewConfigEditor extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
       code: props.viewConfig,
-      hide: false
+      hide: false,
     };
 
     this.handleChangeBound = this.handleChange.bind(this);
@@ -31,10 +40,10 @@ class ViewConfigEditor extends React.Component {
     this.pubSubs = [];
 
     this.pubSubs.push(
-      this.props.pubSub.subscribe('keydown', this.handleKeyDownBound)
+      this.props.pubSub.subscribe('keydown', this.handleKeyDownBound),
     );
     this.pubSubs.push(
-      this.props.pubSub.subscribe('keyup', this.handleKeyUpBound)
+      this.props.pubSub.subscribe('keyup', this.handleKeyUpBound),
     );
   }
 
@@ -49,14 +58,14 @@ class ViewConfigEditor extends React.Component {
 
   componentWillUnmount() {
     this.pubSubs.forEach(subscription =>
-      this.props.pubSub.unsubscribe(subscription)
+      this.props.pubSub.unsubscribe(subscription),
     );
     this.pubSubs = [];
   }
 
   handleChange(code) {
     this.setState({
-      code
+      code,
     });
   }
 
@@ -74,7 +83,7 @@ class ViewConfigEditor extends React.Component {
 
   handleKeyUp(event) {
     this.setState({
-      hide: false
+      hide: false,
     });
 
     if (event.key === 'Escape') {
@@ -92,13 +101,13 @@ class ViewConfigEditor extends React.Component {
 
   hide() {
     this.setState({
-      hide: true
+      hide: true,
     });
   }
 
   show() {
     this.setState({
-      hide: false
+      hide: false,
     });
   }
 
@@ -143,12 +152,12 @@ class ViewConfigEditor extends React.Component {
             ref={c => {
               this.editor = c;
             }}
-            highlight={code => highlight(code, languages.json)}
+            highlight={myHighlight}
             onValueChange={this.handleChangeBound}
             padding={10}
             style={{
               fontFamily: '"Fira code", "Fira Mono", monospace',
-              fontSize: 'inherit'
+              fontSize: 'inherit',
             }}
             value={this.state.code}
           />
@@ -164,7 +173,7 @@ ViewConfigEditor.propTypes = {
   onChange: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
   pubSub: PropTypes.object.isRequired,
-  viewConfig: PropTypes.object.isRequired
+  viewConfig: PropTypes.object.isRequired,
 };
 
 export default withPubSub(withModal(ViewConfigEditor));
