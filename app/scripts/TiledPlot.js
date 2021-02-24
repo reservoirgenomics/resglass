@@ -37,11 +37,11 @@ import {
   isWithin,
   sum,
   visitPositionedTracks,
+  getDefaultTracksForDatatype,
 } from './utils';
 
 // Configs
 import {
-  DEFAULT_TRACKS_FOR_DATATYPE,
   MOUSE_TOOL_TRACK_SELECT,
   MOUSE_TOOL_SELECT,
   TRACKS_INFO_BY_TYPE,
@@ -2086,33 +2086,15 @@ class TiledPlot extends React.Component {
    */
   getIdealizedTrackPositionsOverlay() {
     const evtJson = this.props.draggingHappening;
-    const datatype = evtJson.datatype;
+    const { datatype } = evtJson;
 
-    if (!(datatype in DEFAULT_TRACKS_FOR_DATATYPE) && !evtJson.defaultTracks) {
-      console.warn('unknown data type:', evtJson.higlassTrack);
-      return undefined;
-    }
+    const defaultTracks = getDefaultTracksForDatatype(
+      datatype,
+      evtJson.defaultTracks,
+    );
 
-    const orientationToPositions = {
-      '1d-horizontal': ['top', 'bottom', 'left', 'right'],
-      '2d': ['center'],
-      '1d-vertical': ['left', 'right'],
-    };
-
-    const defaultTracks = DEFAULT_TRACKS_FOR_DATATYPE[datatype] || {};
-
-    if (evtJson.defaultTracks) {
-      for (const trackType of evtJson.defaultTracks) {
-        if (!TRACKS_INFO_BY_TYPE[trackType]) {
-          console.warn('unknown track type', trackType);
-        } else {
-          for (const position of orientationToPositions[
-            TRACKS_INFO_BY_TYPE[trackType].orientation
-          ]) {
-            defaultTracks[position] = trackType;
-          }
-        }
-      }
+    if (!defaultTracks) {
+      return null;
     }
 
     const presentTracks = new Set(

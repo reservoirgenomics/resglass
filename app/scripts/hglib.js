@@ -12,13 +12,13 @@ export { default as ChromosomeInfo } from './ChromosomeInfo';
 export { default as HiGlassComponent } from './HiGlassComponent';
 export {
   default as HiGlassTrackComponent,
-  trackViewer
+  trackViewer,
 } from './HiGlassTrackComponent';
 
 export const tracks = {
   SVGTrack,
   TiledPixiTrack,
-  HorizontalGeneAnnotationsTrack
+  HorizontalGeneAnnotationsTrack,
 };
 
 export { default as schema } from '../schema.json';
@@ -29,7 +29,8 @@ export {
   waitForTilesLoaded,
   waitForTransitionsFinished,
   mountHGComponent,
-  getTrackObjectFromHGC
+  getTrackObjectFromHGC,
+  getDefaultTracksForDatatype,
 } from './utils';
 
 export const version = VERSION;
@@ -52,7 +53,7 @@ const launch = (element, config, options) => {
   const ref = React.createRef();
   ReactDOM.render(
     <HiGlassComponent ref={ref} options={options || {}} viewConfig={config} />,
-    element
+    element,
   );
   return ref.current;
 };
