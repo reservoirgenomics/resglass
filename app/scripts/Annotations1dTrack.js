@@ -89,17 +89,17 @@ class Annotations1dTrack extends BedLikeTrack {
   click(x, y) {
     const rects = rectsAtPoint(this, x, y);
 
-    this.pubSub.publish('app.click', {
-      type: '1d-annotations',
-      event: null,
-      payload: rects,
-    });
-
     if (!rects.length) {
       this.selectRect(null);
     } else {
       this.selectRect(rects[0].value.uid);
     }
+
+    return {
+      type: '1d-annotations',
+      event: null,
+      payload: rects,
+    };
   }
 
   render() {

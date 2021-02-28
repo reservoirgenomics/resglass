@@ -231,17 +231,17 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
     const rects = rectsAtPoint(this, x, y);
     rects.sort((a, b) => a.area - b.area);
 
-    this.pubSub.publish('app.click', {
-      type: '2d-annotations',
-      event: null,
-      payload: rects,
-    });
-
     if (!rects.length) {
       this.selectRect(null);
     } else {
       this.selectRect(rects[0].value.uid);
     }
+
+    return {
+      type: '2d-annotations',
+      event: null,
+      payload: rects,
+    };
   }
 
   /** There was a click outside the track so unselect the

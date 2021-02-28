@@ -33,6 +33,8 @@ export {
   getDefaultTracksForDatatype,
 } from './utils';
 
+export { TRACKS_INFO_BY_TYPE, OPTIONS_INFO } from './configs';
+
 export const version = VERSION;
 
 const launch = (element, config, options) => {

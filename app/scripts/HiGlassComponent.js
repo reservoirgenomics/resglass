@@ -2581,6 +2581,7 @@ class HiGlassComponent extends React.Component {
 
     if (hostTrack.type === 'combined') {
       hostTrack.contents.push(newTrack);
+      hostTrack.uid = slugid.nice();
 
       if (newTrack.type === 'heatmap') {
         // For stacked heatmaps we will adjust some options automatically for convenience
@@ -2607,6 +2608,8 @@ class HiGlassComponent extends React.Component {
     this.setState(prevState => ({
       views: prevState.views,
     }));
+
+    this.triggerViewChangeDb();
   }
 
   handleNoTrackAdded() {
@@ -4466,9 +4469,27 @@ class HiGlassComponent extends React.Component {
       }
     }
 
+    const clickReturns = [];
+
     for (const track of hoveredTracks) {
-      track.click(relTrackX, relTrackY, evt);
+      if (track.childTracks) {
+        for (const subtrack of track.childTracks) {
+          clickReturns.push({
+            trackUid: subtrack.context.trackUid,
+            viewUid: subtrack.context.viewUid,
+            data: subtrack.click(relTrackX, relTrackY, evt),
+          });
+        }
+      } else {
+        clickReturns.push({
+          trackUid: track.context.trackUid,
+          viewUid: track.context.viewUid,
+          data: track.click(relTrackX, relTrackY, evt),
+        });
+      }
     }
+
+    this.pubSub.publish('app.click', clickReturns);
   }
 
   /**

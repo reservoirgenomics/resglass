@@ -1499,11 +1499,21 @@ class TrackRenderer extends React.Component {
 
     const dataFetcher = getDataFetcher(dataConfig, this.props.pubSub);
 
+    const clickHandler = data => {
+      this.props.pubSub.publish('app.click', {
+        trackUid: track.uid,
+        viewUid: this.props.uid,
+        data,
+      });
+    };
     // To simplify the context creation via ES6 object shortcuts.
     const context = {
       id: track.uid,
+      trackUid: track.uid,
+      viewUid: this.props.uid,
       pubSub: this.props.pubSub,
       scene: this.pStage,
+      clickHandler,
       dataConfig,
       dataFetcher,
       getLockGroupExtrema: () => {
@@ -2039,6 +2049,7 @@ TrackRenderer.propTypes = {
   theme: PropTypes.symbol.isRequired,
   topHeight: PropTypes.number,
   topHeightNoGallery: PropTypes.number,
+  uid: PropTypes.string,
   viewOptions: PropTypes.object,
   width: PropTypes.number,
   xDomainLimits: PropTypes.array,
