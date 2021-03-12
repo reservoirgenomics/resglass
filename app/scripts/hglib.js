@@ -30,6 +30,7 @@ export {
   waitForTransitionsFinished,
   mountHGComponent,
   getTrackObjectFromHGC,
+  getTrackByUid,
   getDefaultTracksForDatatype,
 } from './utils';
 
