@@ -4707,7 +4707,8 @@ class HiGlassComponent extends React.Component {
             canvasElement={this.state.canvasElement}
             chooseTrackHandler={
               this.state.chooseTrackHandler
-                ? trackId => this.state.chooseTrackHandler(view.uid, trackId)
+                ? (trackId, evt) =>
+                    this.state.chooseTrackHandler(view.uid, trackId, evt)
                 : null
             }
             chromInfoPath={view.chromInfoPath}

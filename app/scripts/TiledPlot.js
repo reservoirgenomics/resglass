@@ -991,11 +991,11 @@ class TiledPlot extends React.Component {
     this.props.setOverTrackChooser(false);
   }
 
-  handleTrackPositionChosen(pTrack) {
+  handleTrackPositionChosen(pTrack, evt) {
     this.setState({
       mouseOverOverlayUid: null,
     });
-    this.props.chooseTrackHandler(pTrack.track.uid);
+    this.props.chooseTrackHandler(pTrack.track.uid, evt);
   }
 
   handleNoTrackAdded() {
@@ -2703,7 +2703,7 @@ class TiledPlot extends React.Component {
               // to choose an overlay track, the previously selected one isn't
               // automatically highlighted
 
-              onClick={() => this.handleTrackPositionChosen(pTrack)}
+              onClick={evt => this.handleTrackPositionChosen(pTrack, evt)}
               onDragEnter={evt => {
                 this.handleOverlayMouseEnter(pTrack.track.uid);
                 evt.preventDefault();
