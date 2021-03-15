@@ -4477,13 +4477,26 @@ class HiGlassComponent extends React.Component {
           clickReturns.push({
             trackUid: subtrack.context.trackUid,
             viewUid: subtrack.context.viewUid,
+            trackType: subtrack.context.trackType,
             data: subtrack.click(relTrackX, relTrackY, evt),
           });
         }
+
+        // add an event for the combined track
+        clickReturns.push({
+          trackUid: track.context.trackUid,
+          viewUid: track.context.viewUid,
+          trackType: track.context.trackType,
+          data: {
+            type: 'generic',
+            event: evt,
+          },
+        });
       } else {
         clickReturns.push({
           trackUid: track.context.trackUid,
           viewUid: track.context.viewUid,
+          trackType: track.context.trackType,
           data: track.click(relTrackX, relTrackY, evt),
         });
       }

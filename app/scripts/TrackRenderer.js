@@ -1503,13 +1503,16 @@ class TrackRenderer extends React.Component {
       this.props.pubSub.publish('app.click', {
         trackUid: track.uid,
         viewUid: this.props.uid,
+        trackType: track.type,
         data,
       });
     };
+
     // To simplify the context creation via ES6 object shortcuts.
     const context = {
       id: track.uid,
       trackUid: track.uid,
+      trackType: track.type,
       viewUid: this.props.uid,
       pubSub: this.props.pubSub,
       scene: this.pStage,
