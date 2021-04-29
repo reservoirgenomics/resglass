@@ -31,7 +31,7 @@ const calculateZoomLevelFromResolutions = (resolutions, scale) => {
   const trackWidth = scale.range()[1] - scale.range()[0];
 
   const binsDisplayed = sortedResolutions.map(
-    r => (scale.domain()[1] - scale.domain()[0]) / r
+    r => (scale.domain()[1] - scale.domain()[0]) / r,
   );
   const binsPerPixel = binsDisplayed.map(b => b / trackWidth);
 
@@ -42,7 +42,7 @@ const calculateZoomLevelFromResolutions = (resolutions, scale) => {
   if (displayableBinsPerPixel.length === 0) return 0;
 
   return binsPerPixel.indexOf(
-    displayableBinsPerPixel[displayableBinsPerPixel.length - 1]
+    displayableBinsPerPixel[displayableBinsPerPixel.length - 1],
   );
 };
 
@@ -60,7 +60,7 @@ const calculateZoomLevel = (scale, minX, maxX, binsPerTile) => {
 
   const zoomScale = Math.max(
     (maxX - minX) / (scale.domain()[1] - scale.domain()[0]),
-    1
+    1,
   );
 
   // fun fact: the number 384 is halfway between 256 and 512
@@ -70,7 +70,7 @@ const calculateZoomLevel = (scale, minX, maxX, binsPerTile) => {
 
   const addedZoom = Math.max(
     0,
-    Math.ceil(Math.log(rangeWidth / VIEW_RESOLUTION) / Math.LN2)
+    Math.ceil(Math.log(rangeWidth / VIEW_RESOLUTION) / Math.LN2),
   );
   let zoomLevel = Math.round(Math.log(zoomScale) / Math.LN2) + addedZoom;
 
@@ -78,7 +78,7 @@ const calculateZoomLevel = (scale, minX, maxX, binsPerTile) => {
 
   if (binsPerTile) {
     binsPerTileCorrection = Math.floor(
-      Math.log(256) / Math.log(2) - Math.log(binsPerTile) / Math.log(2)
+      Math.log(256) / Math.log(2) - Math.log(binsPerTile) / Math.log(2),
     );
   }
 
@@ -109,7 +109,7 @@ const calculate1DZoomLevel = (tilesetInfo, xScale, maxZoom) => {
       tilesetInfo.resolutions,
       xScale,
       tilesetInfo.min_pos[0],
-      tilesetInfo.max_pos[0] - 2
+      tilesetInfo.max_pos[0] - 2,
     );
 
     return zoomIndexX;
@@ -121,7 +121,7 @@ const calculate1DZoomLevel = (tilesetInfo, xScale, maxZoom) => {
     xScale,
     tilesetInfo.min_pos[0],
     tilesetInfo.max_pos[0],
-    tilesetInfo.bins_per_dimension || tilesetInfo.tile_size
+    tilesetInfo.bins_per_dimension || tilesetInfo.tile_size,
   );
 
   const zoomLevel = Math.min(xZoomLevel, maxZoom);
@@ -159,8 +159,8 @@ const calculateTiles = (zoomLevel, scale, minX, maxX, maxZoom, maxDim) => {
     Math.max(0, Math.floor((scale.domain()[0] - minX) / tileWidth)),
     Math.min(
       2 ** zoomLevelFinal,
-      Math.ceil((scale.domain()[1] - minX - epsilon) / tileWidth)
-    )
+      Math.ceil((scale.domain()[1] - minX - epsilon) / tileWidth),
+    ),
   );
 };
 
@@ -178,7 +178,7 @@ const calculateTilesFromResolution = (
   scale,
   minX,
   maxX = Number.MAX_VALUE,
-  pixelsPerTile = 256
+  pixelsPerTile = 256,
 ) => {
   const epsilon = 0.0000001;
   const tileWidth = resolution * pixelsPerTile;
@@ -186,17 +186,17 @@ const calculateTilesFromResolution = (
 
   const lowerBound = Math.max(
     0,
-    Math.floor((scale.domain()[0] - minX) / tileWidth)
+    Math.floor((scale.domain()[0] - minX) / tileWidth),
   );
   const upperBound = Math.ceil(
-    Math.min(maxX, scale.domain()[1] - minX - epsilon) / tileWidth
+    Math.min(maxX, scale.domain()[1] - minX - epsilon) / tileWidth,
   );
   let tileRange = range(lowerBound, upperBound);
 
   if (tileRange.length > MAX_TILES) {
     // too many tiles visible in this range
     console.warn(
-      `Too many visible tiles: ${tileRange.length} truncating to ${MAX_TILES}`
+      `Too many visible tiles: ${tileRange.length} truncating to ${MAX_TILES}`,
     );
     tileRange = tileRange.slice(0, MAX_TILES);
   }
@@ -224,7 +224,7 @@ const calculate1DVisibleTiles = (tilesetInfo, scale) => {
   const zoomLevel = calculate1DZoomLevel(
     tilesetInfo,
     scale,
-    tilesetInfo.max_zoom
+    tilesetInfo.max_zoom,
   );
 
   if (tilesetInfo.resolutions) {
@@ -236,7 +236,7 @@ const calculate1DVisibleTiles = (tilesetInfo, scale) => {
       sortedResolutions[zoomLevel],
       scale,
       tilesetInfo.min_pos[0],
-      tilesetInfo.max_pos[0]
+      tilesetInfo.max_pos[0],
     );
 
     const tiles = xTiles.map(x => [zoomLevel, x]);
@@ -252,7 +252,7 @@ const calculate1DVisibleTiles = (tilesetInfo, scale) => {
     tilesetInfo.min_pos[0],
     tilesetInfo.max_pos[0],
     tilesetInfo.max_zoom,
-    tilesetInfo.max_width
+    tilesetInfo.max_width,
   );
 
   const tiles = xTiles.map(x => [zoomLevel, x]);
@@ -417,7 +417,7 @@ const getTilePosAndDimensions = (tilesetInfo, tileId) => {
 
   return {
     tileX,
-    tileWidth
+    tileWidth,
   };
 };
 
@@ -425,35 +425,40 @@ const getTilePosAndDimensions = (tilesetInfo, tileId) => {
  * but if we do this too much, shapes (particularly arrowheads) get
  * distorted. This function keeps track of how stretched the track is
  * and redraws it if it becomes too distorted (tileK < 0.5 or tileK > 2) */
-function stretchRects(track, tile, graphicsAccessors) {
-  if (!tile.drawnAtScale) return;
+function stretchRects(track, graphicsAccessors) {
+  Object.values(track.fetchedTiles)
+    // tile hasn't been drawn properly because we likely got some
+    // bogus data from the server
+    .forEach(tile => {
+      if (!tile.drawnAtScale) return;
 
-  const dasRange = tile.drawnAtScale.range();
-  const tRange = track._xScale.range();
+      const dasRange = tile.drawnAtScale.range();
+      const tRange = track._xScale.range();
 
-  // check to make sure the track extent hasn't changed
-  if (dasRange[0] !== tRange[0] || dasRange[1] !== tRange[1]) {
-    track.renderTile(tile);
-    return;
-  }
+      // check to make sure the track extent hasn't changed
+      if (dasRange[0] !== tRange[0] || dasRange[1] !== tRange[1]) {
+        track.renderTile(tile);
+        return;
+      }
 
-  const tileK =
-    (tile.drawnAtScale.domain()[1] - tile.drawnAtScale.domain()[0]) /
-    (track._xScale.domain()[1] - track._xScale.domain()[0]);
+      const tileK =
+        (tile.drawnAtScale.domain()[1] - tile.drawnAtScale.domain()[0]) /
+        (track._xScale.domain()[1] - track._xScale.domain()[0]);
 
-  if (tileK > 2 || tileK < 0.5) {
-    // too stretched out, needs to be re-rendered
-    track.renderTile(tile);
-  } else {
-    // can be stretched a little bit, just need to set the scale
-    const newRange = track._xScale.domain().map(tile.drawnAtScale);
-    const posOffset = newRange[0];
+      if (tileK > 2 || tileK < 0.5) {
+        // too stretched out, needs to be re-rendered
+        track.renderTile(tile);
+      } else {
+        // can be stretched a little bit, just need to set the scale
+        const newRange = track._xScale.domain().map(tile.drawnAtScale);
+        const posOffset = newRange[0];
 
-    for (const graphicsAccessor of graphicsAccessors) {
-      graphicsAccessor(tile).scale.x = tileK;
-      graphicsAccessor(tile).x = -posOffset * tileK;
-    }
-  }
+        for (const graphicsAccessor of graphicsAccessors) {
+          graphicsAccessor(tile).scale.x = tileK;
+          graphicsAccessor(tile).x = -posOffset * tileK;
+        }
+      }
+    });
 }
 
 const trackUtils = {
@@ -463,7 +468,7 @@ const trackUtils = {
   movedY,
   getTilePosAndDimensions,
   stretchRects,
-  zoomedY
+  zoomedY,
 };
 
 export default trackUtils;
