@@ -371,7 +371,10 @@ export default class SeriesListMenu extends ContextMenuContainer {
         </ContextMenuItem>
 
         <ContextMenuItem
-          onClick={() => this.props.apiPublish('datasetInfo', this.props.track)}
+          onClick={() => {
+            this.props.apiPublish('datasetInfo', this.props.track);
+            this.props.closeMenu();
+          }}
           onMouseEnter={e => this.handleOtherMouseEnter(e)}
           styleName="context-menu-item"
         >
