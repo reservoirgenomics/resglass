@@ -2046,6 +2046,7 @@ class TiledPlot extends React.Component {
       return (
         <PopupMenu onMenuClosed={this.closeMenusBound}>
           <ViewContextMenu
+            apiPublish={this.props.apiPublish}
             closeMenu={this.closeMenusBound}
             coords={[this.state.contextMenuDataX, this.state.contextMenuDataY]}
             customItems={this.state.contextMenuCustomItems}
