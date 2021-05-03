@@ -2635,6 +2635,7 @@ class TiledPlot extends React.Component {
             ref={c => {
               this.configTrackMenu = c;
             }}
+            apiPublish={this.props.apiPublish}
             closeMenu={this.closeMenusBound}
             onAddDivisor={this.handleAddDivisorBound}
             onAddSeries={this.handleAddSeriesBound}

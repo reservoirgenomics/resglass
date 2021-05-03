@@ -712,6 +712,10 @@ const createApi = function api(context, pubSub) {
             apiPubSub.unsubscribe('cursorLocation', callback);
             break;
 
+          case 'datasetInfo':
+            apiPubSub.unsubscribe('datasetInfo', callback);
+            break;
+
           case 'location':
             self.offLocationChange(viewId, listenerId);
             break;
@@ -924,6 +928,9 @@ const createApi = function api(context, pubSub) {
 
           case 'cursorLocation':
             return apiPubSub.subscribe('cursorLocation', callback);
+
+          case 'datasetInfo':
+            return apiPubSub.subscribe('datasetInfo', callback);
 
           case 'location':
             // returns a set of scales (xScale, yScale) on every zoom event

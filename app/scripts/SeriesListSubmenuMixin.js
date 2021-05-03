@@ -18,18 +18,18 @@ const SeriesListSubmenuMixin = Mixin(
           if (this.state.orientation === 'left') {
             position = {
               left: this.state.left,
-              top: bbox.top
+              top: bbox.top,
             };
           } else {
             position = {
               left: this.state.left + bbox.width + 7,
-              top: bbox.top
+              top: bbox.top,
             };
           }
 
           const series = getAllTracksAndSubtracks(this.props.tracks);
           const selectedTrack = series.filter(
-            t => t.uid === this.state.submenuShown.uid
+            t => t.uid === this.state.submenuShown.uid,
           )[0];
 
           // for now we can't replace 'whole' tracks because they're
@@ -43,6 +43,7 @@ const SeriesListSubmenuMixin = Mixin(
               ref={c => {
                 this.seriesListMenu = c;
               }}
+              apiPublish={this.props.apiPublish}
               closeMenu={this.props.closeMenu}
               hostTrack={this.props.tracks[0]}
               onAddDivisor={this.props.onAddDivisor}
@@ -70,7 +71,7 @@ const SeriesListSubmenuMixin = Mixin(
         }
         return <div />;
       }
-    }
+    },
 );
 
 export default SeriesListSubmenuMixin;
