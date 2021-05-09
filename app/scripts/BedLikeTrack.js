@@ -302,6 +302,9 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
   updateExistingGraphics() {
     const errors = this.checkForErrors();
 
+    let plusStrandRows = [];
+    let minusStrandRows = [];
+
     if (errors.length > 0) {
       this.draw();
       return;
@@ -312,9 +315,6 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
         .map(x => x.tileData)
         .flat(),
     );
-
-    let plusStrandRows = [];
-    let minusStrandRows = [];
 
     this.uniqueSegments.forEach(td => {
       // A random importance helps with selective hiding
