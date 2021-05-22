@@ -1,6 +1,8 @@
 import createPubSub from 'pub-sub-es';
 import { format } from 'd3-format';
 
+import slugid from 'slugid';
+
 import { uniqueify, TextManager } from './BedLikeTrack';
 import { rectsAtPoint } from './Annotations1dTrack';
 
@@ -369,8 +371,29 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
   /**
    * Create whatever is needed to draw this tile.
    */
-  initTile(/* tile */) {
-    // this.drawTile(tile);
+  initTile(tile) {
+    // mirror all entries
+    const newEntries = [];
+    for (const entry of tile.tileData) {
+      const newEntry = JSON.parse(JSON.stringify(entry));
+
+      const xStart = newEntry.xStart;
+      const xEnd = newEntry.xEnd;
+
+      newEntry.xStart = newEntry.yStart;
+      newEntry.xEnd = newEntry.yEnd;
+
+      newEntry.yStart = xStart;
+      newEntry.yEnd = xEnd;
+
+      newEntry.uid = slugid.nice();
+
+      newEntries.push(newEntry);
+    }
+
+    for (const newEntry of newEntries) {
+      tile.tileData.push(newEntry);
+    }
   }
 
   destroyTile() {
