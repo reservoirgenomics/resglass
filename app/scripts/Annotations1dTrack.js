@@ -46,7 +46,7 @@ class Annotations1dTrack extends BedLikeTrack {
   }
 
   rerender(options, force) {
-    if (options.projectUid !== this.options.projectUid) {
+    if (options && options.projectUid !== this.options.projectUid) {
       // we're filtering by a new project id so we have to
       // re-fetch the tiles
       this.options = options;

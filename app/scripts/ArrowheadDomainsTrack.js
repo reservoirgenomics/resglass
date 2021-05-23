@@ -113,7 +113,7 @@ function drawAnnotation(
     (dRyMax > yMin && dRyMax < yMax)
   ) {
     if (drawnRect.width > minThres || drawnRect.height > minThres) {
-      if (track.selectedRect === td.uid) {
+      if (track.selectedRect === td.aUid) {
         graphics.lineStyle(origStrokeWidth + 2, 0, 0.75);
       } else {
         graphics.lineStyle(origStrokeWidth, origStroke, origStrokeOpacity);
@@ -231,12 +231,13 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
    */
   click(x, y) {
     const rects = rectsAtPoint(this, x, y);
+
     rects.sort((a, b) => a.area - b.area);
 
     if (!rects.length) {
       this.selectRect(null);
     } else {
-      this.selectRect(rects[0].value.uid);
+      this.selectRect(rects[0].value.aUid);
     }
 
     return {
@@ -387,6 +388,11 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
       newEntry.yEnd = xEnd;
 
       newEntry.uid = slugid.nice();
+
+      // keep track of the original uid so that we
+      // can find and select mirrored regions
+      entry.aUid = entry.uid;
+      newEntry.aUid = entry.uid;
 
       newEntries.push(newEntry);
     }

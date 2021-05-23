@@ -109,6 +109,13 @@ class LeftTrackModifier {
     return this;
   }
 
+  selectRect(uid) {
+    /**
+     * Used for annotation tracks to highlight a rectangle.
+     */
+    this.originalTrack.selectRect(uid);
+  }
+
   xScale(_) {
     /**
      * Either get or set the xScale
@@ -214,8 +221,16 @@ class LeftTrackModifier {
     this.originalTrack.refScalesChanged(refYScale, refXScale);
   }
 
+  get options() {
+    return this.originalTrack.options;
+  }
+
   rerender(options) {
     this.originalTrack.rerender(options);
+  }
+
+  animate() {
+    this.originalTrack.animate();
   }
 
   exportSVG() {
