@@ -264,6 +264,10 @@ class LeftTrackModifier {
       y <= this.dimensions[1] + this.position[1]
     );
   }
+
+  visibleAndFetchedTiles() {
+    return this.originalTrack.visibleAndFetchedTiles();
+  }
 }
 
 export default LeftTrackModifier;
