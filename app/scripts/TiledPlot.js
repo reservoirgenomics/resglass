@@ -613,7 +613,11 @@ class TiledPlot extends React.Component {
       return;
     }
 
-    const positionedTracks = this.positionedTracks();
+    // get all tracks and remove the ones that are in the
+    // "whole" position (e.g. rules)
+    const positionedTracks = this.positionedTracks().filter(
+      x => x.track.position !== 'whole',
+    );
 
     const brushes = this.createBrushes(positionedTracks);
     this.brushes = brushes;
