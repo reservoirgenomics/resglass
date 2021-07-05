@@ -9,7 +9,7 @@ class HorizontalLine1DPixiTrack extends HorizontalTiled1DPixiTrack {
   constructor(context, options) {
     // Fritz: this smells very hacky!
     const newContext = {
-      ...context
+      ...context,
     };
     newContext.onValueScaleChanged = () => {
       this.drawAxis(this.valueScale);
@@ -48,7 +48,7 @@ class HorizontalLine1DPixiTrack extends HorizontalTiled1DPixiTrack {
       trackX - markerWidth / 2,
       yPos - markerWidth / 2,
       markerWidth,
-      markerWidth
+      markerWidth,
     );
 
     this.animate();
@@ -118,7 +118,7 @@ class HorizontalLine1DPixiTrack extends HorizontalTiled1DPixiTrack {
 
     const { tileX, tileWidth } = this.getTilePosAndDimensions(
       tile.tileData.zoomLevel,
-      tile.tileData.tilePos
+      tile.tileData.tilePos,
     );
 
     const tileValues = tile.tileData.dense;
@@ -130,7 +130,7 @@ class HorizontalLine1DPixiTrack extends HorizontalTiled1DPixiTrack {
     const [vs, offsetValue] = this.makeValueScale(
       this.minValue(),
       this.medianVisibleValue,
-      this.maxValue()
+      this.maxValue(),
     );
 
     this.valueScale = vs;
@@ -145,20 +145,20 @@ class HorizontalLine1DPixiTrack extends HorizontalTiled1DPixiTrack {
     ) {
       console.warn(
         'Negative values present when using a log scale',
-        this.valueScale.domain()
+        this.valueScale.domain(),
       );
       return;
     }
 
     const stroke = colorToHex(
-      this.options.lineStrokeColor ? this.options.lineStrokeColor : 'blue'
+      this.options.lineStrokeColor ? this.options.lineStrokeColor : 'blue',
     );
     // this scale should go from an index in the data array to
     // a position in the genome coordinates
     if (!this.tilesetInfo.tile_size && !this.tilesetInfo.bins_per_dimension) {
       console.warn(
         'No tileset_info.tile_size or tileset_info.bins_per_dimension',
-        this.tilesetInfo
+        this.tilesetInfo,
       );
     }
 
@@ -300,7 +300,7 @@ class HorizontalLine1DPixiTrack extends HorizontalTiled1DPixiTrack {
     track.appendChild(output);
     output.setAttribute(
       'transform',
-      `translate(${this.position[0]},${this.position[1]})`
+      `translate(${this.position[0]},${this.position[1]})`,
     );
 
     const stroke = this.options.lineStrokeColor
@@ -333,7 +333,7 @@ class HorizontalLine1DPixiTrack extends HorizontalTiled1DPixiTrack {
     base.appendChild(gAxis);
     gAxis.setAttribute(
       'transform',
-      `translate(${this.axis.pAxis.position.x}, ${this.axis.pAxis.position.y})`
+      `translate(${this.axis.pAxis.position.x}, ${this.axis.pAxis.position.y})`,
     );
 
     // add the axis to the export
@@ -344,7 +344,7 @@ class HorizontalLine1DPixiTrack extends HorizontalTiled1DPixiTrack {
       // left axis are shown at the beginning of the plot
       const gDrawnAxis = this.axis.exportAxisLeftSVG(
         this.valueScale,
-        this.dimensions[1]
+        this.dimensions[1],
       );
       gAxis.appendChild(gDrawnAxis);
     } else if (
@@ -353,7 +353,7 @@ class HorizontalLine1DPixiTrack extends HorizontalTiled1DPixiTrack {
     ) {
       const gDrawnAxis = this.axis.exportAxisRightSVG(
         this.valueScale,
-        this.dimensions[1]
+        this.dimensions[1],
       );
       gAxis.appendChild(gDrawnAxis);
     }

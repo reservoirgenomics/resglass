@@ -113,7 +113,7 @@ export function workerSetPix(
   zeroValueColor = null,
   selectedRows = null,
   selectedRowsAggregationMode = null,
-  selectedRowsAggregationWithRelativeHeight = null
+  selectedRowsAggregationWithRelativeHeight = null,
 ) {
   let valueScale = null;
 
@@ -130,7 +130,7 @@ export function workerSetPix(
       console.warn(
         'Unknown value scale type:',
         valueScaleType,
-        ' Defaulting to linear'
+        ' Defaulting to linear',
       );
     }
     valueScale = scaleLinear()
@@ -146,7 +146,7 @@ export function workerSetPix(
     filteredSize =
       selectedItemsToSize(
         selectedRows,
-        selectedRowsAggregationWithRelativeHeight
+        selectedRowsAggregationWithRelativeHeight,
       ) * shape[1];
   }
 
@@ -187,7 +187,7 @@ export function workerSetPix(
       console.warn(
         'out of bounds rgbIdx:',
         rgbIdx,
-        ' (should be 0 <= rgbIdx <= 255)'
+        ' (should be 0 <= rgbIdx <= 255)',
       );
     }
 
@@ -245,7 +245,7 @@ export function workerSetPix(
             ) {
               setPixData(
                 pixRowI * shape[1] + colI, // pixData index
-                d // data point
+                d, // data point
               );
               pixRowI++;
             }
@@ -253,7 +253,7 @@ export function workerSetPix(
             // Set a single pixel, either representing a single row or an entire row group, if the vertical height for each group should be uniform (i.e. should not depend on group size).
             setPixData(
               pixRowI * shape[1] + colI, // pixData index
-              d // data point
+              d, // data point
             );
             pixRowI++;
           }
@@ -396,6 +396,14 @@ export function tileResponseToData(data, server, theseTileIds) {
         a = new Float32Array(arrayBuffer);
       }
 
+      // multivec data has a shape associated with it that needs to
+      // be considered when calculating extrema
+      if (data[key].shape) {
+        a.shape = data[key].shape;
+      } else {
+        a.shape = [1, a.length];
+      }
+
       const dde =
         data[key].tilePos.length === 2
           ? new DenseDataExtrema2D(a)
@@ -423,14 +431,14 @@ export function tileResponseToData(data, server, theseTileIds) {
 
 export function workerGetTiles(outUrl, server, theseTileIds, authHeader, done) {
   const headers = {
-    'content-type': 'application/json'
+    'content-type': 'application/json',
   };
 
   if (authHeader) headers.Authorization = authHeader;
 
   fetch(outUrl, {
     credentials: 'same-origin',
-    headers
+    headers,
   })
     .then(response => response.json())
     .then(data => {

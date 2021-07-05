@@ -17,6 +17,7 @@ import CombinedTrack from './CombinedTrack';
 import BedLikeTrack from './BedLikeTrack';
 import OverlayTrack from './OverlayTrack';
 
+import FilledLine from './FilledLine';
 import HorizontalLine1DPixiTrack from './HorizontalLine1DPixiTrack';
 import HorizontalPoint1DPixiTrack from './HorizontalPoint1DPixiTrack';
 import HorizontalMultivecTrack from './HorizontalMultivecTrack';
@@ -1588,6 +1589,9 @@ class TrackRenderer extends React.Component {
       case 'horizontal-line': // legacy, included for backwards compatiblity
       case 'vertical-line': // legacy, included for backwards compatiblity
         return new HorizontalLine1DPixiTrack(context, options);
+
+      case 'filled-line':
+        return new FilledLine(context, options);
 
       case 'point':
       case 'horizontal-point': // legacy, included for backwards compatiblity
