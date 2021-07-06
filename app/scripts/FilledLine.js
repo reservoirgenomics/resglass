@@ -117,9 +117,9 @@ class FilledLine extends HorizontalLine1DPixiTrack {
 
     tile.segments = [];
 
-    const minYs = [];
-    const maxYs = [];
-    const xs = [];
+    tile.minYs = [];
+    tile.maxYs = [];
+    tile.xs = [];
 
     for (let i = 0; i < tile.tileData.shape[0]; i++) {
       // for (let i = 0; i < 1; i++) {
@@ -127,9 +127,9 @@ class FilledLine extends HorizontalLine1DPixiTrack {
     }
 
     for (let j = 0; j < tile.tileData.shape[1]; j++) {
-      minYs.push(Number.MAX_SAFE_INTEGER);
-      maxYs.push(-Number.MAX_SAFE_INTEGER);
-      xs.push(this._xScale(tileXScale(j)));
+      tile.minYs.push(Number.MAX_SAFE_INTEGER);
+      tile.maxYs.push(-Number.MAX_SAFE_INTEGER);
+      tile.xs.push(this._xScale(tileXScale(j)));
     }
 
     // find minimum and maximum values
@@ -138,20 +138,17 @@ class FilledLine extends HorizontalLine1DPixiTrack {
 
       const first = segment[0];
 
-      if (first[1] < minYs[counter]) minYs[counter] = first[1];
-      if (first[1] > maxYs[counter]) maxYs[counter] = first[1];
+      if (first[1] < tile.minYs[counter]) tile.minYs[counter] = first[1];
+      if (first[1] > tile.maxYs[counter]) tile.maxYs[counter] = first[1];
 
       const rest = segment.slice(1);
       for (const point of rest) {
         counter += 1;
 
-        if (point[1] < minYs[counter]) minYs[counter] = point[1];
-        if (point[1] > maxYs[counter]) maxYs[counter] = point[1];
+        if (point[1] < tile.minYs[counter]) tile.minYs[counter] = point[1];
+        if (point[1] > tile.maxYs[counter]) tile.maxYs[counter] = point[1];
       }
     }
-
-    // console.log('minYs', minYs);
-    // console.log('maxYs', maxYs);
 
     // we have to do something funky here to make sure that
     // discontinuous sections are rendered as such
@@ -163,28 +160,29 @@ class FilledLine extends HorizontalLine1DPixiTrack {
     const opacity =
       'fillOpacity' in this.options ? this.options.fillOpacity : 0.5;
 
-    while (startI < xs.length) {
+    while (startI < tile.xs.length) {
       graphics.beginFill(colorHex, opacity);
-      graphics.moveTo(xs[startI], minYs[startI]);
+      graphics.moveTo(tile.xs[startI], tile.minYs[startI]);
       // draw a filled area around the whole region
       let i = startI + 1;
 
-      for (; i < xs.length; i++) {
-        if (minYs[i] < Number.MAX_SAFE_INTEGER)
-          graphics.lineTo(xs[i], minYs[i]);
+      for (; i < tile.xs.length; i++) {
+        if (tile.minYs[i] < Number.MAX_SAFE_INTEGER)
+          graphics.lineTo(tile.xs[i], tile.minYs[i]);
         else break;
       }
 
       for (let j = i; j >= startI; j--) {
-        if (maxYs[j] > -Number.MAX_SAFE_INTEGER) {
+        if (tile.maxYs[j] > -Number.MAX_SAFE_INTEGER) {
           // console.log('to', xs[i], maxYs[i]);
-          graphics.lineTo(xs[j], maxYs[j]);
+          graphics.lineTo(tile.xs[j], tile.maxYs[j]);
         }
       }
 
       graphics.endFill();
 
-      while (minYs[i] === Number.MAX_SAFE_INTEGER && i < xs.length) i++;
+      while (tile.minYs[i] === Number.MAX_SAFE_INTEGER && i < tile.xs.length)
+        i++;
       startI = i;
     }
 
@@ -197,6 +195,132 @@ class FilledLine extends HorizontalLine1DPixiTrack {
         graphics.lineTo(point[0], point[1]);
       }
     }
+  }
+
+  /**
+   * Export an SVG representation of this track
+   *
+   * @returns {Array} The two returned DOM nodes are both SVG
+   * elements [base,track]. Base is a parent which contains track as a
+   * child. Track is clipped with a clipping rectangle contained in base.
+   *
+   */
+  exportSVG() {
+    let track = null;
+    let base = null;
+
+    if (super.exportSVG) {
+      [base, track] = super.exportSVG();
+    } else {
+      base = document.createElement('g');
+      track = base;
+    }
+
+    base.setAttribute('class', 'exported-line-track');
+    const output = document.createElement('g');
+
+    track.appendChild(output);
+    output.setAttribute(
+      'transform',
+      `translate(${this.position[0]},${this.position[1]})`,
+    );
+
+    const stroke = this.options.lineStrokeColor
+      ? this.options.lineStrokeColor
+      : 'blue';
+
+    this.visibleAndFetchedTiles().forEach(tile => {
+      // draw the filled area
+      const color = this.options.fillColor || 'grey';
+
+      const opacity =
+        'fillOpacity' in this.options ? this.options.fillOpacity : 0.5;
+
+      let startI = 0;
+
+      while (startI < tile.xs.length) {
+        const g1 = document.createElement('path');
+        g1.setAttribute('opacity', opacity);
+        g1.setAttribute('fill', color);
+        g1.setAttribute('stroke', 'transparent');
+
+        let d = `M${tile.xs[startI]},${tile.minYs[startI]}`;
+        // draw a filled area around the whole region
+        let i = startI + 1;
+
+        for (; i < tile.xs.length; i++) {
+          if (tile.minYs[i] < Number.MAX_SAFE_INTEGER)
+            d += `L${tile.xs[i]},${tile.minYs[i]}`;
+          else break;
+        }
+
+        for (let j = i; j >= startI; j--) {
+          if (tile.maxYs[j] > -Number.MAX_SAFE_INTEGER) {
+            // console.log('to', xs[i], maxYs[i]);
+            d += `L${tile.xs[j]},${tile.maxYs[j]}`;
+          }
+        }
+
+        g1.setAttribute('d', d);
+        output.appendChild(g1);
+
+        while (tile.minYs[i] === Number.MAX_SAFE_INTEGER && i < tile.xs.length)
+          i++;
+        startI = i;
+      }
+
+      // draw the lines
+      const g = document.createElement('path');
+      g.setAttribute('fill', 'transparent');
+      g.setAttribute('stroke', stroke);
+      let d = '';
+
+      for (const segment of tile.segments) {
+        const first = segment[0];
+        const rest = segment.slice(1);
+        d += `M${first[0]} ${first[1]}`;
+        for (const point of rest) {
+          d += `L${point[0]} ${point[1]}`;
+        }
+      }
+
+      g.setAttribute('d', d);
+      output.appendChild(g);
+    });
+
+    const gAxis = document.createElement('g');
+    gAxis.setAttribute('id', 'axis');
+
+    // append the axis to base so that it's not clipped
+    base.appendChild(gAxis);
+    gAxis.setAttribute(
+      'transform',
+      `translate(${this.axis.pAxis.position.x}, ${this.axis.pAxis.position.y})`,
+    );
+
+    // add the axis to the export
+    if (
+      this.options.axisPositionHorizontal === 'left' ||
+      this.options.axisPositionVertical === 'top'
+    ) {
+      // left axis are shown at the beginning of the plot
+      const gDrawnAxis = this.axis.exportAxisLeftSVG(
+        this.valueScale,
+        this.dimensions[1],
+      );
+      gAxis.appendChild(gDrawnAxis);
+    } else if (
+      this.options.axisPositionHorizontal === 'right' ||
+      this.options.axisPositionVertical === 'bottom'
+    ) {
+      const gDrawnAxis = this.axis.exportAxisRightSVG(
+        this.valueScale,
+        this.dimensions[1],
+      );
+      gAxis.appendChild(gDrawnAxis);
+    }
+
+    return [base, track];
   }
 }
 
