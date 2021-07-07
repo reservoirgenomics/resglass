@@ -1322,13 +1322,7 @@ class TrackRenderer extends React.Component {
       const track = this.trackDefObjects[uid].trackObject;
       const trackDef = this.trackDefObjects[uid].trackDef;
 
-      let orientation = 'unknown';
-
-      if (TRACKS_INFO_BY_TYPE[trackDef.track.type]) {
-        orientation = TRACKS_INFO_BY_TYPE[trackDef.track.type].orientation;
-      }
-
-      if (orientation === 'whole') {
+      if (trackDef.track.position === 'whole') {
         // whole tracks need different scales which go beyond the ends of
         // center track and encompass the whole view
         const trackXScale = scaleLinear()
