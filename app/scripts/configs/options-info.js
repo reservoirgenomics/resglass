@@ -131,9 +131,30 @@ export const OPTIONS_INFO = {
     name: 'Stroke Width',
     inlineOptions: AVAILABLE_WIDTHS,
   },
-  outerStrokeWidth: {
-    name: 'Outer Stroke Width',
-    inlineOptions: AVAILABLE_WIDTHS,
+  strokeSingleSeries: {
+    name: 'Draw single series',
+    generateOptions: track => {
+      const inlineOptions = [];
+
+      if (!track.row_infos) return [];
+
+      for (let i = 0; i < track.row_infos.length; i++) {
+        inlineOptions.push({
+          name: i + 1,
+          value: i + 1,
+        });
+      }
+
+      inlineOptions.push({
+        name: 'All',
+        value: 'all',
+      });
+      inlineOptions.push({
+        name: 'None',
+        value: 'none',
+      });
+      return inlineOptions;
+    },
   },
   strokeWidthAndNone: {
     name: 'Stroke Width',

@@ -928,6 +928,9 @@ class TiledPlot extends React.Component {
     } else {
       track.maxZoom = tilesetInfo.max_zoom;
     }
+    if (tilesetInfo.row_infos) {
+      track.row_infos = tilesetInfo.row_infos;
+    }
     track.coordSystem = tilesetInfo.coordSystem;
     track.datatype = tilesetInfo.datatype;
   }

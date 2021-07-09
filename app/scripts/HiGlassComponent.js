@@ -3352,6 +3352,7 @@ class HiGlassComponent extends React.Component {
         delete track.filetype;
         delete track.binsPerDimension;
         delete track.resolutions;
+        delete track.row_infos;
         delete track.aggregationModes;
       });
 
