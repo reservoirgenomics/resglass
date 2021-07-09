@@ -110,10 +110,14 @@ class FilledLine extends HorizontalLine1DPixiTrack {
       .domain([0, tileSize])
       .range([tileX, tileX + tileWidth]);
 
-    const strokeWidth = this.options.lineStrokeWidth
-      ? this.options.lineStrokeWidth
-      : 1;
-    graphics.lineStyle(strokeWidth, stroke, 1);
+    const strokeWidth =
+      this.options.lineStrokeWidth !== undefined
+        ? this.options.lineStrokeWidth
+        : 1;
+    const outerStrokeWidth =
+      this.options.outerStrokeWidth !== 'none'
+        ? this.options.outerStrokeWidth
+        : strokeWidth;
 
     tile.segments = [];
 
@@ -160,6 +164,8 @@ class FilledLine extends HorizontalLine1DPixiTrack {
     const opacity =
       'fillOpacity' in this.options ? this.options.fillOpacity : 0.5;
 
+    graphics.lineStyle(0, stroke, 0);
+
     while (startI < tile.xs.length) {
       graphics.beginFill(colorHex, opacity);
       graphics.moveTo(tile.xs[startI], tile.minYs[startI]);
@@ -186,8 +192,23 @@ class FilledLine extends HorizontalLine1DPixiTrack {
       startI = i;
     }
 
+    console.log(
+      'outerStrokeWidth',
+      outerStrokeWidth,
+      this.options.outerStrokeWidth,
+    );
     // draw the boundary values
-    for (const segment of tile.segments) {
+    for (let i = 0; i < tile.segments.length; i++) {
+      console.log('i:', i);
+      if (i === 1 || i === tile.segments.length - 1) {
+        console.log('outer', outerStrokeWidth);
+        graphics.lineStyle(outerStrokeWidth, stroke, 1);
+      } else {
+        console.log('inner', strokeWidth);
+        graphics.lineStyle(strokeWidth, stroke, 1);
+      }
+
+      const segment = tile.segments[i];
       const first = segment[0];
       const rest = segment.slice(1);
       graphics.moveTo(first[0], first[1]);

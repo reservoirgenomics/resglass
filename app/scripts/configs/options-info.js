@@ -47,7 +47,7 @@ const SPECIAL_COLORS = {
   use_stroke: { name: 'Glyph color', value: '[glyph-color]' },
 };
 
-const AVAILABLE_WIDTHS = sizesInPx([1, 2, 3, 5, 8, 13, 21]);
+const AVAILABLE_WIDTHS = sizesInPx([0, 1, 2, 3, 5, 8, 13, 21]);
 const AVAILABLE_WIDTHS_AND_NONE = Object.assign(AVAILABLE_WIDTHS, {
   none: { name: 'none', value: 'none' },
 });
@@ -131,9 +131,13 @@ export const OPTIONS_INFO = {
     name: 'Stroke Width',
     inlineOptions: AVAILABLE_WIDTHS,
   },
-  strokeWidth: {
-    name: 'Stroke Width',
+  outerStrokeWidth: {
+    name: 'Outer Stroke Width',
     inlineOptions: AVAILABLE_WIDTHS,
+  },
+  strokeWidthAndNone: {
+    name: 'Stroke Width',
+    inlineOptions: AVAILABLE_WIDTHS_AND_NONE,
   },
   trackBorderWidth: {
     name: 'Track Border Width',
