@@ -136,13 +136,13 @@ export const OPTIONS_INFO = {
     generateOptions: track => {
       const inlineOptions = [];
 
-      if (!track.row_infos) return [];
-
-      for (let i = 0; i < track.row_infos.length; i++) {
-        inlineOptions.push({
-          name: i + 1,
-          value: i + 1,
-        });
+      if (track.row_infos) {
+        for (let i = 0; i < track.row_infos.length; i++) {
+          inlineOptions.push({
+            name: i + 1,
+            value: i + 1,
+          });
+        }
       }
 
       inlineOptions.push({
