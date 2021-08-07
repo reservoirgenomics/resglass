@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { mix } from './mixwith';
 
-import { expandCombinedTracks } from './utils';
+import { absToChr, expandCombinedTracks } from './utils';
 import { getSeriesItems } from './SeriesListItems';
 
 import ContextMenuItem from './ContextMenuItem';
@@ -15,13 +15,13 @@ import { THEME_DARK } from './configs';
 import '../styles/ContextMenu.module.scss';
 
 class ViewContextMenu extends mix(ContextMenuContainer).with(
-  SeriesListSubmenuMixin
+  SeriesListSubmenuMixin,
 ) {
   render() {
     const seriesItems = getSeriesItems(
       this.props.tracks,
       this.handleItemMouseEnter.bind(this),
-      this.handleMouseLeave.bind(this)
+      this.handleMouseLeave.bind(this),
     );
 
     const customItemsWrapped = this.props.customItems
@@ -29,14 +29,14 @@ class ViewContextMenu extends mix(ContextMenuContainer).with(
           React.cloneElement(child, {
             onMouseEnter: e => {
               this.handleOtherMouseEnter(e);
-            }
-          })
+            },
+          }),
         )
       : null;
 
     let styleNames = 'context-menu';
     if (this.props.theme === THEME_DARK) styleNames += ' context-menu-dark';
-
+    console.log('this.props:', this.props.tracks);
     return (
       <div
         ref={c => {
@@ -45,7 +45,7 @@ class ViewContextMenu extends mix(ContextMenuContainer).with(
         data-menu-type="ViewContextMenu"
         style={{
           left: this.state.left,
-          top: this.state.top
+          top: this.state.top,
         }}
         styleName={styleNames}
       >
@@ -57,12 +57,32 @@ class ViewContextMenu extends mix(ContextMenuContainer).with(
 
         {seriesItems && <hr styleName="context-menu-hr" />}
 
+        {this.props.genomePositionSearchBox && (
+          <ContextMenuItem
+            onClick={() => {
+              const is2d =
+                this.props.tracks[0] &&
+                this.props.tracks[0].position === 'center';
+              console.log('2d', is2d);
+              console.log(
+                'chrominfo:',
+                this.props.genomePositionSearchBox.searchField.chromInfo,
+              );
+            }}
+            onMouseEnter={e => this.handleOtherMouseEnter(e)}
+          >
+            {'Copy location under cursor'}
+          </ContextMenuItem>
+        )}
+
+        <hr styleName="context-menu-hr" />
+
         <ContextMenuItem
           onClick={() =>
             this.props.onAddTrack({
               type: 'horizontal-rule',
               y: this.props.coords[1],
-              position: 'whole'
+              position: 'whole',
             })
           }
           onMouseEnter={e => this.handleOtherMouseEnter(e)}
@@ -75,7 +95,7 @@ class ViewContextMenu extends mix(ContextMenuContainer).with(
             this.props.onAddTrack({
               type: 'vertical-rule',
               x: this.props.coords[0],
-              position: 'whole'
+              position: 'whole',
             })
           }
           onMouseEnter={e => this.handleOtherMouseEnter(e)}
@@ -89,7 +109,7 @@ class ViewContextMenu extends mix(ContextMenuContainer).with(
               type: 'cross-rule',
               x: this.props.coords[0],
               y: this.props.coords[1],
-              position: 'whole'
+              position: 'whole',
             })
           }
           onMouseEnter={e => this.handleOtherMouseEnter(e)}
@@ -134,21 +154,21 @@ class ViewContextMenu extends mix(ContextMenuContainer).with(
     this.props.onAddTrack({
       type: 'horizontal-rule',
       y: this.props.coords[1],
-      position: 'whole'
+      position: 'whole',
     });
     this.props.onAddTrack({
       data: {
         type: 'horizontal-section',
         server: matrixTrack.server,
         tilesetUid: matrixTrack.tilesetUid,
-        slicePos: this.props.coords[1]
+        slicePos: this.props.coords[1],
       },
       options: {
-        valueScaling: 'log'
+        valueScaling: 'log',
       },
       type: 'horizontal-bar',
       height: 30,
-      position: 'top'
+      position: 'top',
     });
   }
 
@@ -159,21 +179,21 @@ class ViewContextMenu extends mix(ContextMenuContainer).with(
     this.props.onAddTrack({
       type: 'vertical-rule',
       x: this.props.coords[0],
-      position: 'whole'
+      position: 'whole',
     });
     this.props.onAddTrack({
       data: {
         type: 'vertical-section',
         server: matrixTrack.server,
         tilesetUid: matrixTrack.tilesetUid,
-        slicePos: this.props.coords[0]
+        slicePos: this.props.coords[0],
       },
       options: {
-        valueScaling: 'log'
+        valueScaling: 'log',
       },
       type: 'vertical-bar',
       height: 30,
-      position: 'left'
+      position: 'left',
     });
   }
 }
@@ -181,7 +201,7 @@ class ViewContextMenu extends mix(ContextMenuContainer).with(
 ViewContextMenu.propTypes = {
   // the data coordinates where this context menu was initiated
   coords: PropTypes.array,
-  customItems: PropTypes.array
+  customItems: PropTypes.array,
 };
 
 export default ViewContextMenu;

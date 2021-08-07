@@ -170,6 +170,7 @@ export default class SeriesListMenu extends ContextMenuContainer {
       });
     }
 
+    console.log('track', track);
     let { datatype } = track;
 
     let orientation = null;
@@ -181,6 +182,9 @@ export default class SeriesListMenu extends ContextMenuContainer {
       }
       ({ orientation } = TRACKS_INFO_BY_TYPE[track.type]);
     }
+
+    console.log('orientation', orientation);
+    console.log('datatype', datatype);
 
     // see which other tracks can display a similar datatype
     const availableTrackTypes = Object.values(TRACKS_INFO_BY_TYPE)

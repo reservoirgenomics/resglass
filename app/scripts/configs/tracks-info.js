@@ -965,7 +965,7 @@ export const TRACKS_INFO = [
       'horizontal-2d-rectangle-domains',
       'vertical-2d-rectangle-domains',
     ],
-    datatype: ['2d-rectangle-domains'],
+    datatype: ['bedpe'],
     local: false,
     orientation: '1d-horizontal',
     rotatable: true,
