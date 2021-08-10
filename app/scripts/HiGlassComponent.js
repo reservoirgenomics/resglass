@@ -262,9 +262,21 @@ class HiGlassComponent extends React.Component {
       );
     }
 
+    if (this.props.options.pluginDataFetchers) {
+      window.higlassDataFetchersByType = Object.assign(
+        window.higlassDataFetchersByType || {},
+        this.props.options.pluginDataFetchers,
+      );
+    }
+
+    const pluginDataFetchers = window.higlassDataFetchersByType;
+
     const rowHeight = this.props.options.pixelPreciseMarginPadding ? 1 : 30;
 
     this.mounted = false;
+    this.pluginTracks = pluginTracks;
+    this.pluginDataFetchers = pluginDataFetchers;
+
     this.state = {
       pluginTracks,
       currentBreakpoint: 'lg',
@@ -4778,6 +4790,7 @@ class HiGlassComponent extends React.Component {
             paddingTop={this.viewPaddingTop}
             pixiRenderer={this.pixiRenderer}
             pixiStage={this.pixiStage}
+            pluginDataFetchers={this.pluginDataFetchers}
             pluginTracks={this.state.pluginTracks}
             rangeSelection1dSize={this.state.rangeSelection1dSize}
             rangeSelectionToInt={this.state.rangeSelectionToInt}

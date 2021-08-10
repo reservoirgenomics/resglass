@@ -2603,6 +2603,7 @@ class TiledPlot extends React.Component {
           paddingTop={this.props.paddingTop}
           pixiRenderer={this.props.pixiRenderer}
           pixiStage={this.props.pixiStage}
+          pluginDataFetchers={this.props.pluginDataFetchers}
           pluginTracks={this.props.pluginTracks}
           positionedTracks={positionedTracks}
           registerDraggingChangedListener={

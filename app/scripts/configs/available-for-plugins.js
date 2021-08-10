@@ -28,12 +28,17 @@ import * as configs from '.';
 import * as utils from '../utils';
 
 // Tracks
+import Annotations1dTrack from '../Annotations1dTrack';
 import Annotations2dTrack from '../Annotations2dTrack';
 import ArrowheadDomainsTrack from '../ArrowheadDomainsTrack';
 import BarTrack from '../BarTrack';
 import BedLikeTrack from '../BedLikeTrack';
 import CNVIntervalTrack from '../CNVIntervalTrack';
+import Chromosome2DAnnotations from '../Chromosome2DAnnotations';
+import Chromosome2DLabels from '../Chromosome2DLabels';
+import ChromosomeGrid from '../ChromosomeGrid';
 import CombinedTrack from '../CombinedTrack';
+import CrossRule from '../CrossRule';
 import DivergentBarTrack from '../DivergentBarTrack';
 import HeatmapTiledPixiTrack from '../HeatmapTiledPixiTrack';
 import Horizontal2DDomainsTrack from '../Horizontal2DDomainsTrack';
@@ -43,6 +48,8 @@ import HorizontalHeatmapTrack from '../HorizontalHeatmapTrack';
 import HorizontalLine1DPixiTrack from '../HorizontalLine1DPixiTrack';
 import HorizontalMultivecTrack from '../HorizontalMultivecTrack';
 import HorizontalPoint1DPixiTrack from '../HorizontalPoint1DPixiTrack';
+import HorizontalRule from '../HorizontalRule';
+import HorizontalTiled1DPixiTrack from '../HorizontalTiled1DPixiTrack';
 import HorizontalTiledPlot from '../HorizontalTiledPlot';
 import HorizontalTrack from '../HorizontalTrack';
 import Id2DTiledPixiTrack from '../Id2DTiledPixiTrack';
@@ -51,8 +58,11 @@ import IdVertical1DTiledPixiTrack from '../IdVertical1DTiledPixiTrack';
 import LeftAxisTrack from '../LeftAxisTrack';
 import MapboxTilesTrack from '../MapboxTilesTrack';
 import MoveableTrack from '../MoveableTrack';
+import OSMTileIdsTrack from '../OSMTileIdsTrack';
 import OSMTilesTrack from '../OSMTilesTrack';
+import OverlayTrack from '../OverlayTrack';
 import PixiTrack from '../PixiTrack';
+import RasterTilesTrack from '../RasterTilesTrack';
 import SVGTrack from '../SVGTrack';
 import SquareMarkersTrack from '../SquareMarkersTrack';
 import Tiled1DPixiTrack from '../Tiled1DPixiTrack';
@@ -60,8 +70,13 @@ import TiledPixiTrack from '../TiledPixiTrack';
 import TopAxisTrack from '../TopAxisTrack';
 import Track from '../Track';
 import ValueIntervalTrack from '../ValueIntervalTrack';
+import VerticalRule from '../VerticalRule';
 import VerticalTiled1DPixiTrack from '../VerticalTiled1DPixiTrack';
 import VerticalTrack from '../VerticalTrack';
+import ViewportTracker2D from '../ViewportTracker2D';
+import ViewportTracker2DPixi from '../ViewportTracker2DPixi';
+import ViewportTrackerHorizontal from '../ViewportTrackerHorizontal';
+import ViewportTrackerVertical from '../ViewportTrackerVertical';
 
 // Factories
 import ContextMenuItem from '../ContextMenuItem';
@@ -74,6 +89,10 @@ import * as services from '../services';
 // Chromosomes
 import ChromosomeInfo from '../ChromosomeInfo';
 import SearchField from '../SearchField';
+
+import GBKDataFetcher from '../data-fetchers/genbank-fetcher';
+import LocalDataFetcher from '../data-fetchers/local-tile-fetcher';
+import getDataFetcher from '../data-fetchers/get-data-fetcher';
 
 const libraries = {
   d3Array,
@@ -92,16 +111,21 @@ const libraries = {
   d3Zoom,
   PIXI: configs.GLOBALS.PIXI,
   mix,
-  slugid
+  slugid,
 };
 
 const tracks = {
+  Annotations1dTrack,
   Annotations2dTrack,
   ArrowheadDomainsTrack,
   BarTrack,
   BedLikeTrack,
   CNVIntervalTrack,
+  Chromosome2DAnnotations,
+  Chromosome2DLabels,
+  ChromosomeGrid,
   CombinedTrack,
+  CrossRule,
   DivergentBarTrack,
   HeatmapTiledPixiTrack,
   Horizontal2DDomainsTrack,
@@ -111,6 +135,8 @@ const tracks = {
   HorizontalLine1DPixiTrack,
   HorizontalMultivecTrack,
   HorizontalPoint1DPixiTrack,
+  HorizontalRule,
+  HorizontalTiled1DPixiTrack,
   HorizontalTiledPlot,
   HorizontalTrack,
   Id2DTiledPixiTrack,
@@ -119,8 +145,11 @@ const tracks = {
   LeftAxisTrack,
   MapboxTilesTrack,
   MoveableTrack,
+  OSMTileIdsTrack,
   OSMTilesTrack,
+  OverlayTrack,
   PixiTrack,
+  RasterTilesTrack,
   SVGTrack,
   SquareMarkersTrack,
   Tiled1DPixiTrack,
@@ -128,29 +157,42 @@ const tracks = {
   TopAxisTrack,
   Track,
   ValueIntervalTrack,
+  VerticalRule,
   VerticalTiled1DPixiTrack,
-  VerticalTrack
+  VerticalTrack,
+  ViewportTracker2D,
+  ViewportTracker2DPixi,
+  ViewportTrackerHorizontal,
+  ViewportTrackerVertical,
 };
 
 const factories = {
   ContextMenuItem,
   DataFetcher,
-  LruCache
+  LruCache,
 };
 
 const chromosomes = {
   ChromosomeInfo,
-  SearchField
+  SearchField,
+};
+
+const dataFetchers = {
+  DataFetcher,
+  GBKDataFetcher,
+  LocalDataFetcher,
+  getDataFetcher,
 };
 
 export default {
   chromosomes,
   libraries,
   tracks,
+  dataFetchers,
   factories,
   services,
   utils,
   configs,
   // Defined globally by webpack.
-  VERSION
+  VERSION,
 };

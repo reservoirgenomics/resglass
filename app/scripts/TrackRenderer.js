@@ -1492,7 +1492,11 @@ class TrackRenderer extends React.Component {
       }
     }
 
-    const dataFetcher = getDataFetcher(dataConfig, this.props.pubSub);
+    const dataFetcher = getDataFetcher(
+      dataConfig,
+      this.props.pubSub,
+      this.props.pluginDataFetchers,
+    );
 
     const clickHandler = data => {
       this.props.pubSub.publish('app.click', {
