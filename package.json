@@ -1,6 +1,6 @@
 {
   "name": "@reservoirgenomics/resglass",
-  "version": "1.12.6",
+  "version": "1.13.0",
   "description": "Resgen flavored HiGlass",
   "author": "Peter Kerpedjiev <pkerpedjiev@gmail.com>",
   "publishConfig": {
