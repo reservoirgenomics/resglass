@@ -7,7 +7,7 @@ class Horizontal2DDomainsTrack extends TiledPixiTrack {
   constructor(context, options) {
     super(context, options);
 
-    this.drawnRects = new Set();
+    this.drawnRects = {};
     this.pMain = this.pMobile;
   }
 
@@ -38,12 +38,12 @@ class Horizontal2DDomainsTrack extends TiledPixiTrack {
     const xZoomLevel = tileProxy.calculateZoomLevel(
       this._xScale,
       this.tilesetInfo.min_pos[0],
-      this.tilesetInfo.max_pos[0]
+      this.tilesetInfo.max_pos[0],
     );
     const yZoomLevel = tileProxy.calculateZoomLevel(
       this._xScale,
       this.tilesetInfo.min_pos[1],
-      this.tilesetInfo.max_pos[1]
+      this.tilesetInfo.max_pos[1],
     );
 
     let zoomLevel = Math.max(xZoomLevel, yZoomLevel);
@@ -69,7 +69,7 @@ class Horizontal2DDomainsTrack extends TiledPixiTrack {
      */
     this.visibleTiles = tilePositions.map(x => ({
       tileId: this.tileToLocalId(x),
-      remoteId: this.tileToRemoteId(x)
+      remoteId: this.tileToRemoteId(x),
     }));
 
     this.visibleTileIds = new Set(this.visibleTiles.map(x => x.tileId));
@@ -97,11 +97,11 @@ class Horizontal2DDomainsTrack extends TiledPixiTrack {
     // on each side
     expandedXScale.domain([
       this._xScale.invert(
-        this._xScale.range()[0] - this.dimensions[1] * Math.sqrt(2)
+        this._xScale.range()[0] - this.dimensions[1] * Math.sqrt(2),
       ),
       this._xScale.invert(
-        this._xScale.range()[1] + this.dimensions[1] * Math.sqrt(2)
-      )
+        this._xScale.range()[1] + this.dimensions[1] * Math.sqrt(2),
+      ),
     ]);
 
     this.xTiles = tileProxy.calculateTiles(
@@ -110,7 +110,7 @@ class Horizontal2DDomainsTrack extends TiledPixiTrack {
       this.tilesetInfo.min_pos[0],
       this.tilesetInfo.max_pos[0],
       this.tilesetInfo.max_zoom,
-      this.tilesetInfo.max_width
+      this.tilesetInfo.max_width,
     );
 
     this.yTiles = tileProxy.calculateTiles(
@@ -119,7 +119,7 @@ class Horizontal2DDomainsTrack extends TiledPixiTrack {
       this.tilesetInfo.min_pos[0],
       this.tilesetInfo.max_pos[0],
       this.tilesetInfo.max_zoom,
-      this.tilesetInfo.max_width
+      this.tilesetInfo.max_width,
     );
 
     const rows = this.xTiles;
@@ -173,7 +173,7 @@ class Horizontal2DDomainsTrack extends TiledPixiTrack {
   draw() {
     // console.log('delayDrawing:', this.delayDrawing, this.dimensions[1]);
     if (!this.delayDrawing) {
-      this.drawnRects.clear();
+      this.drawnRects = {};
     }
 
     super.draw();
@@ -192,12 +192,12 @@ class Horizontal2DDomainsTrack extends TiledPixiTrack {
     const stroke = colorToHex(
       this.options.rectangleDomainStrokeColor
         ? this.options.rectangleDomainStrokeColor
-        : 'black'
+        : 'black',
     );
     const fill = colorToHex(
       this.options.rectangleDomainFillColor
         ? this.options.rectangleDomainFillColor
-        : 'grey'
+        : 'grey',
     );
 
     graphics.lineStyle(1 / this.pMain.scale.x, stroke, 1);
@@ -218,12 +218,18 @@ class Horizontal2DDomainsTrack extends TiledPixiTrack {
 
       const uid = td.uid;
 
-      if (this.drawnRects.has(uid)) {
+      if (this.drawnRects[uid]) {
         continue;
       }
       // we've already drawn this rectangle in another tile
 
-      this.drawnRects.add(uid);
+      this.drawnRects[uid] = {
+        x: startX,
+        y: startY,
+        width: endX - startX,
+        height: endY - startY,
+      };
+
       graphics.drawRect(startX, startY, endX - startX, endY - startY);
 
       graphics.pivot.x = this._refXScale(0);
@@ -288,6 +294,71 @@ class Horizontal2DDomainsTrack extends TiledPixiTrack {
 
   leftTrackDraw() {
     this.draw();
+  }
+
+  exportSVG() {
+    let track = null;
+    let base = null;
+
+    if (super.exportSVG) {
+      [base, track] = super.exportSVG();
+    } else {
+      base = document.createElement('g');
+      track = base;
+    }
+    const output = document.createElement('g');
+    output.setAttribute(
+      'transform',
+      `translate(${this.pMain.position.x},${this.pMain.position.y}) scale(${this.pMain.scale.x},${this.pMain.scale.y})`,
+    );
+
+    track.appendChild(output);
+
+    for (const tile of this.visibleAndFetchedTiles()) {
+      // this tile has no data
+      if (!tile.tileData || !tile.tileData.length) continue;
+
+      tile.tileData.forEach(td => {
+        const uid = td.uid;
+        const gTile = document.createElement('g');
+
+        const graphics = tile.graphics;
+        const graphicsRotation = (graphics.rotation * 180) / Math.PI;
+        const transformText = `translate(${graphics.position.x},${
+          graphics.position.y
+        }) rotate(${graphicsRotation}) scale(${graphics.scale.x},${
+          graphics.scale.y
+        }) translate(${-graphics.pivot.x},${-graphics.pivot.y})`;
+
+        gTile.setAttribute('transform', transformText);
+        output.appendChild(gTile);
+
+        if (uid in this.drawnRects) {
+          const rect = this.drawnRects[uid];
+
+          const r = document.createElement('rect');
+          r.setAttribute('x', rect.x);
+          r.setAttribute('y', rect.y);
+          r.setAttribute('width', rect.width);
+          r.setAttribute('height', rect.height);
+
+          r.setAttribute(
+            'fill',
+            this.options.rectangleDomainFillColor
+              ? this.options.rectangleDomainFillColor
+              : 'grey',
+          );
+          r.setAttribute('opacity', 0.3);
+
+          r.style.stroke = 'black';
+          r.style.strokeWidth = '1px';
+
+          gTile.appendChild(r);
+        }
+      });
+    }
+
+    return [base, base];
   }
 }
 
