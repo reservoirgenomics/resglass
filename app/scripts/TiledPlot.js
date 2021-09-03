@@ -2079,6 +2079,7 @@ class TiledPlot extends React.Component {
             orientation="right"
             position={this.state.contextMenuPosition}
             theme={this.props.theme}
+            trackRenderer={this.trackRenderer}
             tracks={relevantTracks}
             trackSourceServers={this.props.trackSourceServers}
           />

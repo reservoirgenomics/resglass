@@ -1,8 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { format } from 'd3-format';
+
 import { mix } from './mixwith';
 
-import { absToChr, expandCombinedTracks } from './utils';
+import { absToChr, copyTextToClipboard, expandCombinedTracks } from './utils';
 import { getSeriesItems } from './SeriesListItems';
 
 import ContextMenuItem from './ContextMenuItem';
@@ -36,7 +38,6 @@ class ViewContextMenu extends mix(ContextMenuContainer).with(
 
     let styleNames = 'context-menu';
     if (this.props.theme === THEME_DARK) styleNames += ' context-menu-dark';
-    console.log('this.props:', this.props.tracks);
     return (
       <div
         ref={c => {
@@ -59,16 +60,7 @@ class ViewContextMenu extends mix(ContextMenuContainer).with(
 
         {this.props.genomePositionSearchBox && (
           <ContextMenuItem
-            onClick={() => {
-              const is2d =
-                this.props.tracks[0] &&
-                this.props.tracks[0].position === 'center';
-              console.log('2d', is2d);
-              console.log(
-                'chrominfo:',
-                this.props.genomePositionSearchBox.searchField.chromInfo,
-              );
-            }}
+            onClick={this.copyLocationToClipboard.bind(this)}
             onMouseEnter={e => this.handleOtherMouseEnter(e)}
           >
             {'Copy location under cursor'}
@@ -170,6 +162,46 @@ class ViewContextMenu extends mix(ContextMenuContainer).with(
       height: 30,
       position: 'top',
     });
+  }
+
+  copyLocationToClipboard() {
+    const is2d =
+      this.props.tracks[0] && this.props.tracks[0].position === 'center';
+
+    const chromInfo =
+      this.props.genomePositionSearchBox &&
+      this.props.genomePositionSearchBox.searchField &&
+      this.props.genomePositionSearchBox.searchField.chromInfo;
+
+    if (!chromInfo) {
+      console.warn(
+        'There needs to be a genome position search box present to copy the location',
+      );
+      this.props.closeMenu();
+      return;
+    }
+
+    const xAbsCoord = this.props.trackRenderer.zoomedXScale.invert(
+      this.props.position.left,
+    );
+    const yAbsCoord = this.props.trackRenderer.zoomedYScale.invert(
+      this.props.position.top,
+    );
+
+    const xChr = absToChr(xAbsCoord, chromInfo);
+    const stringFormat = format(',d');
+
+    let locationText = `${xChr[0]}:${stringFormat(xChr[1])}`;
+
+    if (is2d) {
+      const yChr = absToChr(yAbsCoord, chromInfo);
+      locationText = `${locationText} & ${yChr[0]}:${stringFormat(yChr[1])}`;
+      copyTextToClipboard(locationText);
+    } else {
+      copyTextToClipboard(locationText);
+    }
+
+    this.props.closeMenu();
   }
 
   handleAddVerticalSection() {
