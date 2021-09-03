@@ -2057,6 +2057,7 @@ class TiledPlot extends React.Component {
             closeMenu={this.closeMenusBound}
             coords={[this.state.contextMenuDataX, this.state.contextMenuDataY]}
             customItems={this.state.contextMenuCustomItems}
+            genomePositionSearchBox={this.props.genomePositionSearchBox}
             onAddDivisor={this.handleAddDivisorBound}
             onAddSeries={this.handleAddSeriesBound}
             // Can only add one new track at a time
@@ -2078,6 +2079,7 @@ class TiledPlot extends React.Component {
             orientation="right"
             position={this.state.contextMenuPosition}
             theme={this.props.theme}
+            trackRenderer={this.trackRenderer}
             tracks={relevantTracks}
             trackSourceServers={this.props.trackSourceServers}
           />

@@ -4741,6 +4741,7 @@ class HiGlassComponent extends React.Component {
             disableTrackMenu={this.isTrackMenuDisabled()}
             draggingHappening={this.state.draggingHappening}
             editable={this.isEditable()}
+            genomePositionSearchBox={this.genomePositionSearchBoxes[view.uid]}
             getLockGroupExtrema={uid => this.getLockGroupExtrema(view.uid, uid)}
             initialXDomain={view.initialXDomain}
             initialYDomain={view.initialYDomain}
