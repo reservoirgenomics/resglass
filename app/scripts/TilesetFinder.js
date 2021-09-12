@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import slugid from 'slugid';
 import CheckboxTree from 'react-checkbox-tree';
 
@@ -123,13 +122,7 @@ class TilesetFinder extends React.Component {
         [].concat(
           ...this.augmentedTracksInfo
             .filter(x => x.datatype)
-            .filter(x => {
-              return (
-                x.orientation === this.props.orientation ||
-                (this.props.orientation === '1d-vertical' &&
-                  x.orientation === '1d-horizontal')
-              );
-            })
+            .filter(x => x.orientation === this.props.orientation)
             .map(x => x.datatype),
         ),
       );
@@ -200,9 +193,7 @@ class TilesetFinder extends React.Component {
 
     this.props.selectedTilesetChanged(selectedTilesets);
 
-    this.setState({
-      selectedUuid: selectedValues,
-    });
+    this.setState({ selectedUuid: selectedValues });
   }
 
   handleSelect() {
@@ -220,9 +211,7 @@ class TilesetFinder extends React.Component {
   handleSearchChange() {
     const domElement = this.searchBox;
 
-    this.setState({
-      filter: domElement.value,
-    });
+    this.setState({ filter: domElement.value });
   }
 
   /*
@@ -301,15 +290,11 @@ class TilesetFinder extends React.Component {
   handleChecked(checked) {
     this.handleSelectedOptions(checked);
 
-    this.setState({
-      checked,
-    });
+    this.setState({ checked });
   }
 
   handleExpanded(expanded) {
-    this.setState({
-      expanded,
-    });
+    this.setState({ expanded });
   }
 
   render() {
@@ -369,7 +354,7 @@ class TilesetFinder extends React.Component {
                   <use xlinkHref="#check_square_o" />
                 </svg>
               ),
-              halfCheck: (
+              halfcheck: (
                 <svg style={halfSvgStyle}>
                   <use xlinkHref="#check_square_o" />
                 </svg>
@@ -411,14 +396,5 @@ class TilesetFinder extends React.Component {
     return <div>{form}</div>;
   }
 }
-
-TilesetFinder.propTypes = {
-  datatype: PropTypes.string,
-  orientation: PropTypes.string,
-  onDoubleClick: PropTypes.func,
-  pubSub: PropTypes.object.isRequired,
-  selectedTilesetChanged: PropTypes.func,
-  trackSourceServers: PropTypes.array,
-};
 
 export default withPubSub(TilesetFinder);

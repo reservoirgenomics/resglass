@@ -2,7 +2,6 @@ import { queue } from 'd3-queue';
 import { select } from 'd3-selection';
 import React from 'react';
 import slugid from 'slugid';
-import { FormGroup, Glyphicon } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
 import { ZOOM_TRANSITION_DURATION, THEME_DARK } from './configs';
@@ -17,6 +16,8 @@ import { tileProxy } from './services';
 // Utils
 import { scalesCenterAndK } from './utils';
 import withPubSub from './hocs/with-pub-sub';
+
+import { SearchIcon } from './icons';
 
 // Styles
 import styles from '../styles/GenomePositionSearchBox.module.scss'; // eslint-disable-line no-unused-vars
@@ -500,19 +501,13 @@ class GenomePositionSearchBox extends React.Component {
   }
 
   render() {
-    // const assemblyMenuItems = this.state.availableAssemblies.map(x => (
-    //   <MenuItem eventKey={x} key={x}>
-    //     {x}
-    //   </MenuItem>
-    // ));
-
     let className = this.state.isFocused
       ? 'styles.genome-position-search-focus'
       : 'styles.genome-position-search';
 
-    const classNameButton = this.state.isFocused
-      ? 'styles.genome-position-search-bar-button-focus'
-      : 'styles.genome-position-search-bar-button';
+    // const classNameButton = this.state.isFocused;
+    // ? 'styles.genome-position-search-bar-button-focus'
+    // : 'styles.genome-position-search-bar-button';
 
     // const classNameIcon = this.state.isFocused
     //   ? 'styles.genome-position-search-bar-icon-focus'
@@ -522,11 +517,10 @@ class GenomePositionSearchBox extends React.Component {
       className += ' styles.genome-position-search-dark';
 
     return (
-      <FormGroup
+      <div
         ref={c => {
           this.gpsbForm = c;
         }}
-        bsSize="small"
         styleName={className}
       >
         <Autocomplete
@@ -567,14 +561,11 @@ class GenomePositionSearchBox extends React.Component {
           }}
         />
 
-        <button
+        <SearchIcon
           onClick={this.buttonClick.bind(this)}
-          styleName={classNameButton}
-          type="button"
-        >
-          <Glyphicon glyph="search" />
-        </button>
-      </FormGroup>
+          theStyle="multitrack-header-icon"
+        />
+      </div>
     );
   }
 }
