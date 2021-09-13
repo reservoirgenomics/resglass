@@ -3,9 +3,6 @@
   "version": "1.15.1",
   "description": "Resgen flavored HiGlass",
   "author": "Peter Kerpedjiev <pkerpedjiev@gmail.com>",
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
-  },
   "main": "dist/hglib.js",
   "unpkg": "dist/hglib.min.js",
   "jsdelivr": "dist/hglib.min.js",
