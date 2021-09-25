@@ -1,6 +1,10 @@
 # Release notes
 
-## Unreleased
+## v1.15.4
+
+- Fixed bug where the component crashed if no plugin data fetchers were loaded
+
+## Skipped a few versions
 
 - Colors for rules
 - Ability to load genome position search box chromosome sizes from an arbitrary location
