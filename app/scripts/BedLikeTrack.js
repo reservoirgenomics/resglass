@@ -225,7 +225,7 @@ export class TextManager {
 
         // geneInfo[3] is the gene symbol
 
-        if (this.flipText) {
+        if (this.track.isLeftModified) {
           text.scale.x = -1;
         }
 

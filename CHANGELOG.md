@@ -1,5 +1,10 @@
 # Release notes
 
+## v1.15.5
+
+- Fixed copy location under mouse issue
+- Fixed mirrored left bed track issue
+
 ## v1.15.4
 
 - Fixed bug where the component crashed if no plugin data fetchers were loaded

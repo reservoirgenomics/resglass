@@ -181,12 +181,8 @@ class ViewContextMenu extends mix(ContextMenuContainer).with(
       return;
     }
 
-    const xAbsCoord = this.props.trackRenderer.zoomedXScale.invert(
-      this.props.position.left,
-    );
-    const yAbsCoord = this.props.trackRenderer.zoomedYScale.invert(
-      this.props.position.top,
-    );
+    const xAbsCoord = this.props.coords[0];
+    const yAbsCoord = this.props.coords[1];
 
     const xChr = absToChr(xAbsCoord, chromInfo);
     const stringFormat = format(',d');
