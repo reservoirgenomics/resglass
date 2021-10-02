@@ -16,6 +16,11 @@ export const MOUSE_TOOL_SELECT = 'select';
 
 export const MOUSE_TOOL_TRACK_SELECT = 'track-select';
 
+export const SIZE_MODE_DEFAULT = 'default';
+export const SIZE_MODE_BOUNDED = 'bounded';
+export const SIZE_MODE_OVERFLOW = 'overflow';
+export const SIZE_MODE_SCROLL = 'scroll';
+
 export const TILE_FETCH_DEBOUNCE = 100;
 
 // Number of milliseconds zoom-related actions (e.g., tile loading) are debounced
@@ -43,7 +48,7 @@ export const TRACK_LOCATIONS = [
   'bottom',
   'center',
   'whole',
-  'gallery'
+  'gallery',
 ];
 
 export const MIN_HORIZONTAL_HEIGHT = 20;
