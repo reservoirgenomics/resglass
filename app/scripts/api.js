@@ -12,6 +12,10 @@ import {
   MOUSE_TOOL_MOVE,
   MOUSE_TOOL_SELECT,
   MOUSE_TOOL_TRACK_SELECT,
+  SIZE_MODE_DEFAULT,
+  SIZE_MODE_BOUNDED,
+  SIZE_MODE_OVERFLOW,
+  SIZE_MODE_SCROLL,
 } from './configs';
 
 const forceUpdate = self => {
@@ -548,6 +552,32 @@ const createApi = function api(context, pubSub) {
 
           default:
             self.setMouseTool(MOUSE_TOOL_MOVE);
+            break;
+        }
+      },
+
+      /**
+       * Set the size mode for the higlass container
+       *
+       * @param {string sizeMode The size mode for the container.
+       *                         The vailable options are 'default',
+       *                         'bounded', 'overflow' and 'scroll'
+       */
+      setSizeMode(sizeMode) {
+        switch (sizeMode) {
+          case 'bounded':
+            self.setSizeMode(SIZE_MODE_BOUNDED);
+            break;
+          case 'overflow':
+            self.setSizeMode(SIZE_MODE_OVERFLOW);
+            break;
+          case 'scroll':
+            self.setSizeMode(SIZE_MODE_SCROLL);
+            break;
+
+          case 'default':
+          default:
+            self.setSizeMode(SIZE_MODE_DEFAULT);
             break;
         }
       },
