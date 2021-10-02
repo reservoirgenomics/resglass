@@ -1,5 +1,9 @@
 # Release notes
 
+## v1.16.0
+
+- Added an API function for setSizeMode
+
 ## v1.15.5
 
 - Fixed copy location under mouse issue
