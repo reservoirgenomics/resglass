@@ -1,5 +1,9 @@
 # Release notes
 
+## v1.17.0
+
+- Added the `nanAsZero` option for `horizontal-line` tracks
+
 ## v1.16.0
 
 - Added an API function for setSizeMode
