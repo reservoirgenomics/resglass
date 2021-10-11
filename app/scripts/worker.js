@@ -155,7 +155,11 @@ export function workerSetPix(
   const tileWidth = Math.sqrt(size);
   const pixData = new Uint8ClampedArray(filteredSize * 4);
 
-  let dToRgbIdx = x => Math.max(0, Math.min(254, Math.floor(valueScale(x))));
+  let dToRgbIdx = x => {
+    const v = valueScale(x);
+    if (Number.isNaN(v)) return 254;
+    return Math.max(0, Math.min(254, Math.floor(v)));
+  };
 
   if (valueScaleType === 'categorical') {
     dToRgbIdx = x => x;
@@ -170,7 +174,6 @@ export function workerSetPix(
   const setPixData = (i, d) => {
     // Transparent
     rgbIdx = 255;
-    console.log('d:', d);
 
     if (
       // ignore the upper right portion of a tile because it's on the diagonal
@@ -410,7 +413,6 @@ export function tileResponseToData(data, server, theseTileIds) {
           ? new DenseDataExtrema2D(a)
           : new DenseDataExtrema1D(a);
 
-      console.log('a', a);
       data[key].dense = a;
       data[key].denseDataExtrema = dde;
       data[key].minNonZero = dde.minNonZeroInTile;
