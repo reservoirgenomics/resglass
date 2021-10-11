@@ -29,10 +29,6 @@
     "test-watch": "npm run build && karma start karma.conf.js",
     "test-watch-headless": "npm run build && karma start karma.conf.js --browsers HeadlessChrome"
   },
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:reservoirgenomics/resglass.git"
-  },
   "license": "MIT",
   "engines": {
     "node": ">=0.12.0"
@@ -71,7 +67,7 @@
     "prop-types": "^15.6.0",
     "pub-sub-es": "^1.2.1",
     "react": "^16.8.0",
-    "react-autocomplete": "git+https://git@github.com:reservoirgenomics/react-autocomplete#fix-176",
+    "react-autocomplete": "github:reservoirgenomics/react-autocomplete#fix-176",
     "react-bootstrap": "0.32.1",
     "react-checkbox-tree": "^1.4.1",
     "react-color": "^2.13.8",
