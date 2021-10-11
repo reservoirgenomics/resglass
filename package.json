@@ -67,7 +67,7 @@
     "prop-types": "^15.6.0",
     "pub-sub-es": "^1.2.1",
     "react": "^16.8.0",
-    "react-autocomplete": "github:reservoirgenomics/react-autocomplete#fix-176",
+    "react-autocomplete": "git://git@github.com:reservoirgenomics/react-autocomplete#fix-176",
     "react-bootstrap": "0.32.1",
     "react-checkbox-tree": "^1.4.1",
     "react-color": "^2.13.8",
