@@ -7,7 +7,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const UnminifiedWebpackPlugin = require('unminified-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const SassOptimizer = require('./scripts/sass-optimizer.js');
-const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 
 const packageJson = require('./package.json');
 
@@ -53,7 +53,7 @@ module.exports = (env, argv) => ({
       new TerserPlugin({
         include: /\.min\.js$/,
       }),
-      new CssMinimizerPlugin()
+      new CssMinimizerPlugin(),
     ],
   },
   module: {
@@ -177,13 +177,18 @@ module.exports = (env, argv) => ({
   },
   plugins: [
     // Expose version numbers.
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer'],
+    }),
     new webpack.DefinePlugin({
       VERSION: JSON.stringify(packageJson.version),
     }),
-    new webpack.IgnorePlugin({resourceRegExp: /react\/addons/}),
-    new webpack.IgnorePlugin({resourceRegExp: /react\/lib\/ReactContext/}),
-    new webpack.IgnorePlugin({resourceRegExp: /react\/lib\/ExecutionEnvironment/}),
-    new MiniCssExtractPlugin({filename: 'hglib.css'}),
+    new webpack.IgnorePlugin({ resourceRegExp: /react\/addons/ }),
+    new webpack.IgnorePlugin({ resourceRegExp: /react\/lib\/ReactContext/ }),
+    new webpack.IgnorePlugin({
+      resourceRegExp: /react\/lib\/ExecutionEnvironment/,
+    }),
+    new MiniCssExtractPlugin({ filename: 'hglib.css' }),
     new SassOptimizer('*.scss'),
     new webpack.optimize.ModuleConcatenationPlugin(),
     new UnminifiedWebpackPlugin(),

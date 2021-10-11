@@ -170,6 +170,7 @@ export function workerSetPix(
   const setPixData = (i, d) => {
     // Transparent
     rgbIdx = 255;
+    console.log('d:', d);
 
     if (
       // ignore the upper right portion of a tile because it's on the diagonal
@@ -409,6 +410,7 @@ export function tileResponseToData(data, server, theseTileIds) {
           ? new DenseDataExtrema2D(a)
           : new DenseDataExtrema1D(a);
 
+      console.log('a', a);
       data[key].dense = a;
       data[key].denseDataExtrema = dde;
       data[key].minNonZero = dde.minNonZeroInTile;
