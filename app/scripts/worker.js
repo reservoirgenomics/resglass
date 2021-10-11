@@ -155,7 +155,11 @@ export function workerSetPix(
   const tileWidth = Math.sqrt(size);
   const pixData = new Uint8ClampedArray(filteredSize * 4);
 
-  let dToRgbIdx = x => Math.max(0, Math.min(254, Math.floor(valueScale(x))));
+  let dToRgbIdx = x => {
+    const v = valueScale(x);
+    if (Number.isNaN(v)) return 254;
+    return Math.max(0, Math.min(254, Math.floor(v)));
+  };
 
   if (valueScaleType === 'categorical') {
     dToRgbIdx = x => x;

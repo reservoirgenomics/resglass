@@ -3,11 +3,11 @@
 const autoprefixer = require('autoprefixer');
 const path = require('path');
 const webpack = require('webpack');
-const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const UnminifiedWebpackPlugin = require('unminified-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const SassOptimizer = require('./scripts/sass-optimizer.js');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 
 const packageJson = require('./package.json');
 
@@ -28,13 +28,12 @@ module.exports = (env, argv) => ({
   },
   // devtool: 'cheap-source-map',
   devServer: {
-    contentBase: [
+    static: [
       path.resolve(__dirname, 'app'),
       path.resolve(__dirname, 'docs', 'examples'),
       path.resolve(__dirname, 'node_modules'),
       path.resolve(__dirname, 'lib', 'vendor'),
     ],
-    publicPath: '/',
   },
   output: {
     path: `${__dirname}/build`,
@@ -54,7 +53,7 @@ module.exports = (env, argv) => ({
       new TerserPlugin({
         include: /\.min\.js$/,
       }),
-      new OptimizeCSSAssetsPlugin(),
+      new CssMinimizerPlugin(),
     ],
   },
   module: {
@@ -178,18 +177,18 @@ module.exports = (env, argv) => ({
   },
   plugins: [
     // Expose version numbers.
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer'],
+    }),
     new webpack.DefinePlugin({
       VERSION: JSON.stringify(packageJson.version),
     }),
-    new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: JSON.stringify('production'),
-      },
+    new webpack.IgnorePlugin({ resourceRegExp: /react\/addons/ }),
+    new webpack.IgnorePlugin({ resourceRegExp: /react\/lib\/ReactContext/ }),
+    new webpack.IgnorePlugin({
+      resourceRegExp: /react\/lib\/ExecutionEnvironment/,
     }),
-    new webpack.IgnorePlugin(/react\/addons/),
-    new webpack.IgnorePlugin(/react\/lib\/ReactContext/),
-    new webpack.IgnorePlugin(/react\/lib\/ExecutionEnvironment/),
-    new MiniCssExtractPlugin('hglib.css'),
+    new MiniCssExtractPlugin({ filename: 'hglib.css' }),
     new SassOptimizer('*.scss'),
     new webpack.optimize.ModuleConcatenationPlugin(),
     new UnminifiedWebpackPlugin(),
