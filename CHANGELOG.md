@@ -1,5 +1,13 @@
 # Release notes
 
+## v1.17.2
+
+- Don't publish on GitHub packages any more
+
+## v1.17.1
+
+- Switch to webpack 5 and update many packages
+
 ## v1.17.0
 
 - Added the `nanAsZero` option for `horizontal-line` tracks
