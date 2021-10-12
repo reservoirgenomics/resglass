@@ -23,8 +23,5 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - run: git config --global url."https://".insteadOf git://
-      - run: |
-        git config --global url."https://github.com/".insteadOf git@github.com:
       - run: npm ci
       - run: npm run build --if-present
