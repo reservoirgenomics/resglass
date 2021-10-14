@@ -488,7 +488,7 @@ class GenomePositionSearchBox extends React.Component {
     });
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (
       nextProps.chromInfoId !== this.currentChromInfoId ||
       nextProps.chromInfoServer !== this.currentChromInfoServer
