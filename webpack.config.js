@@ -11,7 +11,8 @@ const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 
 const packageJson = require('./package.json');
 
-// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
+  .BundleAnalyzerPlugin;
 
 module.exports = (env, argv) => ({
   mode: argv.mode === 'production' ? 'production' : 'development',
@@ -192,6 +193,9 @@ module.exports = (env, argv) => ({
     new SassOptimizer('*.scss'),
     new webpack.optimize.ModuleConcatenationPlugin(),
     new UnminifiedWebpackPlugin(),
-    // new BundleAnalyzerPlugin(),
+    new BundleAnalyzerPlugin({
+      analyzerMode: 'disabled',
+      generateStatsFile: true,
+    }),
   ],
 });
