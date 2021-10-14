@@ -9,12 +9,13 @@ class Autocomplete extends React.Component {
   constructor(props) {
     super(props);
 
+    this.mrefs = {};
     this.state = {
       highlightedIndex: null,
       menuTop: 0,
       menuLeft: 0,
       menuWidth: 0,
-      isOpen: false
+      isOpen: false,
     };
 
     this.keyDownHandlers = {
@@ -30,7 +31,7 @@ class Autocomplete extends React.Component {
         this._performAutoCompleteOnKeyUp = true;
         this.setState({
           highlightedIndex: index,
-          isOpen: true
+          isOpen: true,
         });
       },
 
@@ -46,7 +47,7 @@ class Autocomplete extends React.Component {
         this._performAutoCompleteOnKeyUp = true;
         this.setState({
           highlightedIndex: index,
-          isOpen: true
+          isOpen: true,
         });
       },
 
@@ -58,11 +59,11 @@ class Autocomplete extends React.Component {
           // -> close the menu, highlight whatever's in input
           this.setState(
             {
-              isOpen: false
+              isOpen: false,
             },
             () => {
               this.inputEl.select();
-            }
+            },
           );
         } else {
           // text entered + menu item has been highlighted + enter is hit
@@ -73,13 +74,13 @@ class Autocomplete extends React.Component {
           this.setState(
             {
               isOpen: false,
-              highlightedIndex: null
+              highlightedIndex: null,
             },
             () => {
               // this.refs.input.focus() // TODO: file issue
               this.inputEl.setSelectionRange(value.length, value.length);
               this.props.onSelect(value, item);
-            }
+            },
           );
         }
       },
@@ -87,16 +88,16 @@ class Autocomplete extends React.Component {
       Escape() {
         this.setState({
           highlightedIndex: null,
-          isOpen: false
+          isOpen: false,
         });
-      }
+      },
     };
   }
 
   getInitialState() {
     return {
       isOpen: false,
-      highlightedIndex: null
+      highlightedIndex: null,
     };
   }
 
@@ -142,12 +143,12 @@ class Autocomplete extends React.Component {
   maybeScrollItemIntoView() {
     if (this.state.isOpen === true && this.state.highlightedIndex !== null) {
       // eslint-disable-next-line react/no-string-refs
-      const itemNode = this.refs[`item-${this.state.highlightedIndex}`];
+      const itemNode = this.mrefs[`item-${this.state.highlightedIndex}`];
       // eslint-disable-next-line react/no-string-refs
-      const menuNode = this.refs.menu;
+      const menuNode = this.mrefs.menu;
       if (itemNode) {
         scrollIntoView(findDOMNode(itemNode), findDOMNode(menuNode), {
-          onlyScrollIfNeeded: true
+          onlyScrollIfNeeded: true,
         });
       }
     }
@@ -159,7 +160,7 @@ class Autocomplete extends React.Component {
     } else {
       this.setState({
         highlightedIndex: null,
-        isOpen: true
+        isOpen: true,
       });
     }
   }
@@ -181,7 +182,7 @@ class Autocomplete extends React.Component {
 
     if (this.props.shouldItemRender) {
       items = items.filter(item =>
-        this.props.shouldItemRender(item, this.props.value)
+        this.props.shouldItemRender(item, this.props.value),
       );
     }
 
@@ -221,13 +222,13 @@ class Autocomplete extends React.Component {
     this.setState({
       menuTop: rect.bottom + marginBottom,
       menuLeft: rect.left + marginLeft,
-      menuWidth: rect.width + marginLeft + marginRight
+      menuWidth: rect.width + marginLeft + marginRight,
     });
   }
 
   highlightItemFromMouse(index) {
     this.setState({
-      highlightedIndex: index
+      highlightedIndex: index,
     });
   }
 
@@ -236,12 +237,12 @@ class Autocomplete extends React.Component {
     this.setState(
       {
         isOpen: false,
-        highlightedIndex: null
+        highlightedIndex: null,
       },
       () => {
         this.props.onSelect(value, item);
         this.inputEl.focus();
-      }
+      },
     );
   }
 
@@ -254,25 +255,29 @@ class Autocomplete extends React.Component {
       const element = this.props.renderItem(
         item,
         this.state.highlightedIndex === index,
-        { cursor: 'default' }
+        { cursor: 'default' },
       );
       return React.cloneElement(element, {
         onMouseDown: () => this.setIgnoreBlur(true),
         // Ignore blur to prevent menu from de-rendering before we can process click
         onMouseEnter: () => this.highlightItemFromMouse(index),
         onClick: () => this.selectItemFromMouse(item),
-        ref: `item-${index}`
+        ref: e => {
+          this.mrefs[`item-${index}`] = e;
+        },
       });
     });
     const style = {
       left: this.state.menuLeft,
       top: this.state.menuTop,
-      minWidth: this.state.menuWidth
+      minWidth: this.state.menuWidth,
     };
     if (!items.length) return null;
     const menu = this.props.renderMenu(items, this.props.value, style);
     return React.cloneElement(menu, {
-      ref: 'menu'
+      ref: e => {
+        this.mrefs.menu = e;
+      },
     });
   }
 
@@ -285,7 +290,7 @@ class Autocomplete extends React.Component {
     }
     this.setState({
       isOpen: false,
-      highlightedIndex: null
+      highlightedIndex: null,
     });
   }
 
@@ -303,7 +308,7 @@ class Autocomplete extends React.Component {
     // The event order is:  MouseDown -> Focus -> MouseUp -> Click
     this._ignoreClick = true;
     this.setState({
-      isOpen: true
+      isOpen: true,
     });
   }
 
@@ -318,11 +323,11 @@ class Autocomplete extends React.Component {
     // Input will not be focused if it's disabled
     if (this.isInputFocused() && this.state.isOpen === false) {
       this.setState({
-        isOpen: true
+        isOpen: true,
       });
     } else if (this.state.highlightedIndex !== null && !this._ignoreClick) {
       this.selectItemFromMouse(
-        this.getFilteredItems()[this.state.highlightedIndex]
+        this.getFilteredItems()[this.state.highlightedIndex],
       );
     }
     this._ignoreClick = false;
@@ -344,7 +349,7 @@ class Autocomplete extends React.Component {
       // you don't like it, you love it
       _debugStates.push({
         id: _debugStates.length,
-        state: this.state
+        state: this.state,
       });
     }
 
@@ -360,24 +365,24 @@ class Autocomplete extends React.Component {
           autoComplete="off"
           onBlur={this.composeEventHandlers(
             this.handleInputBlur.bind(this),
-            inputProps.onBlur && inputProps.onBlur.bind(this)
+            inputProps.onBlur && inputProps.onBlur.bind(this),
           )}
           onChange={this.handleChange.bind(this)}
           onClick={this.composeEventHandlers(
             this.handleInputClick.bind(this),
-            inputProps.onClick && inputProps.onClick.bind(this)
+            inputProps.onClick && inputProps.onClick.bind(this),
           )}
           onFocus={this.composeEventHandlers(
             this.handleInputFocus.bind(this),
-            inputProps.onFocus && inputProps.onFocus.bind(this)
+            inputProps.onFocus && inputProps.onFocus.bind(this),
           )}
           onKeyDown={this.composeEventHandlers(
             this.handleKeyDown.bind(this),
-            inputProps.onKeyDown && inputProps.onKeyDown.bind(this)
+            inputProps.onKeyDown && inputProps.onKeyDown.bind(this),
           )}
           onKeyUp={this.composeEventHandlers(
             this.handleKeyUp.bind(this),
-            inputProps.onKeyUp && inputProps.onKeyUp.bind(this)
+            inputProps.onKeyUp && inputProps.onKeyUp.bind(this),
           )}
           role="combobox"
           value={this.props.value}
@@ -387,13 +392,13 @@ class Autocomplete extends React.Component {
         {this.props.debug && (
           <pre
             style={{
-              marginLeft: 300
+              marginLeft: 300,
             }}
           >
             {JSON.stringify(
               _debugStates.slice(_debugStates.length - 5, _debugStates.length),
               null,
-              2
+              2,
             )}
           </pre>
         )}
@@ -406,7 +411,7 @@ Autocomplete.defaultProps = {
   value: '',
   wrapperProps: {},
   wrapperStyle: {
-    display: 'inline-block'
+    display: 'inline-block',
   },
   inputProps: {},
   onChange() {},
@@ -429,10 +434,10 @@ Autocomplete.defaultProps = {
     fontSize: '90%',
     position: 'fixed',
     overflow: 'auto',
-    maxHeight: '50%' // TODO: don't cheat, let it flow to the bottom
+    maxHeight: '50%', // TODO: don't cheat, let it flow to the bottom
   },
   autoHighlight: true,
-  onMenuVisibilityChange() {}
+  onMenuVisibilityChange() {},
 };
 
 Autocomplete.propTypes = {
@@ -453,7 +458,7 @@ Autocomplete.propTypes = {
   sortItems: PropTypes.func,
   value: PropTypes.any,
   wrapperProps: PropTypes.object,
-  wrapperStyle: PropTypes.object
+  wrapperStyle: PropTypes.object,
 };
 
 export default Autocomplete;

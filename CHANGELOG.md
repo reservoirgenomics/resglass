@@ -1,5 +1,13 @@
 # Release notes
 
+## v1.17.4
+
+- No strings refs in Autocomplete
+
+## v1.17.3
+
+- Publish to GitHub packages as well
+
 ## v1.17.2
 
 - Don't publish on GitHub packages any more
