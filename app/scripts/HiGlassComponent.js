@@ -4204,7 +4204,6 @@ class HiGlassComponent extends React.Component {
     for (let i = 0; i < views.length; i++) {
       const tiledPlot = this.tiledPlots[views[i].uid];
 
-      console.log('this.tiledAreaDivs', this.tiledAreasDivs);
       const area = this.tiledAreasDivs[views[i].uid].getBoundingClientRect();
 
       const { top, left } = area;
@@ -4970,43 +4969,21 @@ class HiGlassComponent extends React.Component {
             />
           ) : null;
 
-        console.log('return');
         return (
-          <div
-            key={view.uid}
-            ref={c => {
-              console.log('c', c);
-              this.tiledAreasDivs[view.uid] = c;
-            }}
-            styleName="styles.tiled-area"
-          >
-            {multiTrackHeader}
-            {tiledPlot}
-            {overlay}
+          <div key={view.uid}>
+            <div
+              key={view.uid}
+              ref={c => {
+                this.tiledAreasDivs[view.uid] = c;
+              }}
+              styleName="styles.tiled-area"
+            >
+              {multiTrackHeader}
+              {tiledPlot}
+              {overlay}
+            </div>
           </div>
         );
-
-        // console.log('return');
-        // const ReturnComponent = React.forwardRef(
-        //   ({ style, className, ...props }, ref) => (
-        //     <div style={{ ...style }} className={className} ref={ref}>
-        //       {multiTrackHeader}
-        //       {tiledPlot}
-        //       {overlay}
-        //     </div>
-        //   ),
-        // );
-
-        // return (
-        //   <ReturnComponent
-        //     key={view.uid}
-        //     ref={c => {
-        //       console.log('c', c);
-        //       this.tiledAreasDivs[view.uid] = c;
-        //     }}
-        //     styleName="styles.tiled-area"
-        //   />
-        // );
       });
     }
 
@@ -5034,7 +5011,6 @@ class HiGlassComponent extends React.Component {
         ? +this.props.options.containerPaddingY
         : defaultContainerPaddingY;
 
-    console.log('this.tiledAreas', this.tiledAreas);
     const gridLayout = (
       <ReactGridLayout
         // Reserved props
