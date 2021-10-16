@@ -1,5 +1,9 @@
 # Release notes
 
+## v1.17.6
+
+- Fixed view syncing and viewport projection bug having to do with state changes happening before a state variable was being used.
+
 ## v1.17.5
 
 - Bumped react-grid-layout version
