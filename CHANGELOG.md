@@ -1,5 +1,9 @@
 # Release notes
 
+## v1.17.5
+
+- Bumped react-grid-layout version
+
 ## v1.17.4
 
 - No strings refs in Autocomplete
