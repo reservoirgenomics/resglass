@@ -1,6 +1,6 @@
 {
   "name": "@reservoirgenomics/resglass",
-  "version": "1.17.4",
+  "version": "1.17.5",
   "description": "Resgen flavored HiGlass",
   "author": "Peter Kerpedjiev <pkerpedjiev@gmail.com>",
   "main": "dist/hglib.js",
