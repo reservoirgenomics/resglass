@@ -27,7 +27,7 @@ module.exports = (env, argv) => ({
     poll: 1000,
     ignored: /node_modules/,
   },
-  devtool: 'eval-cheap-source-map',
+  // devtool: 'cheap-source-map',
   devServer: {
     static: [
       path.resolve(__dirname, 'app'),
