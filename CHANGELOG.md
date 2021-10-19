@@ -1,5 +1,10 @@
 # Release notes
 
+## v1.18.0
+
+- View names
+- Fixed click handler on LeftTrackModified tracks
+
 ## v1.17.6
 
 - Fixed view syncing and viewport projection bug having to do with state changes happening before a state variable was being used.

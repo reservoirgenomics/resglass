@@ -293,7 +293,7 @@ class ViewHeader extends React.Component {
               <use xlinkHref="#select" />
             </svg>
           )}
-          <span style={{ marginLeft: '0.5rem' }}>
+          <span style={{ marginLeft: '0.5rem', fontSize: '0.9rem' }}>
             <b>{this.context.viewUidToName(this.props.viewUid)}</b>
           </span>
           <div
