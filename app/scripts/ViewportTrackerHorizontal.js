@@ -130,12 +130,14 @@ class ViewportTrackerHorizontal extends SVGTrack {
 
     const dest = [x0, x1];
 
-    const VIEW_UID_OPACITY = 0.5;
+    const viewNameOpacity =
+      'viewNameOpacity' in this.options ? this.options.viewNameOpacity : 0.8;
+
     this.text
       .attr('x', (x0 + x1) / 2)
       .attr('y', this.dimensions[1] / 2)
       .text(this.context.viewUidToName(this.context.fromViewUid))
-      .attr('opacity', VIEW_UID_OPACITY);
+      .attr('opacity', viewNameOpacity);
 
     // console.log('dest:', dest[0], dest[1]);
 

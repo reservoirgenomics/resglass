@@ -1633,6 +1633,8 @@ class TrackRenderer extends React.Component {
           context.registerViewportChanged = track.registerViewportChanged;
           context.removeViewportChanged = track.removeViewportChanged;
           context.setDomainsCallback = track.setDomainsCallback;
+          context.fromViewUid = track.fromViewUid;
+
           return new ViewportTracker2D(context, options);
         }
         return new Track(context, options);
@@ -1663,6 +1665,8 @@ class TrackRenderer extends React.Component {
           context.registerViewportChanged = track.registerViewportChanged;
           context.removeViewportChanged = track.removeViewportChanged;
           context.setDomainsCallback = track.setDomainsCallback;
+          context.fromViewUid = track.fromViewUid;
+
           return new ViewportTrackerVertical(context, options);
         }
         return new Track(context, options);

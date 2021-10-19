@@ -306,6 +306,10 @@ export const OPTIONS_INFO = {
     name: 'Bar opacity',
     inlineOptions: OPACITY_OPTIONS,
   },
+  viewNameOpacity: {
+    name: 'View name opacity',
+    inlineOptions: OPACITY_OPTIONS,
+  },
   zeroLineVisible: {
     name: 'Zero line visible',
     inlineOptions: YES_NO,
