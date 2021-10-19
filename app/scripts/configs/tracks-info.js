@@ -818,6 +818,7 @@ export const TRACKS_INFO = [
       'projectionFillColor',
       'projectionStrokeColor',
       'strokeWidth',
+      'viewNameOpacity',
     ],
     defaultOptions: {
       projectionFillColor: '#777',
@@ -825,6 +826,7 @@ export const TRACKS_INFO = [
       projectionFillOpacity: 0.3,
       projectionStrokeOpacity: 0.7,
       strokeWidth: 1,
+      viewNameOpacity: 0.7,
     },
   },
   {
@@ -839,6 +841,7 @@ export const TRACKS_INFO = [
       'projectionFillColor',
       'projectionStrokeColor',
       'strokeWidth',
+      'viewNameOpacity',
     ],
     defaultOptions: {
       projectionFillColor: '#777',
@@ -846,6 +849,7 @@ export const TRACKS_INFO = [
       projectionFillOpacity: 0.3,
       projectionStrokeOpacity: 0.7,
       strokeWidth: 1,
+      viewNameOpacity: 0.7,
     },
   },
   {
@@ -860,6 +864,7 @@ export const TRACKS_INFO = [
       'projectionFillColor',
       'projectionStrokeColor',
       'strokeWidth',
+      'viewNameOpacity',
     ],
     defaultOptions: {
       projectionFillColor: '#777',
@@ -867,6 +872,7 @@ export const TRACKS_INFO = [
       projectionFillOpacity: 0.3,
       projectionStrokeOpacity: 0.7,
       strokeWidth: 1,
+      viewNameOpacity: 0.7,
     },
   },
   {

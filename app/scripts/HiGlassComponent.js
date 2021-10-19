@@ -27,6 +27,8 @@ import { Provider as PubSubProvider } from './hocs/with-pub-sub';
 import { Provider as ModalProvider } from './hocs/with-modal';
 import { Provider as ThemeProvider } from './hocs/with-theme';
 
+import HiGlassComponentContext from './HiGlassComponentContext';
+
 // Services
 import {
   chromInfo,
@@ -351,6 +353,7 @@ class HiGlassComponent extends React.Component {
     this.closeModalBound = this.closeModal.bind(this);
     this.handleEditViewConfigBound = this.handleEditViewConfig.bind(this);
     this.onScrollHandlerBound = this.onScrollHandler.bind(this);
+    this.viewUidToNameBound = this.viewUidToName.bind(this);
 
     // for typed shortcuts (e.g. e-d-i-t) to toggle editable
     this.typedText = '';
@@ -4684,6 +4687,24 @@ class HiGlassComponent extends React.Component {
     }
   }
 
+  /** Convert a viewUid to a view name so that when we create
+   * viewport projects, we can show which view they refer to.
+   * The name is usually a single letter like 'A'
+   *  The view's name will also be visible in the header. */
+  viewUidToName(viewUid) {
+    const views = Object.keys(this.state.views);
+
+    for (let i = 0; i < views.length; i++) {
+      if (views[i] === viewUid) {
+        // Starting from A and then onwards. God help us if there's
+        // more than 52 views
+        return String.fromCharCode(65 + i);
+      }
+    }
+
+    return 'UU';
+  }
+
   render() {
     this.tiledAreasDivs = {};
     this.tiledAreas = <div styleName="styles.tiled-area" />;
@@ -5080,49 +5101,53 @@ class HiGlassComponent extends React.Component {
         <PubSubProvider value={this.pubSub}>
           <ModalProvider value={this.modal}>
             <ThemeProvider value={this.theme}>
-              {this.state.modal}
-              <canvas
-                key={this.uid}
-                ref={c => {
-                  this.canvasElement = c;
-                }}
-                onClick={this.canvasClickHandlerBound}
-                styleName="styles.higlass-canvas"
-              />
-              <div
-                ref={c => {
-                  this.scrollContainer = c;
-                }}
-                className="higlass-scroll-container"
-                onScroll={this.onScrollHandlerBound}
-                styleName={scrollStyleNames}
+              <HiGlassComponentContext.Provider
+                value={{ viewUidToName: this.viewUidToNameBound }}
               >
+                {this.state.modal}
+                <canvas
+                  key={this.uid}
+                  ref={c => {
+                    this.canvasElement = c;
+                  }}
+                  onClick={this.canvasClickHandlerBound}
+                  styleName="styles.higlass-canvas"
+                />
                 <div
                   ref={c => {
-                    this.divDrawingSurface = c;
+                    this.scrollContainer = c;
                   }}
-                  className="higlass-drawing-surface"
-                  styleName="styles.higlass-drawing-surface"
+                  className="higlass-scroll-container"
+                  onScroll={this.onScrollHandlerBound}
+                  styleName={scrollStyleNames}
                 >
-                  {gridLayout}
+                  <div
+                    ref={c => {
+                      this.divDrawingSurface = c;
+                    }}
+                    className="higlass-drawing-surface"
+                    styleName="styles.higlass-drawing-surface"
+                  >
+                    {gridLayout}
+                  </div>
+                  <svg
+                    ref={c => {
+                      this.svgElement = c;
+                    }}
+                    style={{
+                      // inline the styles so they aren't overriden by other css
+                      // on the web page
+                      position: 'absolute',
+                      width: '100%',
+                      height: '100%',
+                      left: 0,
+                      top: 0,
+                      pointerEvents: 'none',
+                    }}
+                    styleName="styles.higlass-svg"
+                  />
                 </div>
-                <svg
-                  ref={c => {
-                    this.svgElement = c;
-                  }}
-                  style={{
-                    // inline the styles so they aren't overriden by other css
-                    // on the web page
-                    position: 'absolute',
-                    width: '100%',
-                    height: '100%',
-                    left: 0,
-                    top: 0,
-                    pointerEvents: 'none',
-                  }}
-                  styleName="styles.higlass-svg"
-                />
-              </div>
+              </HiGlassComponentContext.Provider>
             </ThemeProvider>
           </ModalProvider>
         </PubSubProvider>

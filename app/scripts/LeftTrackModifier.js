@@ -154,6 +154,10 @@ class LeftTrackModifier {
     this.originalTrack.clickOutside();
   }
 
+  click(...args) {
+    this.originalTrack.click(...args);
+  }
+
   draw() {
     this.originalTrack.draw();
   }
@@ -219,6 +223,10 @@ class LeftTrackModifier {
 
   refScalesChanged(refXScale, refYScale) {
     this.originalTrack.refScalesChanged(refYScale, refXScale);
+  }
+
+  get context() {
+    return this.originalTrack.context;
   }
 
   get options() {
