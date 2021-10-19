@@ -49,6 +49,12 @@ class ViewportTrackerHorizontal extends SVGTrack {
 
     this.gBrush.selectAll('.handle--s').style('pointer-events', 'none');
 
+    this.text = this.gMain
+      .append('text')
+      .text('A')
+      .attr('text-anchor', 'middle')
+      .attr('dominant-baseline', 'middle');
+
     registerViewportChanged(uid, this.viewportChanged.bind(this));
 
     // the viewport will call this.viewportChanged immediately upon
@@ -123,6 +129,13 @@ class ViewportTrackerHorizontal extends SVGTrack {
     const x1 = this._xScale(this.viewportXDomain[1]);
 
     const dest = [x0, x1];
+
+    const VIEW_UID_OPACITY = 0.5;
+    this.text
+      .attr('x', (x0 + x1) / 2)
+      .attr('y', this.dimensions[1] / 2)
+      .text(this.context.viewUidToName(this.context.fromViewUid))
+      .attr('opacity', VIEW_UID_OPACITY);
 
     // console.log('dest:', dest[0], dest[1]);
 

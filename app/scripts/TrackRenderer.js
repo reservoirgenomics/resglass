@@ -38,6 +38,7 @@ import SquareMarkersTrack from './SquareMarkersTrack';
 import Chromosome2DLabels from './Chromosome2DLabels';
 import ChromosomeGrid from './ChromosomeGrid';
 import Chromosome2DAnnotations from './Chromosome2DAnnotations';
+import HiGlassComponentContext from './HiGlassComponentContext';
 import HorizontalChromosomeLabels from './HorizontalChromosomeLabels';
 
 import HorizontalHeatmapTrack from './HorizontalHeatmapTrack';
@@ -86,6 +87,8 @@ import '../styles/TrackRenderer.module.scss';
 const SCROLL_TIMEOUT = 100;
 
 class TrackRenderer extends React.Component {
+  static contextType = HiGlassComponentContext;
+
   /**
    * Maintain a list of tracks, and re-render them whenever either
    * their size changes or the zoom level changes
@@ -1539,6 +1542,7 @@ class TrackRenderer extends React.Component {
       chromInfoPath: track.chromInfoPath,
       isShowGlobalMousePosition: () => this.props.isShowGlobalMousePosition,
       getTheme: () => this.props.theme,
+      viewUidToName: this.context.viewUidToName,
     };
 
     // for horizontal and vertical rules
@@ -1559,7 +1563,6 @@ class TrackRenderer extends React.Component {
     if (track.projectionYDomain) {
       context.projectionYDomain = track.projectionYDomain;
     }
-
     const options = track.options;
 
     switch (track.type) {
@@ -1644,6 +1647,8 @@ class TrackRenderer extends React.Component {
           context.registerViewportChanged = track.registerViewportChanged;
           context.removeViewportChanged = track.removeViewportChanged;
           context.setDomainsCallback = track.setDomainsCallback;
+          context.fromViewUid = track.fromViewUid;
+
           return new ViewportTrackerHorizontal(context, options);
         }
         return new Track(context, options);

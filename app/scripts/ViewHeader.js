@@ -6,6 +6,8 @@ import ContextMenuContainer from './ContextMenuContainer';
 import ConfigViewMenu from './ConfigViewMenu';
 import AddTrackPositionMenu from './AddTrackPositionMenu';
 
+import HiGlassComponentContext from './HiGlassComponentContext';
+
 // HOCS
 import withTheme from './hocs/with-theme';
 
@@ -21,6 +23,8 @@ import {
 import '../styles/ViewHeader.module.scss';
 
 class ViewHeader extends React.Component {
+  static contextType = HiGlassComponentContext;
+
   constructor(props) {
     super(props);
 
@@ -289,6 +293,9 @@ class ViewHeader extends React.Component {
               <use xlinkHref="#select" />
             </svg>
           )}
+          <span style={{ marginLeft: '0.5rem' }}>
+            <b>{this.context.viewUidToName(this.props.viewUid)}</b>
+          </span>
           <div
             styleName="multitrack-header-grabber"
             title="Drag to move the view"
