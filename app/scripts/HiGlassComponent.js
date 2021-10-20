@@ -3597,6 +3597,8 @@ class HiGlassComponent extends React.Component {
         views,
       };
     });
+
+    this.triggerViewChangeDb();
   }
 
   handleSelectedAssemblyChanged(
@@ -4075,9 +4077,8 @@ class HiGlassComponent extends React.Component {
   }
 
   triggerViewChange() {
-    this.viewChangeListener.forEach(callback =>
-      callback(this.getViewsAsString()),
-    );
+    const viewsString = this.getViewsAsString();
+    this.viewChangeListener.forEach(callback => callback(viewsString));
   }
 
   getGenomeLocation(viewId) {
