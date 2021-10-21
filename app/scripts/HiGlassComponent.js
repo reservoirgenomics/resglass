@@ -3532,7 +3532,7 @@ class HiGlassComponent extends React.Component {
    * User clicked on the "Add View" button. We'll duplicate the last
    * view.
    */
-  handleAddView(view) {
+  handleAddView(view, newViewParams) {
     const views = dictValues(this.state.views);
     const lastView = view;
 
@@ -3572,11 +3572,14 @@ class HiGlassComponent extends React.Component {
 
     const jsonString = JSON.stringify(lastView);
 
-    const newView = JSON.parse(jsonString); // ghetto copy
+    let newView = JSON.parse(jsonString); // ghetto copy
 
     newView.initialXDomain = this.xScales[newView.uid].domain();
     newView.initialYDomain = this.yScales[newView.uid].domain();
 
+    if (newViewParams) {
+      newView = { ...newView, ...newViewParams };
+    }
     // place this new view below all the others
 
     [[newView.layout.x, newView.layout.y]] = potentialPositions;
@@ -3597,8 +3600,6 @@ class HiGlassComponent extends React.Component {
         views,
       };
     });
-
-    this.triggerViewChangeDb();
   }
 
   handleSelectedAssemblyChanged(
