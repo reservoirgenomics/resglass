@@ -1,5 +1,9 @@
 # Release notes
 
+## v1.19.0
+
+- Accidental release because of butterfingers
+
 ## v1.18.2
 
 - Make handleAddView return a viewconf so that it can be modified by a calling application
