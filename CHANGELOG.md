@@ -1,5 +1,9 @@
 # Release notes
 
+## v1.18.2
+
+- Make handleAddView return a viewconf so that it can be modified by a calling application
+
 ## v1.18.1
 
 - Enable passing params `handleAddView` so that it can be called to create a new view that is zoomed to a particular location

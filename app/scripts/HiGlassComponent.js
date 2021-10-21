@@ -3316,9 +3316,9 @@ class HiGlassComponent extends React.Component {
     };
   }
 
-  getViewsAsJson() {
+  getViewsAsJson(views) {
     const newJson = JSON.parse(JSON.stringify(this.state.viewConfig));
-    newJson.views = Object.values(this.state.views).map(k => {
+    newJson.views = Object.values(views || this.state.views).map(k => {
       const newView = JSON.parse(JSON.stringify(k));
 
       visitPositionedTracks(newView.tracks, track => {
@@ -3532,7 +3532,7 @@ class HiGlassComponent extends React.Component {
    * User clicked on the "Add View" button. We'll duplicate the last
    * view.
    */
-  handleAddView(view, newViewParams) {
+  handleAddView(view, newViewParams, noUpdate) {
     const views = dictValues(this.state.views);
     const lastView = view;
 
@@ -3588,18 +3588,39 @@ class HiGlassComponent extends React.Component {
     newView.uid = slugid.nice();
     newView.layout.i = newView.uid;
 
+    this.xScales[newView.uid] = scaleLinear().domain(newView.initialXDomain);
+    this.yScales[newView.uid] = scaleLinear().domain(newView.initialYDomain);
+
     visitPositionedTracks(newView.tracks, track => {
       this.addCallbacks(newView.uid, track);
     });
 
-    this.setState(prevState => {
-      // eslint-disable-next-line no-shadow
-      const views = JSON.parse(JSON.stringify(prevState.views));
-      views[newView.uid] = newView;
-      return {
-        views,
-      };
-    });
+    const createNewViews = prevViews => {
+      const _views = JSON.parse(JSON.stringify(prevViews));
+      _views[newView.uid] = newView;
+
+      return _views;
+    };
+
+    let newViews = null;
+
+    if (!noUpdate) {
+      this.setState(prevState => {
+        // eslint-disable-next-line no-shadow
+        newViews = createNewViews(prevState.views);
+
+        return {
+          views: newViews,
+        };
+      });
+    } else {
+      newViews = createNewViews(this.state.views);
+    }
+
+    return {
+      newViewUid: newView.uid,
+      newViewconf: this.getViewsAsJson(newViews),
+    };
   }
 
   handleSelectedAssemblyChanged(
