@@ -451,6 +451,8 @@ class TiledPlot extends React.Component {
 
           apiPublish('annotationChanged', {
             annotationUid: this.annotationUid,
+            viewUid: this.props.uid,
+            track: track.track,
             extent: [this.brushSelection, [null, null]],
           });
         });
@@ -482,6 +484,8 @@ class TiledPlot extends React.Component {
 
           apiPublish('annotationChanged', {
             annotationUid: this.annotationUid,
+            track: track.track,
+            viewUid: this.props.uid,
             extent: [[null, null], this.brushSelection],
           });
         });
@@ -2714,7 +2718,6 @@ class TiledPlot extends React.Component {
               // we want to remove the mouseOverOverlayUid so that next time we try
               // to choose an overlay track, the previously selected one isn't
               // automatically highlighted
-
               onClick={evt => this.handleTrackPositionChosen(pTrack, evt)}
               onDragEnter={evt => {
                 this.handleOverlayMouseEnter(pTrack.track.uid);

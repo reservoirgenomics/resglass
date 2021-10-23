@@ -233,6 +233,14 @@ class LeftTrackModifier {
     return this.originalTrack.options;
   }
 
+  get tilesetInfo() {
+    return this.originalTrack.tilesetInfo;
+  }
+
+  get chromInfo() {
+    return this.originalTrack.chromInfo;
+  }
+
   rerender(options) {
     this.originalTrack.rerender(options);
   }

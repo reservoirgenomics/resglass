@@ -25,6 +25,8 @@ export { default as schema } from '../schema.json';
 
 // export functions that are useful for testing
 export {
+  convertNumberNotation,
+  chrPosToPositionString,
   debounce,
   waitForJsonComplete,
   waitForTilesLoaded,

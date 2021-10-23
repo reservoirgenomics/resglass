@@ -77,6 +77,7 @@ export { default as trackUtils } from './track-utils';
 export { default as positionedTracksToAllTracks } from './positioned-tracks-to-all-tracks';
 export { default as getDefaultTracksForDatatype } from './default-tracks';
 export { default as copyTextToClipboard } from './copy-text-to-clipboard';
+export { convertNumberNotation, chrPosToPositionString } from './number';
 
 export {
   getTrackObjectFromHGC,

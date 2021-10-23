@@ -1,5 +1,11 @@
 # Release notes
 
+## v1.19.1
+
+- Fix bug where track information wasn't being included in annotation events
+- Export `convertToNumber` and `chrPosToPositionString` functions
+- Fix bug where LeftTrackModifier wasn't passing on property accesses to .tilesetInfo and .chromInfo
+
 ## v1.19.0
 
 - Accidental release because of butterfingers
