@@ -1,5 +1,9 @@
 # Release notes
 
+## v1.19.2
+
+- Added missing js file
+
 ## v1.19.1
 
 - Fix bug where track information wasn't being included in annotation events
