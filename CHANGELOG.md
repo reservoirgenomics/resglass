@@ -1,5 +1,9 @@
 # Release notes
 
+## v1.19.4
+
+- Bumped d3-transition version
+
 ## v1.19.3
 
 - Add track data section on drag and dropped track
