@@ -1,5 +1,9 @@
 # Release notes
 
+## v1.19.3
+
+- Add track data section on drag and dropped track
+
 ## v1.19.2
 
 - Added missing js file
