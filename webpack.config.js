@@ -48,6 +48,9 @@ module.exports = (env, argv) => ({
     libraryTarget: 'umd',
     library: '[name]',
   },
+  experiments: {
+    cacheUnaffected: true,
+  },
   optimization: {
     minimize: argv.mode === 'production',
     minimizer: [
@@ -56,6 +59,7 @@ module.exports = (env, argv) => ({
       }),
       new CssMinimizerPlugin(),
     ],
+    providedExports: false,
   },
   module: {
     rules: [

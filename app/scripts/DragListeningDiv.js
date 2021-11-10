@@ -12,7 +12,7 @@ class DragListeningDiv extends React.Component {
     super(props);
 
     this.state = {
-      dragOnTop: false
+      dragOnTop: false,
     };
   }
 
@@ -24,9 +24,16 @@ class DragListeningDiv extends React.Component {
     const newTrack = {
       type: this.props.defaultTrackType,
       uid: slugid.nice(),
-      tilesetUid: evtJson.tilesetUid,
-      server: evtJson.server
     };
+
+    if (evtJson.tilesetUid && evtJson.server) {
+      newTrack.tilesetUid = evtJson.tilesetUid;
+      newTrack.server = evtJson.server;
+    }
+
+    if (evtJson.data) {
+      newTrack.data = evtJson.data;
+    }
 
     this.props.onTrackDropped(newTrack);
     this.props.pubSub.publish('trackDropped', newTrack);
@@ -58,12 +65,12 @@ class DragListeningDiv extends React.Component {
         onDrop={this.handleDrop.bind(this)}
         onMouseEnter={() => {
           this.setState({
-            dragOnTop: true
+            dragOnTop: true,
           });
         }}
         onMouseLeave={() => {
           this.setState({
-            dragOnTop: false
+            dragOnTop: false,
           });
         }}
         style={this.props.style}
@@ -77,7 +84,7 @@ DragListeningDiv.defaultProps = {
   enabled: false,
   style: {},
   draggingHappening: {},
-  onTrackDropped: () => {}
+  onTrackDropped: () => {},
 };
 
 DragListeningDiv.propTypes = {
@@ -86,7 +93,7 @@ DragListeningDiv.propTypes = {
   defaultTrackType: PropTypes.object,
   draggingHappening: PropTypes.object,
   onTrackDropped: PropTypes.func,
-  position: PropTypes.string.isRequired
+  position: PropTypes.string.isRequired,
 };
 
 export default withPubSub(DragListeningDiv);
