@@ -19,6 +19,7 @@ export const MOUSE_TOOL_TRACK_SELECT = 'track-select';
 export const SIZE_MODE_DEFAULT = 'default';
 export const SIZE_MODE_BOUNDED = 'bounded';
 export const SIZE_MODE_OVERFLOW = 'overflow';
+export const SIZE_MODE_BOUNDED_OVERFLOW = 'bounded-overflow';
 export const SIZE_MODE_SCROLL = 'scroll';
 
 export const TILE_FETCH_DEBOUNCE = 100;

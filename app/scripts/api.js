@@ -14,6 +14,7 @@ import {
   MOUSE_TOOL_TRACK_SELECT,
   SIZE_MODE_DEFAULT,
   SIZE_MODE_BOUNDED,
+  SIZE_MODE_BOUNDED_OVERFLOW,
   SIZE_MODE_OVERFLOW,
   SIZE_MODE_SCROLL,
 } from './configs';
@@ -570,6 +571,9 @@ const createApi = function api(context, pubSub) {
             break;
           case 'overflow':
             self.setSizeMode(SIZE_MODE_OVERFLOW);
+            break;
+          case 'bounded-overflow':
+            self.setSizeMode(SIZE_MODE_BOUNDED_OVERFLOW);
             break;
           case 'scroll':
             self.setSizeMode(SIZE_MODE_SCROLL);

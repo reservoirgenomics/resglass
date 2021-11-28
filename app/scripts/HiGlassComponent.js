@@ -82,6 +82,7 @@ import {
   SIZE_MODE_DEFAULT,
   SIZE_MODE_BOUNDED,
   SIZE_MODE_OVERFLOW,
+  SIZE_MODE_BOUNDED_OVERFLOW,
   SIZE_MODE_SCROLL,
 } from './configs';
 
@@ -2112,7 +2113,8 @@ class HiGlassComponent extends React.Component {
   updateRowHeight() {
     if (
       !this.props.options ||
-      this.sizeMode !== SIZE_MODE_BOUNDED ||
+      (this.sizeMode !== SIZE_MODE_BOUNDED &&
+        this.sizeMode !== SIZE_MODE_BOUNDED_OVERFLOW) ||
       this.props.options.pixelPreciseMarginPadding
     ) {
       // not bounded so we don't need to update the row height
@@ -2122,9 +2124,29 @@ class HiGlassComponent extends React.Component {
     // const width = this.element.parentNode.clientWidth;
     const height = this.element.parentNode.clientHeight;
 
-    let maxHeight = 0;
+    let maxHeight = 1;
+    let perTrackRowHeight = 0;
+
     for (const view of dictValues(this.state.views)) {
       maxHeight = Math.max(maxHeight, view.layout.y + view.layout.h);
+
+      const topTrackHeights = view.tracks.top
+        .map(x => x.height)
+        .reduce((a, b) => a + b, 0);
+      const bottomTrackHeights = view.tracks.bottom
+        .map(x => x.height)
+        .reduce((a, b) => a + b, 0);
+      const centerTrackHeight = view.tracks.center
+        .map(x => x.height)
+        .reduce((a, b) => a + b, 0);
+
+      perTrackRowHeight = Math.ceil(
+        Math.max(
+          perTrackRowHeight,
+          (topTrackHeights + bottomTrackHeights + centerTrackHeight) /
+            view.layout.h,
+        ),
+      );
     }
 
     this.handleDragStart();
@@ -2135,39 +2157,18 @@ class HiGlassComponent extends React.Component {
     const marginHeight = MARGIN_HEIGHT * maxHeight - 1;
     const availableHeight = height - marginHeight;
 
-    // const currentRowHeight = this.state.rowHeight;
-    const prospectiveRowHeight = availableHeight / maxHeight; // maxHeight is the number of
+    // if we're bounded, then maxHeight * rowHeight = availableHeight
+    // but the catch is that if we have tracks that would be larger
+    // than the largest div, we have to adjust the height to make sure
+    // all of them are visible
+    // to do that, we have to go view by view and calculate the heights
+    // of the top and bottom sections and then divide that by the view's height
+    // if there's a center track
+
+    const prospectiveRowHeight = Math.floor(availableHeight / maxHeight); // maxHeight is the number of
     // rows necessary to display this view
 
-    const chosenRowHeight = Math.floor(prospectiveRowHeight);
-
-    // for (const view of dictValues(this.state.views)) {
-    //   const {
-    //     totalWidth,
-    //     totalHeight,
-    //     topHeight,
-    //     bottomHeight,
-    //     leftWidth,
-    //     rightWidth,
-    //     centerWidth,
-    //     centerHeight,
-    //     minNecessaryHeight
-    //   } = this.calculateViewDimensions(view);
-
-    //   // If the view is bounded, then we always fit everything inside the container
-    //   //
-    //   // It used to be that if the viewconfig was too long, we just let it overflow,
-    //   // but I think it's better that it's always contained.
-
-    //   /*
-    //         if (minNecessaryHeight > view.layout.h * (prospectiveRowHeight + MARGIN_HEIGHT)) {
-    //             // we don't have space for one of the containers, so let them exceed the bounds
-    //             // of the box
-    //             chosenRowHeight = currentRowHeight;
-    //             break;
-    //         }
-    //         */
-    // }
+    const chosenRowHeight = Math.max(prospectiveRowHeight, perTrackRowHeight);
 
     this.setState({
       rowHeight: chosenRowHeight,
@@ -3964,6 +3965,7 @@ class HiGlassComponent extends React.Component {
   processViewConfig(viewConfig) {
     let { views } = viewConfig;
     let viewsByUid = {};
+    let maxHeight = 1;
 
     if (!viewConfig.views || viewConfig.views.length === 0) {
       console.warn('No views provided in viewConfig');
@@ -4053,6 +4055,18 @@ class HiGlassComponent extends React.Component {
       } else {
         v.layout = this.generateViewLayout(v);
       }
+
+      maxHeight = Math.max(maxHeight, v.layout.y + v.layout.h);
+    });
+
+    // we want to scale up the height of each view so that the maxHeight
+    // is closer to 12
+    const TARGET_MAX_HEIGHT = 12;
+    const multiplier = Math.ceil(TARGET_MAX_HEIGHT / maxHeight);
+
+    views.forEach(v => {
+      v.layout.h *= multiplier;
+      v.layout.y *= multiplier;
     });
 
     this.deserializeZoomLocks(viewConfig);
@@ -4822,7 +4836,10 @@ class HiGlassComponent extends React.Component {
             }
             onNoTrackAdded={this.handleNoTrackAdded.bind(this)}
             onRangeSelection={this.rangeSelectionHandler.bind(this)}
-            onResizeTrack={this.triggerViewChangeDb}
+            onResizeTrack={() => {
+              this.adjustLayoutToTrackSizes(view);
+              this.triggerViewChangeDb();
+            }}
             onScalesChanged={(x, y) => this.handleScalesChanged(view.uid, x, y)}
             onTrackOptionsChanged={(trackId, options) =>
               this.handleTrackOptionsChanged(view.uid, trackId, options)
@@ -5098,13 +5115,17 @@ class HiGlassComponent extends React.Component {
 
     if (
       this.sizeMode === SIZE_MODE_OVERFLOW ||
+      this.sizeMode === SIZE_MODE_BOUNDED_OVERFLOW ||
       this.sizeMode === SIZE_MODE_SCROLL
     ) {
       styleNames += ' styles.higlass-container-overflow';
     }
 
     let scrollStyleNames = '';
-    if (this.sizeMode === SIZE_MODE_OVERFLOW) {
+    if (
+      this.sizeMode === SIZE_MODE_OVERFLOW ||
+      this.sizeMode === SIZE_MODE_BOUNDED_OVERFLOW
+    ) {
       scrollStyleNames = 'styles.higlass-scroll-container-overflow';
     } else if (this.sizeMode === SIZE_MODE_SCROLL) {
       scrollStyleNames = 'styles.higlass-scroll-container-scroll';

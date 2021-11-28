@@ -1,5 +1,9 @@
 # Release notes
 
+## v1.20.0
+
+- Added `bounded-overflow` scroll mode
+
 ## v1.19.4
 
 - Bumped d3-transition version
