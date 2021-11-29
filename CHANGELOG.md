@@ -1,5 +1,10 @@
 # Release notes
 
+## v1.20.1
+
+- Fix issue where the combined center track was missing a height and it was leading to undefined row heights being
+  calculated
+
 ## v1.20.0
 
 - Added `bounded-overflow` scroll mode

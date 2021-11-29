@@ -2131,12 +2131,15 @@ class HiGlassComponent extends React.Component {
       maxHeight = Math.max(maxHeight, view.layout.y + view.layout.h);
 
       const topTrackHeights = view.tracks.top
+        .filter(x => x.height)
         .map(x => x.height)
         .reduce((a, b) => a + b, 0);
       const bottomTrackHeights = view.tracks.bottom
+        .filter(x => x.height)
         .map(x => x.height)
         .reduce((a, b) => a + b, 0);
       const centerTrackHeight = view.tracks.center
+        .filter(x => x.height)
         .map(x => x.height)
         .reduce((a, b) => a + b, 0);
 
