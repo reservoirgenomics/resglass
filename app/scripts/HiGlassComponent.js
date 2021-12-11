@@ -2138,16 +2138,18 @@ class HiGlassComponent extends React.Component {
         .filter(x => x.height)
         .map(x => x.height)
         .reduce((a, b) => a + b, 0);
-      const centerTrackHeight = view.tracks.center
-        .filter(x => x.height)
-        .map(x => x.height)
-        .reduce((a, b) => a + b, 0);
+
+      // centerTrackHeight is excluded because center tracks
+      // are resized to fit into the remaining part of the view
+      // const centerTrackHeight = view.tracks.center
+      //   .filter(x => x.height)
+      //   .map(x => x.height)
+      //   .reduce((a, b) => a + b, 0);
 
       perTrackRowHeight = Math.ceil(
         Math.max(
           perTrackRowHeight,
-          (topTrackHeights + bottomTrackHeights + centerTrackHeight) /
-            view.layout.h,
+          (topTrackHeights + bottomTrackHeights) / view.layout.h,
         ),
       );
     }
@@ -2171,7 +2173,14 @@ class HiGlassComponent extends React.Component {
     const prospectiveRowHeight = Math.floor(availableHeight / maxHeight); // maxHeight is the number of
     // rows necessary to display this view
 
+    // console.log('maxHeight', maxHeight);
+
+    // console.log('perTrackRowHeight', perTrackRowHeight);
+    // console.log('prospectiveRowHeight', prospectiveRowHeight);
+
     const chosenRowHeight = Math.max(prospectiveRowHeight, perTrackRowHeight);
+
+    // console.log('chosenRowHeight', chosenRowHeight);
 
     this.setState({
       rowHeight: chosenRowHeight,
@@ -2392,8 +2401,8 @@ class HiGlassComponent extends React.Component {
             : defaultCenterWidth;
         }
 
-        currHeight += height;
-        currWidth += width;
+        centerHeight = height;
+        centerWidth = width;
       }
     } else if (
       ((view.tracks.top && dictValues(view.tracks.top).length > 1) ||
@@ -2927,7 +2936,10 @@ class HiGlassComponent extends React.Component {
     totalTrackHeight += MARGIN_HEIGHT;
     const rowHeight = this.state.rowHeight + MARGIN_HEIGHT;
 
-    if (this.sizeMode !== SIZE_MODE_BOUNDED) {
+    if (
+      this.sizeMode !== SIZE_MODE_BOUNDED &&
+      this.sizeMode !== SIZE_MODE_BOUNDED_OVERFLOW
+    ) {
       view.layout.h = Math.ceil(totalTrackHeight / rowHeight);
     }
   }

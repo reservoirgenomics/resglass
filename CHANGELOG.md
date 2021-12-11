@@ -1,5 +1,9 @@
 # Release notes
 
+## v1.20.2
+
+- Fix issue where the total height was double-calculating the center track and we were adjusting the view layout for bounded-overflow size mode
+
 ## v1.20.1
 
 - Fix issue where the combined center track was missing a height and it was leading to undefined row heights being
