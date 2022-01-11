@@ -1,5 +1,9 @@
 # Release notes
 
+## v1.20.3
+
+- Copied over higlass DenseDataExtrema for improved performance
+
 ## v1.20.2
 
 - Fix issue where the total height was double-calculating the center track and we were adjusting the view layout for bounded-overflow size mode

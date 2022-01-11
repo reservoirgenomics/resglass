@@ -138,20 +138,18 @@ class DenseDataExtrema1D {
       let curMin = Number.MAX_SAFE_INTEGER;
 
       for (let j = 0; j < this.subsetSize; j++) {
-        for (let k = 0; k < this.data.shape[0]; k++) {
-          const x = this.data[k * this.data.shape[1] + i * this.subsetSize + j];
-          // if the tilesize is not a power of 2 we might access
-          // a value that is not there
-          if (x === undefined) {
-            continue;
-          }
+        const x = this.data[i * this.subsetSize + j];
+        // if the tilesize is not a power of 2 we might access
+        // a value that is not there
+        if (x === undefined) {
+          continue;
+        }
 
-          if (x < this.epsilon && x > -this.epsilon) {
-            continue;
-          }
-          if (x < curMin) {
-            curMin = x;
-          }
+        if (x < this.epsilon && x > -this.epsilon) {
+          continue;
+        }
+        if (x < curMin) {
+          curMin = x;
         }
       }
       minimums.push(curMin);
@@ -171,20 +169,18 @@ class DenseDataExtrema1D {
       let curMax = Number.MIN_SAFE_INTEGER;
 
       for (let j = 0; j < this.subsetSize; j++) {
-        for (let k = 0; k < this.data.shape[0]; k++) {
-          const x = this.data[k * this.data.shape[1] + i * this.subsetSize + j];
-          // if the tilesize is not a power of 2 we might access
-          // a value that is not there
-          if (x === undefined) {
-            continue;
-          }
+        const x = this.data[i * this.subsetSize + j];
+        // if the tilesize is not a power of 2 we might access
+        // a value that is not there
+        if (x === undefined) {
+          continue;
+        }
 
-          if (x < this.epsilon && x > -this.epsilon) {
-            continue;
-          }
-          if (x > curMax) {
-            curMax = x;
-          }
+        if (x < this.epsilon && x > -this.epsilon) {
+          continue;
+        }
+        if (x > curMax) {
+          curMax = x;
         }
       }
       maximums.push(curMax);
@@ -220,17 +216,15 @@ class DenseDataExtrema1D {
   minNonZero(data, start, end) {
     let minNonZeroNum = Number.MAX_SAFE_INTEGER;
 
-    for (let k = 0; k < this.data.shape[0]; k++) {
-      for (let i = start; i < end; i++) {
-        const x = data[k * this.data.shape[1] + i];
+    for (let i = start; i < end; i++) {
+      const x = data[i];
 
-        if (x < this.epsilon && x > -this.epsilon) {
-          continue;
-        }
+      if (x < this.epsilon && x > -this.epsilon) {
+        continue;
+      }
 
-        if (x < minNonZeroNum) {
-          minNonZeroNum = x;
-        }
+      if (x < minNonZeroNum) {
+        minNonZeroNum = x;
       }
     }
 
@@ -249,19 +243,18 @@ class DenseDataExtrema1D {
   maxNonZero(data, start, end) {
     let maxNonZeroNum = Number.MIN_SAFE_INTEGER;
 
-    for (let k = 0; k < this.data.shape[0]; k++) {
-      for (let i = start; i < end; i++) {
-        const x = data[k * this.data.shape[1] + i];
+    for (let i = start; i < end; i++) {
+      const x = data[i];
 
-        if (x < this.epsilon && x > -this.epsilon) {
-          continue;
-        }
+      if (x < this.epsilon && x > -this.epsilon) {
+        continue;
+      }
 
-        if (x > maxNonZeroNum) {
-          maxNonZeroNum = x;
-        }
+      if (x > maxNonZeroNum) {
+        maxNonZeroNum = x;
       }
     }
+
     return maxNonZeroNum;
   }
 }
