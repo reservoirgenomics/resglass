@@ -139,12 +139,11 @@ module.exports = (env, argv) => ({
             loader: 'css-loader',
             options: {
               importLoaders: 2,
-              localIdentName: '[name]_[local]-[hash:base64:5]',
-              minimize: false,
               modules: {
                 mode: 'local',
                 localIdentName: '[name]_[local]-[hash:base64:5]',
               },
+              sourceMap: false,
             },
           },
           {
