@@ -123,7 +123,6 @@ module.exports = (env, argv) => ({
                     flexbox: 'no-2009',
                   }),
                 ],
-                outputStyle: 'expanded',
               },
               sourceMap: false,
             },
@@ -145,6 +144,7 @@ module.exports = (env, argv) => ({
             options: {
               importLoaders: 2,
               modules: {
+                mode: 'local',
                 localIdentName: '[name]_[local]-[hash:base64:5]',
               },
               sourceMap: false,
@@ -170,7 +170,6 @@ module.exports = (env, argv) => ({
                     flexbox: 'no-2009',
                   }),
                 ],
-                outputStyle: 'expanded',
               },
               sourceMap: false,
             },
