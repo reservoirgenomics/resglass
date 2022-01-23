@@ -118,7 +118,7 @@ module.exports = (env, argv) => ({
                     ],
                     flexbox: 'no-2009',
                   }),
-                ]
+                ],
               },
               sourceMap: false,
             },
@@ -139,13 +139,6 @@ module.exports = (env, argv) => ({
             loader: 'css-loader',
             options: {
               importLoaders: 2,
-<<<<<<< HEAD
-              modules: {
-                localIdentName: '[name]_[local]-[hash:base64:5]'
-              },
-              sourceMap: false
-            }
-=======
               localIdentName: '[name]_[local]-[hash:base64:5]',
               minimize: false,
               modules: {
@@ -153,14 +146,12 @@ module.exports = (env, argv) => ({
                 localIdentName: '[name]_[local]-[hash:base64:5]',
               },
             },
->>>>>>> e8c4433f (Downgraded css-loader back but to greater version 3)
           },
           {
             loader: 'postcss-loader',
             options: {
               // Necessary for external CSS imports to work
               // https://github.com/facebookincubator/create-react-app/issues/2677
-<<<<<<< HEAD
               postcssOptions: {
                 ident: 'postcss',
                 plugins: () => [
@@ -171,33 +162,14 @@ module.exports = (env, argv) => ({
                       '>1%',
                       'last 4 versions',
                       'Firefox ESR',
-                      'not ie < 9' // React doesn't support IE8 anyway
+                      'not ie < 9', // React doesn't support IE8 anyway
                     ],
-                    flexbox: 'no-2009'
+                    flexbox: 'no-2009',
                   }),
                 ],
-                outputStyle: 'expanded'
               },
-              sourceMap: false
-            }
-=======
-              ident: 'postcss',
-              plugins: () => [
-                // eslint-disable-next-line global-require
-                require('postcss-flexbugs-fixes'),
-                autoprefixer({
-                  browsers: [
-                    '>1%',
-                    'last 4 versions',
-                    'Firefox ESR',
-                    'not ie < 9', // React doesn't support IE8 anyway
-                  ],
-                  flexbox: 'no-2009',
-                }),
-              ],
               sourceMap: false,
             },
->>>>>>> e8c4433f (Downgraded css-loader back but to greater version 3)
           },
           {
             loader: 'fast-sass-loader',
