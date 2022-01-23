@@ -104,20 +104,23 @@ module.exports = (env, argv) => ({
             options: {
               // Necessary for external CSS imports to work
               // https://github.com/facebookincubator/create-react-app/issues/2677
-              ident: 'postcss',
-              plugins: () => [
-                // eslint-disable-next-line global-require
-                require('postcss-flexbugs-fixes'),
-                autoprefixer({
-                  browsers: [
-                    '>1%',
-                    'last 4 versions',
-                    'Firefox ESR',
-                    'not ie < 9' // React doesn't support IE8 anyway
-                  ],
-                  flexbox: 'no-2009'
-                })
-              ],
+              postcssOptions: {
+                ident: 'postcss',
+                plugins: () => [
+                  // eslint-disable-next-line global-require
+                  require('postcss-flexbugs-fixes'),
+                  autoprefixer({
+                    browsers: [
+                      '>1%',
+                      'last 4 versions',
+                      'Firefox ESR',
+                      'not ie < 9' // React doesn't support IE8 anyway
+                    ],
+                    flexbox: 'no-2009'
+                  })
+                ],
+                outputStyle: 'expanded',
+              },
               sourceMap: false
             }
           },
@@ -137,9 +140,9 @@ module.exports = (env, argv) => ({
             loader: 'css-loader',
             options: {
               importLoaders: 2,
-              localIdentName: '[name]_[local]-[hash:base64:5]',
-              minimize: false,
-              modules: true,
+              modules: {
+                localIdentName: '[name]_[local]-[hash:base64:5]',
+              },
               sourceMap: false
             }
           },
@@ -148,20 +151,23 @@ module.exports = (env, argv) => ({
             options: {
               // Necessary for external CSS imports to work
               // https://github.com/facebookincubator/create-react-app/issues/2677
-              ident: 'postcss',
-              plugins: () => [
-                // eslint-disable-next-line global-require
-                require('postcss-flexbugs-fixes'),
-                autoprefixer({
-                  browsers: [
-                    '>1%',
-                    'last 4 versions',
-                    'Firefox ESR',
-                    'not ie < 9' // React doesn't support IE8 anyway
-                  ],
-                  flexbox: 'no-2009'
-                })
-              ],
+              postcssOptions: {
+                ident: 'postcss',
+                plugins: () => [
+                  // eslint-disable-next-line global-require
+                  require('postcss-flexbugs-fixes'),
+                  autoprefixer({
+                    browsers: [
+                      '>1%',
+                      'last 4 versions',
+                      'Firefox ESR',
+                      'not ie < 9' // React doesn't support IE8 anyway
+                    ],
+                    flexbox: 'no-2009'
+                  }),
+                ],
+                outputStyle: 'expanded',
+              },
               sourceMap: false
             }
           },

@@ -510,7 +510,8 @@ class HiGlassComponent extends React.Component {
       height: this.state.height,
       view: this.canvasElement,
       antialias: true,
-      transparent: true,
+      backgroundAlpha: 0,
+      autoDensity: true,
       resolution: 2,
       autoResize: true,
     };
@@ -534,6 +535,7 @@ class HiGlassComponent extends React.Component {
         );
       // eslint-disable-next-line
       case '5':
+      case '6':
         if (this.props.options.renderer === 'canvas') {
           this.pixiRenderer = new GLOBALS.PIXI.CanvasRenderer(rendererOptions);
         } else {
