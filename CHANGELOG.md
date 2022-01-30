@@ -1,5 +1,7 @@
 # Release notes
 
+- Updated all the packages to the latest major version, except css-loader, which updated from 0.28.0 to 3.6.0 due-to big amount of breaking changes
+
 ## v1.20.3
 
 - Copied over higlass DenseDataExtrema for improved performance
