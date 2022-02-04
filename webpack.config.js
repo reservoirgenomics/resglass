@@ -59,7 +59,7 @@ module.exports = (env, argv) => ({
       }),
       new CssMinimizerPlugin(),
     ],
-    providedExports: false,
+    providedExports: true,
   },
   module: {
     rules: [

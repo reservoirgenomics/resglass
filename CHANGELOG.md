@@ -1,4 +1,5 @@
 # Release notes
+- Fixed webpack bundling in production mode by changing webpack optimization setting
 
 - Updated all the packages to the latest major version, except css-loader, which updated from 0.28.0 to 3.6.0 due-to big amount of breaking changes
 
