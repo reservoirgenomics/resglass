@@ -701,7 +701,12 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
           this.options.colorEncoding === 'itemRgb' &&
           td.fields[8]
         ) {
-          const parts = td.fields[8].split(',');
+          const parts = [];
+
+          try {
+            td.fields[8].split(',');
+            // eslint-disable-next-line
+          } catch {}
 
           if (parts.length === 3) {
             const color = `rgb(${td.fields[8]})`;
