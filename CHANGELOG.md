@@ -1,6 +1,10 @@
 # Release notes
 
+## v1.20.5
+
 - Fixed webpack bundling in production mode by changing webpack optimization setting
+- Fix itemRgb bug in BedLikeTracks
+
 ## v1.20.4
 
 - Updated all the packages to the latest major version, except css-loader, which updated from 0.28.0 to 3.6.0 due-to big amount of breaking changes

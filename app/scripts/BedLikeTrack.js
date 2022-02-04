@@ -52,7 +52,7 @@ export const polyToPoly = (poly, kx, px, ky, py) => {
   return newArr;
 };
 
-const hashFunc = function(s) {
+const hashFunc = function (s) {
   let hash = 0;
   if (s.length === 0) {
     return hash;
@@ -76,7 +76,7 @@ const scaleScalableGraphics = (graphics, xScale, drawnAtScale) => {
   graphics.position.x = -posOffset * tileK;
 };
 
-export const uniqueify = elements => {
+export const uniqueify = (elements) => {
   const byUid = {};
   for (let i = 0; i < elements.length; i++) {
     byUid[elements[i].uid] = elements[i];
@@ -195,7 +195,7 @@ export class TextManager {
       yRange = [yRange[0] - yRangeWidth * 0.8, yRange[1] + yRangeWidth * 0.8];
 
       const relevantSegments = this.track.uniqueSegments.filter(
-        x => !x.yMiddle || (x.yMiddle > yRange[0] && x.yMiddle < yRange[1]),
+        (x) => !x.yMiddle || (x.yMiddle > yRange[0] && x.yMiddle < yRange[1]),
       );
 
       // console.log('relevantSegments:', relevantSegments);
@@ -312,11 +312,11 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
 
     this.uniqueSegments = uniqueify(
       Object.values(this.fetchedTiles)
-        .map(x => x.tileData)
+        .map((x) => x.tileData)
         .flat(),
     );
 
-    this.uniqueSegments.forEach(td => {
+    this.uniqueSegments.forEach((td) => {
       // A random importance helps with selective hiding
       // of overlapping texts
       if (!td.importance) {
@@ -329,7 +329,7 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
     if (!this.options || !this.options.valueColumn) {
       // no value column so we can break entries up into separate
       // plus and minus strand segments
-      const segments = this.uniqueSegments.map(x => {
+      const segments = this.uniqueSegments.map((x) => {
         const chrOffset = +x.chrOffset;
 
         return {
@@ -341,10 +341,12 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
         };
       });
 
-      plusStrandRows = segmentsToRows(segments.filter(x => x.strand === '+'));
-      minusStrandRows = segmentsToRows(segments.filter(x => x.strand === '-'));
+      plusStrandRows = segmentsToRows(segments.filter((x) => x.strand === '+'));
+      minusStrandRows = segmentsToRows(
+        segments.filter((x) => x.strand === '-'),
+      );
     } else {
-      plusStrandRows = [this.uniqueSegments.map(x => ({ value: x }))];
+      plusStrandRows = [this.uniqueSegments.map((x) => ({ value: x }))];
     }
 
     this.plusStrandRows = plusStrandRows;
@@ -443,7 +445,7 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
   allVisibleRects() {
     const allRects = {};
 
-    Object.values(this.fetchedTiles).forEach(x => {
+    Object.values(this.fetchedTiles).forEach((x) => {
       if (!x.plusStrandRows) return;
 
       for (const row of x.plusStrandRows[0]) {
@@ -645,9 +647,7 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
         ? +this.options.colorEncodingRange[1]
         : this.maxVisibleValueInTiles(+this.options.colorEncoding);
 
-      this.colorValueScale = scaleLinear()
-        .domain([min, max])
-        .range([0, 255]);
+      this.colorValueScale = scaleLinear().domain([min, max]).range([0, 255]);
     }
   }
 
@@ -656,9 +656,7 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
 
     this.initialize();
 
-    const rowScale = scaleBand()
-      .domain(range(maxRows))
-      .range([startY, endY]);
+    const rowScale = scaleBand().domain(range(maxRows)).range([startY, endY]);
     // .paddingOuter(0.2);
     // .paddingInner(0.3)
 
@@ -701,7 +699,11 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
           this.options.colorEncoding === 'itemRgb' &&
           td.fields[8]
         ) {
-          const parts = td.fields[8].split(',');
+          const parts = [];
+
+          try {
+            td.fields[8].split(',');
+          } catch {}
 
           if (parts.length === 3) {
             const color = `rgb(${td.fields[8]})`;
@@ -881,16 +883,16 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
     let min = Math.min.apply(
       null,
       visibleAndFetchedIds
-        .map(x => this.fetchedTiles[x])
-        .filter(x => x.tileData && x.tileData.length)
-        .map(x =>
+        .map((x) => this.fetchedTiles[x])
+        .filter((x) => x.tileData && x.tileData.length)
+        .map((x) =>
           Math.min.apply(
             null,
             x.tileData
               .sort((a, b) => b.importance - a.importance)
               .slice(0, MAX_TILE_ENTRIES)
-              .map(y => +y.fields[valueColumn - 1])
-              .filter(y => !Number.isNaN(y)),
+              .map((y) => +y.fields[valueColumn - 1])
+              .filter((y) => !Number.isNaN(y)),
           ),
         ),
     );
@@ -913,16 +915,16 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
     let max = Math.max.apply(
       null,
       visibleAndFetchedIds
-        .map(x => this.fetchedTiles[x])
-        .filter(x => x.tileData && x.tileData.length)
-        .map(x =>
+        .map((x) => this.fetchedTiles[x])
+        .filter((x) => x.tileData && x.tileData.length)
+        .map((x) =>
           Math.max.apply(
             null,
             x.tileData
               .sort((a, b) => b.importance - a.importance)
               .slice(0, MAX_TILE_ENTRIES)
-              .map(y => +y.fields[valueColumn - 1])
-              .filter(y => !Number.isNaN(y)),
+              .map((y) => +y.fields[valueColumn - 1])
+              .filter((y) => !Number.isNaN(y)),
           ),
         ),
     );
@@ -949,16 +951,16 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
     const values = []
       .concat(
         ...visibleAndFetchedIds
-          .map(x => this.fetchedTiles[x])
-          .filter(x => x.tileData && x.tileData.length)
-          .map(x =>
+          .map((x) => this.fetchedTiles[x])
+          .filter((x) => x.tileData && x.tileData.length)
+          .map((x) =>
             x.tileData
               .sort((a, b) => b.importance - a.importance)
               .slice(0, MAX_TILE_ENTRIES)
-              .map(y => +y.fields[valueColumn - 1]),
+              .map((y) => +y.fields[valueColumn - 1]),
           ),
       )
-      .filter(x => x > 0);
+      .filter((x) => x > 0);
 
     this.medianVisibleValue = median(values);
   }
@@ -984,7 +986,7 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
     // scaleScalableGraphics(this.textGraphics, this._xScale, this.drawnAtScale);
 
     if (this.uniqueSegments && this.uniqueSegments.length) {
-      this.uniqueSegments.forEach(td => {
+      this.uniqueSegments.forEach((td) => {
         const geneInfo = td.fields;
         const geneName = geneInfo[3];
 
@@ -1049,7 +1051,7 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
     output.appendChild(rectOutput);
     output.appendChild(textOutput);
 
-    this.uniqueSegments.forEach(td => {
+    this.uniqueSegments.forEach((td) => {
       const gTile = document.createElement('g');
       gTile.setAttribute(
         'transform',
