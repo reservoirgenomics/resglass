@@ -1,5 +1,9 @@
 # Release notes
 
+## v1.20.7
+
+- Fix coloring in BedLikeTrack
+
 ## v1.20.6
 
 - Revert back to v1.20.3 state
