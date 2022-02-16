@@ -1,5 +1,7 @@
 # Release notes
 
+- Fixed webpack bundling in production mode by adding postcss to dependencies
+
 ## v1.21.0
 
 - Reintroduce the React v17 changes
