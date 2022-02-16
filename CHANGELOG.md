@@ -1,4 +1,4 @@
-# Release notes
+## v1.21.1
 
 - Fixed webpack bundling in production mode by adding postcss to dependencies
 
