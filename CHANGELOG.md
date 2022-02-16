@@ -1,5 +1,17 @@
 # Release notes
 
+## v1.21.0
+
+- Reintroduce the React v17 changes
+
+## v1.20.7
+
+- Fix coloring in BedLikeTrack
+
+## v1.20.6
+
+- Revert back to v1.20.3 state
+
 ## v1.20.5
 
 - Fixed webpack bundling in production mode by changing webpack optimization setting
