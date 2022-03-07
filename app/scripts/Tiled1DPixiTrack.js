@@ -236,7 +236,9 @@ class Tiled1DPixiTrack extends TiledPixiTrack {
     const tileXScale = scaleLinear()
       .domain([
         0,
-        this.tilesetInfo.tile_size || this.tilesetInfo.bins_per_dimension,
+        this.tilesetInfo.tile_size ||
+          this.tilesetInfo.bins_per_dimension ||
+          BINS_PER_TILE,
       ])
       .range([tileX, tileX + tileWidth]);
 
