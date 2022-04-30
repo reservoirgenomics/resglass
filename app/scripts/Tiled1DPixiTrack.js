@@ -5,7 +5,23 @@ import TiledPixiTrack from './TiledPixiTrack';
 import { tileProxy } from './services';
 import trackUtils from './utils/track-utils';
 
-const BINS_PER_TILE = 1024;
+const BINS_PER_TILE_1D = 1024;
+const BINS_PER_TILE_2D = 256;
+
+export function binsPerTile(tilesetInfo) {
+  const bpt =
+    tilesetInfo.bins_per_dimension ||
+    tilesetInfo.tile_size ||
+    // if min_pos.length == 2 then it's a 2D dataset and we're displaying
+    // it here because it's a cross section
+    (tilesetInfo.min_pos && tilesetInfo.min_pos.length === 2
+      ? BINS_PER_TILE_2D
+      : BINS_PER_TILE_1D);
+
+  console.log('tilesetInfo', tilesetInfo);
+  console.log('bpt', bpt);
+  return bpt;
+}
 
 class Tiled1DPixiTrack extends TiledPixiTrack {
   constructor(context, options) {
@@ -134,13 +150,7 @@ class Tiled1DPixiTrack extends TiledPixiTrack {
     const { tileWidth } = trackUtils.getTilePosAndDimensions(
       this.tilesetInfo,
       `${this.zoomLevel}.0`,
-      this.tilesetInfo.bins_per_dimension ||
-        this.tilesetInfo.tile_size ||
-        // if min_pos.length == 2 then it's a 2D dataset and we're displaying
-        // it here because it's a cross section
-        (this.tilesetInfo.min_pos && this.tilesetInfo.min_pos.length === 2
-          ? 256
-          : 1024),
+      binsPerTile(this.tilesetInfo),
     );
 
     if (tileWidth > this.tilesetInfo.max_tile_width) {
@@ -169,7 +179,7 @@ class Tiled1DPixiTrack extends TiledPixiTrack {
       // the default bins per tile which should
       // not be used because the right value should be in the tileset info
 
-      const binsPerTile = binsPerTileIn || BINS_PER_TILE;
+      const binsPerTile = binsPerTileIn || BINS_PER_TILE_1D;
 
       const sortedResolutions = this.tilesetInfo.resolutions
         .map(x => +x)
@@ -237,22 +247,11 @@ class Tiled1DPixiTrack extends TiledPixiTrack {
     const { tileX, tileWidth } = this.getTilePosAndDimensions(
       tile.tileData.zoomLevel,
       tile.tileData.tilePos,
-      this.tilesetInfo.bins_per_dimension ||
-        this.tilesetInfo.tile_size ||
-        // if min_pos.length == 2 then it's a 2D dataset and we're displaying
-        // it here because it's a cross section
-        (this.tilesetInfo.min_pos && this.tilesetInfo.min_pos.length === 2
-          ? 256
-          : 1024),
+      binsPerTile(this.tilesetInfo),
     );
 
     const tileXScale = scaleLinear()
-      .domain([
-        0,
-        this.tilesetInfo.tile_size ||
-          this.tilesetInfo.bins_per_dimension ||
-          BINS_PER_TILE,
-      ])
+      .domain([0, binsPerTile(this.tilesetInfo)])
       .range([tileX, tileX + tileWidth]);
 
     const start = Math.max(
@@ -353,20 +352,11 @@ class Tiled1DPixiTrack extends TiledPixiTrack {
         const { tileX, tileWidth } = this.getTilePosAndDimensions(
           tile.tileData.zoomLevel,
           tile.tileData.tilePos,
-          this.tilesetInfo.bins_per_dimension ||
-            this.tilesetInfo.tile_size ||
-            // if min_pos.length == 2 then it's a 2D dataset and we're displaying
-            // it here because it's a cross section
-            (this.tilesetInfo.min_pos && this.tilesetInfo.min_pos.length === 2
-              ? 256
-              : 1024),
+          binsPerTile(this.tilesetInfo),
         );
 
         const tileXScale = scaleLinear()
-          .domain([
-            0,
-            this.tilesetInfo.tile_size || this.tilesetInfo.bins_per_dimension,
-          ])
+          .domain([0, binsPerTile(this.tilesetInfo)])
           .range([tileX, tileX + tileWidth]);
 
         const start = Math.max(

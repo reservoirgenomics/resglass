@@ -2,7 +2,7 @@ import { scaleLinear } from 'd3-scale';
 import { zoomIdentity } from 'd3-zoom';
 
 import HorizontalLine1DPixiTrack from './HorizontalLine1DPixiTrack';
-
+import { binsPerTile } from './Tiled1DPixiTrack';
 // Configs
 import { GLOBALS } from './configs';
 
@@ -100,7 +100,7 @@ class BarTrack extends HorizontalLine1DPixiTrack {
     const { tileX, tileWidth } = this.getTilePosAndDimensions(
       tile.tileData.zoomLevel,
       tile.tileData.tilePos,
-      this.tilesetInfo.bins_per_dimension || this.tilesetInfo.tile_size,
+      binsPerTile(this.tilesetInfo),
     );
     const tileValues = tile.tileData.dense;
 
@@ -148,12 +148,7 @@ class BarTrack extends HorizontalLine1DPixiTrack {
     // this scale should go from an index in the data array to
     // a position in the genome coordinates
     const tileXScale = scaleLinear()
-      .domain([
-        0,
-        this.tilesetInfo.tile_size ||
-          this.tilesetInfo.bins_per_dimension ||
-          256,
-      ])
+      .domain([0, binsPerTile(this.tilesetInfo)])
       .range([tileX, tileX + tileWidth]);
 
     const strokeWidth = 0;
