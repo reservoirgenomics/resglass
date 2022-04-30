@@ -519,6 +519,7 @@ class TiledPixiTrack extends PixiTrack {
   }
 
   initTile(tile) {
+    console.log('it', tile);
     // create the tile
     // should be overwritten by child classes
     if (tile.tileData && tile.tileData.dense) {

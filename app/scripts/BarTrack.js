@@ -61,6 +61,8 @@ class BarTrack extends HorizontalLine1DPixiTrack {
    */
   initTile(tile) {
     if (!this.initialized) return;
+
+    console.log('bt it', tile);
     super.initTile(tile);
   }
 
@@ -83,6 +85,8 @@ class BarTrack extends HorizontalLine1DPixiTrack {
 
   drawTile(tile) {
     if (!tile.graphics) return;
+
+    console.log('tile', tile);
 
     if (!tile.tileData || !tile.tileData.dense) {
       return;
@@ -109,6 +113,9 @@ class BarTrack extends HorizontalLine1DPixiTrack {
       0,
     );
 
+    console.log('minValue', this.minValue());
+    console.log('maxValue', this.maxValue());
+
     // Important when when using `options.valueScaleMin` or
     // `options.valueScaleMax` such that the y position later on doesn't become
     // negative
@@ -122,6 +129,8 @@ class BarTrack extends HorizontalLine1DPixiTrack {
     graphics.clear();
 
     this.drawAxis(this.valueScale);
+
+    console.log('vs domain', valueScale.domain());
 
     if (
       this.options.valueScaling === 'log' &&
