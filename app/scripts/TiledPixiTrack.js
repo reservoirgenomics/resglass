@@ -519,7 +519,6 @@ class TiledPixiTrack extends PixiTrack {
   }
 
   initTile(tile) {
-    console.log('it', tile);
     // create the tile
     // should be overwritten by child classes
     if (tile.tileData && tile.tileData.dense) {
@@ -948,7 +947,7 @@ class TiledPixiTrack extends PixiTrack {
         // .base(Math.E)
         .domain([offsetValue, maxValue + offsetValue])
         // .domain([offsetValue, this.maxValue()])
-        .range([minDimension, maxDimension]);
+        .range([maxDimension, minDimension]);
 
       // pseudocount = offsetValue;
     } else if (this.options.valueScaling === 'quantile') {

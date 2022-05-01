@@ -101,8 +101,6 @@ export default class DataFetcher {
    *  when all tileset infos are loaded
    */
   tilesetInfoAfterRegister(finished /* , errorCb */) {
-    // console.log('dataConfig', this.dataConfig);
-
     if (!this.dataConfig.children) {
       // this data source has no children so we just need to retrieve one tileset
       // info
@@ -397,7 +395,6 @@ export default class DataFetcher {
       // we need to extract the row corresponding to the data we need
 
       const tilesetUid = dictValues(returnedTiles)[0].tilesetUid;
-      // console.log('tilesetUid:', tilesetUid);
       const newTiles = {};
 
       for (let i = 0; i < newTileIds.length; i++) {

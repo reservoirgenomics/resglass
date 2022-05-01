@@ -89,7 +89,6 @@ class DenseDataExtrema1D {
     const end = indexBounds[1];
     let curMax = Number.MIN_SAFE_INTEGER;
 
-    console.log('max nonzero in tile');
     if (start === 0 && end === this.tileSize) {
       return this.maxNonZeroInTile;
     }

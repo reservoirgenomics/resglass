@@ -18,8 +18,6 @@ export function binsPerTile(tilesetInfo) {
       ? BINS_PER_TILE_2D
       : BINS_PER_TILE_1D);
 
-  console.log('tilesetInfo', tilesetInfo);
-  console.log('bpt', bpt);
   return bpt;
 }
 
@@ -179,7 +177,7 @@ class Tiled1DPixiTrack extends TiledPixiTrack {
       // the default bins per tile which should
       // not be used because the right value should be in the tileset info
 
-      const binsPerTile = binsPerTileIn || BINS_PER_TILE_1D;
+      const _binsPerTile = binsPerTileIn || BINS_PER_TILE_1D;
 
       const sortedResolutions = this.tilesetInfo.resolutions
         .map(x => +x)
@@ -187,11 +185,11 @@ class Tiled1DPixiTrack extends TiledPixiTrack {
 
       const chosenResolution = sortedResolutions[zoomLevel];
 
-      const tileWidth = chosenResolution * binsPerTile;
+      const tileWidth = chosenResolution * _binsPerTile;
       const tileHeight = tileWidth;
 
-      const tileX = chosenResolution * binsPerTile * tilePos[0];
-      const tileY = chosenResolution * binsPerTile * tilePos[1];
+      const tileX = chosenResolution * _binsPerTile * tilePos[0];
+      const tileY = chosenResolution * _binsPerTile * tilePos[1];
 
       return {
         tileX,
