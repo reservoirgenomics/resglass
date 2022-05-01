@@ -1,5 +1,11 @@
 # Release notes
 
+## v1.20.9
+
+- Fix horizontal cross section positioning
+  - binsPerTile was being set incorrectly in Tiled1DPixiTrack
+  - log-scaled value scales in horizontal tracks were being rendered inversely (short bars for high values)
+
 ## v1.20.7
 
 - Fix coloring in BedLikeTrack
