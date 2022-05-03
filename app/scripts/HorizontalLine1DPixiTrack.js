@@ -183,16 +183,16 @@ class HorizontalLine1DPixiTrack extends HorizontalTiled1DPixiTrack {
 
       if (Number.isNaN(tileValues[i]) && this.options.nanAsZero) {
         yPos = this.valueScale(0 + offsetValue);
-      }
-
-      if (
+      } else if (
+        Number.isNaN(tileValues[i]) ||
         (this.options.valueScaling === 'log' && tileValues[i] === 0) ||
         Number.isNaN(yPos)
       ) {
+        // Just ignore 1-element segments
         if (currentSegment.length > 1) {
           tile.segments.push(currentSegment);
         }
-        // Just ignore 1-element segments.
+
         currentSegment = [];
         continue;
       }
