@@ -71,7 +71,7 @@ class Tiled1DPixiTrack extends TiledPixiTrack {
      * The tile identifier used on the server
      */
     const remoteId = this.dataFetcher.dataConfig.chromOrderSource
-      ? `${tile.join('.')}#cos:${this.dataFetcher.dataConfig.chromOrderSource}`
+      ? `${tile.join('.')},cos:${this.dataFetcher.dataConfig.chromOrderSource}`
       : `${tile.join('.')}`;
 
     // tile contains [zoomLevel, xPos]
