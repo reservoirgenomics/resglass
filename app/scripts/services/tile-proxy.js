@@ -634,7 +634,7 @@ function fetchEither(url, callback, textOrJson, pubSub) {
   return fetch(url, { credentials: 'same-origin', headers })
     .then(rep => {
       if (!rep.ok) {
-        throw Error(rep.statusText);
+        throw rep.text();
       }
 
       return rep[textOrJson]();
@@ -701,18 +701,34 @@ export const trackInfo = (server, tilesetUid, doneCb, errorCb, pubSub) => {
     url,
     (error, data) => {
       // eslint-disable-line
+      // console.log('error:', error);
+      // console.log('data', data);
+
       pubSub.publish('requestReceived', url);
       if (error) {
-        // console.log('error:', error);
         // don't do anything
         // no tileset info just means we can't do anything with this file...
-        if (errorCb) {
-          errorCb(`Error retrieving tilesetInfo from: ${server}`);
-        } else {
-          console.warn('Error retrieving: ', url);
-        }
+        error
+          .then(x => {
+            let errText;
+
+            try {
+              errText = JSON.parse(x).error;
+            } catch (e) {
+              errText = x;
+            }
+
+            if (errorCb) {
+              // errorCb(`Error retrieving tilesetInfo from: ${server}`);
+              errorCb(`Error: ${errText}`);
+            } else {
+              console.warn('Error retrieving: ', url);
+            }
+          })
+          .catch(y => {
+            console.error('y', y);
+          });
       } else {
-        // console.log('got data', data);
         doneCb(data);
       }
     },
