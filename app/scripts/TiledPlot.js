@@ -4,7 +4,6 @@ import { format } from 'd3-format';
 
 import slugid from 'slugid';
 import React from 'react';
-import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import { ResizeSensor, ElementQueries } from 'css-element-queries';
 
@@ -182,7 +181,7 @@ class TiledPlot extends React.Component {
   waitForDOMAttachment(callback) {
     if (!this.mounted) return;
 
-    const thisElement = ReactDOM.findDOMNode(this);
+    const thisElement = this.divTiledPlot;
 
     if (document.body.contains(thisElement)) {
       callback();
@@ -193,8 +192,7 @@ class TiledPlot extends React.Component {
 
   componentDidMount() {
     this.mounted = true;
-    this.element = ReactDOM.findDOMNode(this);
-    this.canvasElement = ReactDOM.findDOMNode(this.props.canvasElement);
+    this.element = this.divTiledPlot;
 
     // new ResizeSensor(this.element, this.measureSize.bind(this));
     this.waitForDOMAttachment(() => {
@@ -2583,7 +2581,7 @@ class TiledPlot extends React.Component {
             this.checkAllTilesetInfoReceived();
           }}
           // Custom props
-          canvasElement={this.canvasElement}
+          canvasElement={this.props.canvasElement}
           centerHeight={this.centerHeight}
           centerWidth={this.centerWidth}
           disableTrackMenu={this.props.disableTrackMenu}

@@ -1,10 +1,9 @@
-import React from 'react';
+import React, { createRef } from 'react';
 import PropTypes from 'prop-types';
 import { select, pointer } from 'd3-selection';
 import { scaleLinear } from 'd3-scale';
 import slugid from 'slugid';
 import * as PIXI from 'pixi.js';
-import ReactDOM from 'react-dom';
 import ReactGridLayout from 'react-grid-layout';
 import { ResizeSensor, ElementQueries } from 'css-element-queries';
 import vkbeautify from 'vkbeautify';
@@ -97,6 +96,8 @@ const DEFAULT_NEW_VIEW_HEIGHT = 12;
 const VIEW_HEADER_HEIGHT = 20;
 
 class HiGlassComponent extends React.Component {
+  topDivRef = createRef();
+
   constructor(props) {
     super(props);
 
@@ -477,9 +478,9 @@ class HiGlassComponent extends React.Component {
   waitForDOMAttachment(callback) {
     if (!this.mounted) return;
 
-    const thisElement = ReactDOM.findDOMNode(this);
+    const thisElement = this.topDivRef.current;
 
-    if (document.body.contains(thisElement)) {
+    if (thisElement && document.body.contains(thisElement)) {
       callback();
     } else {
       requestAnimationFrame(() => this.waitForDOMAttachment(callback));
@@ -492,7 +493,8 @@ class HiGlassComponent extends React.Component {
     // in focus, everything is drawn at the top and overlaps. When it gains
     // focus we need to redraw everything in its proper place
     this.mounted = true;
-    this.element = ReactDOM.findDOMNode(this);
+    this.element = this.topDivRef.current;
+
     window.addEventListener('focus', this.boundRefreshView);
 
     Object.values(this.state.views).forEach(view => {
@@ -4283,11 +4285,11 @@ class HiGlassComponent extends React.Component {
    * @param {object}  e  Event object.
    */
   mouseMoveHandler(e) {
-    if (!this.topDiv || this.state.modal) return;
+    if (!this.topDivRef.current || this.state.modal) return;
 
     const absX = e.clientX;
     const absY = e.clientY;
-    const relPos = pointer(e, this.topDiv);
+    const relPos = pointer(e, this.topDivRef.current);
     // We need to add the scrollTop
     relPos[1] += this.scrollTop;
     const hoveredTiledPlot = this.getTiledPlotAtPosition(absX, absY);
@@ -4509,7 +4511,7 @@ class HiGlassComponent extends React.Component {
 
     const hoveredTiledPlot = this.getTiledPlotAtPosition(absX, absY);
 
-    const relPos = pointer(nativeEvent, this.topDiv);
+    const relPos = pointer(nativeEvent, this.topDivRef.current);
     relPos[1] += this.scrollTop;
 
     const hoveredTracks = hoveredTiledPlot
@@ -4658,7 +4660,7 @@ class HiGlassComponent extends React.Component {
     // The event forwarder wasn't written for React's SyntheticEvent
     const nativeEvent = evt.nativeEvent || evt;
 
-    if (!hasParent(nativeEvent.target, this.topDiv)) {
+    if (!hasParent(nativeEvent.target, this.topDivRef.current)) {
       // ignore events that don't come from within the
       // HiGlass container
       return;
@@ -5149,9 +5151,7 @@ class HiGlassComponent extends React.Component {
     return (
       <div
         key={this.uid}
-        ref={c => {
-          this.topDiv = c;
-        }}
+        ref={this.topDivRef}
         className="higlass"
         onMouseLeave={this.onMouseLeaveHandlerBound}
         onMouseMove={this.mouseMoveHandlerBound}
