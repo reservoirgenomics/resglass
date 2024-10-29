@@ -775,13 +775,15 @@ class HiGlassComponent extends React.Component {
   }
 
   fitPixiToParentContainer() {
-    if (!this.element || !this.element.parentNode) {
-      console.warn('No parentNode:', this.element);
+    const element = this.topDivRef.current;
+
+    if (!element || !element.parentNode) {
+      // console.warn('No parentNode:', element);
       return;
     }
 
-    const width = this.element.parentNode.clientWidth;
-    const height = this.element.parentNode.clientHeight;
+    const width = element.parentNode.clientWidth;
+    const height = element.parentNode.clientHeight;
 
     this.pixiMask
       .beginFill(0xffffff)
@@ -2184,9 +2186,11 @@ class HiGlassComponent extends React.Component {
 
     // console.log('chosenRowHeight', chosenRowHeight);
 
-    this.setState({
-      rowHeight: chosenRowHeight,
-    });
+    if (this.topDivRef.current) {
+      this.setState({
+        rowHeight: chosenRowHeight,
+      });
+    }
   }
 
   /**
