@@ -8,7 +8,6 @@ import Button from './Button';
 import Dialog from './Dialog';
 import withModal from './hocs/with-modal';
 import withPubSub from './hocs/with-pub-sub';
-import { timeout } from './utils';
 
 import '../styles/ViewConfigEditor.module.scss';
 
@@ -48,12 +47,14 @@ class ViewConfigEditor extends React.Component {
   }
 
   async componentDidMount() {
-    if (this.editor) {
-      this.editor._input.focus();
-      this.editor._input.setSelectionRange(0, 0);
-      await timeout(0);
-      this.editorWrap.scrollTop = 0;
-    }
+    // 11/11/2024 not sure what this was doing so it's commented
+    // out
+    // if (this.editor) {
+    //   this.editor._input.focus();
+    //   this.editor._input.setSelectionRange(0, 0);
+    //   await timeout(0);
+    //   this.editorWrap.scrollTop = 0;
+    // }
   }
 
   componentWillUnmount() {
@@ -173,7 +174,7 @@ ViewConfigEditor.propTypes = {
   onChange: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
   pubSub: PropTypes.object.isRequired,
-  viewConfig: PropTypes.object.isRequired,
+  viewConfig: PropTypes.string.isRequired,
 };
 
 export default withPubSub(withModal(ViewConfigEditor));
