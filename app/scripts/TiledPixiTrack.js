@@ -219,10 +219,10 @@ class TiledPixiTrack extends PixiTrack {
     });
   }
 
-  setError(error) {
-    this.errorTextText = error;
-    this.draw();
-    this.animate();
+  setError(error, source) {
+    this.errorTexts[source] = error;
+
+    this.drawError();
   }
 
   setFixedValueScaleMin(value) {
@@ -740,13 +740,13 @@ class TiledPixiTrack extends PixiTrack {
       .filter(x => x);
 
     if (errors.length) {
-      this.errorTextText = errors.join('\n');
+      this.errorTexts.TiledPixiTrack = errors.join('\n');
     } else {
-      this.errorTextText = '';
+      this.errorTexts.TiledPixiTrack = '';
     }
 
     if (this.tilesetInfoError) {
-      this.errorTextText = this.tilesetInfoError;
+      this.errorTexts.TiledPixiTrack = this.tilesetInfoError;
 
       errors.push(this.tilesetInfoError);
     }

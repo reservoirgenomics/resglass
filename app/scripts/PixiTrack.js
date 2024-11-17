@@ -1,6 +1,5 @@
 import { formatPrefix, precisionPrefix } from 'd3-format';
 import slugid from 'slugid';
-
 import Track from './Track';
 
 import { colorToHex } from './utils';
@@ -162,11 +161,14 @@ class PixiTrack extends Track {
     this.errorText = new GLOBALS.PIXI.Text('', {
       fontSize: '12px',
       fontFamily: 'Arial',
+      fontStyle: 'bold',
       fill: 'red',
     });
     this.errorText.anchor.x = 0.5;
     this.errorText.anchor.y = 0.5;
     this.pLabel.addChild(this.errorText);
+
+    this.errorTexts = {};
   }
 
   setLabelText() {
@@ -251,11 +253,24 @@ class PixiTrack extends Track {
     this.errorText.x = this.position[0] + this.dimensions[0] / 2;
     this.errorText.y = this.position[1] + this.dimensions[1] / 2;
 
-    this.errorText.text = this.errorTextText;
+    let errorTextText = '';
+    Object.values(this.errorTexts).forEach(x => {
+      // Go through all the errors and render them.
+      if (x && x.length) {
+        if (errorTextText.length) {
+          errorTextText += '\n';
+        }
+        errorTextText += x;
+      }
+    });
 
-    if (this.errorTextText && this.errorTextText.length) {
+    this.errorText.text = errorTextText;
+    this.errorText.alpha = 0.8;
+
+    if (errorTextText && errorTextText.length) {
       // draw a red border around the track to bring attention to its
       // error
+
       const graphics = this.pBorder;
       graphics.clear();
       graphics.lineStyle(1, colorToHex('red'));
@@ -266,6 +281,8 @@ class PixiTrack extends Track {
         this.dimensions[0],
         this.dimensions[1],
       );
+    } else {
+      this.pBorder.clear();
     }
   }
 

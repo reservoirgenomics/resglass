@@ -152,15 +152,13 @@ class Tiled1DPixiTrack extends TiledPixiTrack {
     );
 
     if (tileWidth > this.tilesetInfo.max_tile_width) {
-      this.errorTextText = 'Zoom in to see details';
+      this.setError('Zoom in to see details', 'Tiled1DPixiTrack');
       this.drawError();
-      this.animate();
       return;
     }
-    this.errorTextText = null;
-    this.pBorder.clear();
+    this.setError('', 'Tiled1DPixiTrack');
+
     this.drawError();
-    this.animate();
 
     const tiles = xTiles.map(x => [this.zoomLevel, x]);
     this.setVisibleTiles(tiles);
