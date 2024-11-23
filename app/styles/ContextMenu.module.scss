@@ -9,8 +9,7 @@
   font-size: 12px;
   cursor: default;
   padding: 3px;
-  box-shadow: 0 0 3px 0 $gray-lighter-rgba,
-              0 1px 5px 0 $gray-lightest-rgba;
+  box-shadow: 0 0 3px 0 $gray-lighter-rgba, 0 1px 5px 0 $gray-lightest-rgba;
 }
 
 .context-menu-dark {
@@ -32,13 +31,24 @@
   padding: 2px;
   white-space: nowrap;
   border-radius: 2px;
-  transition: background $fast $ease,
-              color $fast $ease;
+  transition: background $fast $ease, color $fast $ease;
+  max-width: 500px;
 
   &:hover {
     background: $active;
     color: $white;
   }
+}
+
+.context-menu-dataset-name {
+  text-wrap: wrap;
+  word-break: break-word;
+  margin-right: 10px;
+}
+
+.context-menu-name-field {
+  display: flex;
+  align-items: center;
 }
 
 .context-menu-hr {

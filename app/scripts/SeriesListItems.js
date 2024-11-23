@@ -45,7 +45,7 @@ export const getSeriesItems = (
   tracks,
   onItemMouseEnter,
   onItemMouseLeave,
-  onItemClick
+  onItemClick,
 ) => {
   if (!tracks) return null;
 
@@ -89,14 +89,18 @@ export const getSeriesItems = (
       >
         {imgTag}
         <span styleName="context-menu-span">
-          {x.options && x.options.name && x.options.name.length
-            ? x.options.name
-            : x.type}
-          {onItemMouseEnter && onItemMouseLeave ? (
-            <svg styleName="play-icon">
-              <use xlinkHref="#play" />
-            </svg>
-          ) : null}
+          <span styleName="context-menu-name-field">
+            <span styleName="context-menu-dataset-name">
+              {x.options && x.options.name && x.options.name.length
+                ? x.options.name
+                : x.type}
+            </span>
+            {onItemMouseEnter && onItemMouseLeave ? (
+              <svg styleName="play-icon">
+                <use xlinkHref="#play" />
+              </svg>
+            ) : null}
+          </span>
         </span>
       </ContextMenuItem>
     );

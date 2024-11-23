@@ -63,7 +63,7 @@ class ViewContextMenu extends mix(ContextMenuContainer).with(
             onClick={this.copyLocationToClipboard.bind(this)}
             onMouseEnter={e => this.handleOtherMouseEnter(e)}
           >
-            {'Copy location under cursor'}
+            Copy location under cursor
           </ContextMenuItem>
         )}
 
@@ -79,7 +79,7 @@ class ViewContextMenu extends mix(ContextMenuContainer).with(
           }
           onMouseEnter={e => this.handleOtherMouseEnter(e)}
         >
-          {'Add Horizontal Rule'}
+          Add Horizontal Rule
         </ContextMenuItem>
 
         <ContextMenuItem
@@ -92,7 +92,7 @@ class ViewContextMenu extends mix(ContextMenuContainer).with(
           }
           onMouseEnter={e => this.handleOtherMouseEnter(e)}
         >
-          {'Add Vertical Rule'}
+          Add Vertical Rule
         </ContextMenuItem>
 
         <ContextMenuItem
@@ -106,7 +106,7 @@ class ViewContextMenu extends mix(ContextMenuContainer).with(
           }
           onMouseEnter={e => this.handleOtherMouseEnter(e)}
         >
-          {'Add Cross Rule'}
+          Add Cross Rule
         </ContextMenuItem>
 
         <hr styleName="context-menu-hr" />
@@ -116,7 +116,7 @@ class ViewContextMenu extends mix(ContextMenuContainer).with(
             onClick={this.handleAddHorizontalSection.bind(this)}
             onMouseEnter={e => this.handleOtherMouseEnter(e)}
           >
-            {'Add Horizontal Cross Section'}
+            Add Horizontal Cross Section
           </ContextMenuItem>
         )}
         {this.hasMatrixTrack(this.props.tracks) && (
@@ -124,7 +124,7 @@ class ViewContextMenu extends mix(ContextMenuContainer).with(
             onClick={this.handleAddVerticalSection.bind(this)}
             onMouseEnter={e => this.handleOtherMouseEnter(e)}
           >
-            {'Add Vertical Cross Section'}
+            Add Vertical Cross Section
           </ContextMenuItem>
         )}
 
