@@ -1738,6 +1738,12 @@ class HeatmapTiledPixiTrack extends TiledPixiTrack {
     );
   }
 
+  contextMenuItems(trackX, trackY) {
+    /* Get a list of context menu items to display and the actions
+       to take */
+    return [];
+  }
+
   getMouseOverHtml(trackX, trackY) {
     if (!this.options || !this.options.showTooltip) {
       return '';

@@ -892,6 +892,18 @@ class HorizontalGeneAnnotationsTrack extends HorizontalTiled1DPixiTrack {
     this.draw();
   }
 
+  contextMenuItems(trackX, trackY) {
+    /* Get a list of context menu items to display and the actions
+       to take */
+
+    return [
+      {
+        label: 'Gene Annotations Option 1',
+        onClick: () => console.warn('made ya click'),
+      },
+    ];
+  }
+
   getMouseOverHtml(trackX, trackY) {
     if (!this.tilesetInfo) {
       return '';

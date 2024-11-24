@@ -10,6 +10,34 @@ import { OPTIONS_INFO, THEME_DARK, TRACKS_INFO_BY_TYPE } from './configs';
 // Styles
 import '../styles/ContextMenu.module.scss';
 
+function findTrackContextMenuItems(track, trackRenderer, position) {
+  // We're going to get the track object to see if it has a
+  // context menu handler that will give use context menu items
+  // to display
+  let trackObj = trackRenderer.getTrackObject(track.uid);
+
+  // The track may be a LeftTrackModifier track
+  trackObj = trackObj.originalTrack || trackObj;
+
+  // See if the track will provide us with context menu items
+  if (trackObj.contextMenuItems) {
+    let trackLeft = position.canvasLeft - trackObj.position[0];
+    let trackTop = position.canvasTop - trackObj.position[1];
+
+    if (trackObj.flipText) {
+      // This is a left track modifier track so we need to swap the
+      // left and right values
+      const temp = trackLeft;
+      trackLeft = trackTop;
+      trackTop = temp;
+    }
+
+    return trackObj.contextMenuItems(trackLeft, trackTop);
+  }
+
+  return [];
+}
+
 export default class SeriesListMenu extends ContextMenuContainer {
   getConfigureSeriesMenu(position, bbox, track) {
     const menuItems = {};
@@ -284,6 +312,12 @@ export default class SeriesListMenu extends ContextMenuContainer {
   render() {
     let exportDataMenuItem = null;
 
+    const trackContextMenuItems = findTrackContextMenuItems(
+      this.props.track,
+      this.props.trackRenderer,
+      this.props.position,
+    );
+
     if (
       TRACKS_INFO_BY_TYPE[this.props.series.type] &&
       TRACKS_INFO_BY_TYPE[this.props.series.type].exportable
@@ -335,6 +369,20 @@ export default class SeriesListMenu extends ContextMenuContainer {
         }}
         styleName={styleNames}
       >
+        {trackContextMenuItems.map(x => (
+          <ContextMenuItem
+            key={x.label}
+            onClick={evt => {
+              x.onClick(evt);
+              this.props.closeMenu();
+            }}
+            onMouseEnter={e => this.handleOtherMouseEnter(e)}
+            styleName="context-menu-item"
+          >
+            <span styleName="context-menu-span">{x.label}</span>
+          </ContextMenuItem>
+        ))}
+        {trackContextMenuItems.length && <hr styleName="context-menu-hr" />}
         <ContextMenuItem
           onClick={() => {}}
           onMouseEnter={e =>
@@ -345,7 +393,7 @@ export default class SeriesListMenu extends ContextMenuContainer {
           }
           onMouseLeave={e => this.handleMouseLeave(e)}
         >
-          {'Configure Series'}
+          Configure Series
           <svg styleName="play-icon">
             <use xlinkHref="#play" />
           </svg>
@@ -363,7 +411,7 @@ export default class SeriesListMenu extends ContextMenuContainer {
           styleName="context-menu-item"
         >
           <span styleName="context-menu-span">
-            {'Track Type'}
+            Track Type
             <svg styleName="play-icon">
               <use xlinkHref="#play" />
             </svg>
