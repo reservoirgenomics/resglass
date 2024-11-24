@@ -32,7 +32,9 @@ function findTrackContextMenuItems(track, trackRenderer, position) {
       trackTop = temp;
     }
 
-    return trackObj.contextMenuItems(trackLeft, trackTop);
+    const items = trackObj.contextMenuItems(trackLeft, trackTop);
+
+    return items || [];
   }
 
   return [];
@@ -86,6 +88,7 @@ export default class SeriesListMenu extends ContextMenuContainer {
               value: generatedOption.value,
               handler: () => {
                 track.options[optionType] = generatedOption.value;
+
                 this.props.onTrackOptionsChanged(track.uid, track.options);
                 this.props.closeMenu();
               },
@@ -135,6 +138,7 @@ export default class SeriesListMenu extends ContextMenuContainer {
               // type (e.g. "top right")
               optionSelectorSettings.handler = () => {
                 track.options[optionType] = inlineOption.value;
+
                 this.props.onTrackOptionsChanged(track.uid, track.options);
                 this.props.closeMenu();
               };
@@ -373,7 +377,14 @@ export default class SeriesListMenu extends ContextMenuContainer {
           <ContextMenuItem
             key={x.label}
             onClick={evt => {
-              x.onClick(evt);
+              x.onClick(evt, newOptions => {
+                // We're going to pass in a handler to that the track
+                // can use to change its options
+                this.props.onTrackOptionsChanged(this.props.track.uid, {
+                  ...this.props.track.options,
+                  ...newOptions,
+                });
+              });
               this.props.closeMenu();
             }}
             onMouseEnter={e => this.handleOtherMouseEnter(e)}
@@ -382,7 +393,7 @@ export default class SeriesListMenu extends ContextMenuContainer {
             <span styleName="context-menu-span">{x.label}</span>
           </ContextMenuItem>
         ))}
-        {trackContextMenuItems.length && <hr styleName="context-menu-hr" />}
+        {trackContextMenuItems.length > 0 && <hr styleName="context-menu-hr" />}
         <ContextMenuItem
           onClick={() => {}}
           onMouseEnter={e =>
