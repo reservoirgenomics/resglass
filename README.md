@@ -1,6 +1,6 @@
 ### Introduction
 
-ResGlass is the Reservoir Genomics for of the [HiGlass viewer](https://github.com/higlass/higlass). Use at your own risk.
+ResGlass is the Reservoir Genomics fork of the [HiGlass viewer](https://github.com/higlass/higlass). Use at your own risk.
 
 ### Development
 

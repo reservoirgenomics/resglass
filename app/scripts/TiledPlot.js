@@ -2667,6 +2667,7 @@ class TiledPlot extends React.Component {
               this.props.tracks,
               this.state.configTrackMenuId,
             )}
+            trackRenderer={this.trackRenderer}
             tracks={[
               getTrackByUid(this.props.tracks, this.state.configTrackMenuId),
             ]}
