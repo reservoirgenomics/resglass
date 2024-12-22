@@ -300,7 +300,7 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
   }
 
   updateExistingGraphics() {
-    const errors = this.checkForErrors();
+    const errors = this._checkForErrors();
 
     let plusStrandRows = [];
     let minusStrandRows = [];
