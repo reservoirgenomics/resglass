@@ -198,12 +198,6 @@ export class TextManager {
         x => !x.yMiddle || (x.yMiddle > yRange[0] && x.yMiddle < yRange[1]),
       );
 
-      // console.log('relevantSegments:', relevantSegments);
-
-      // if (!relevantSegments.length) {
-      //   return;
-      // }
-
       relevantSegments.forEach((td, i) => {
         // don't draw too many texts so they don't bog down the frame rate
         if (i >= (+this.track.options.maxTexts || MAX_TEXTS)) {
@@ -675,11 +669,8 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
         const td = rows[j][i].value;
         const geneInfo = td.fields;
 
-        // the returned positions are chromosome-based and they need to
-        // be converted to genome-based
-        const chrOffset = +td.chrOffset;
-        const txStart = +geneInfo[1] + chrOffset;
-        const txEnd = +geneInfo[2] + chrOffset;
+        const txStart = +td.xStart;
+        const txEnd = +td.xEnd;
         const txMiddle = (txStart + txEnd) / 2;
         let yMiddle = rowScale(j) + rowScale.bandwidth() / 2;
 
@@ -1065,6 +1056,7 @@ class BedLikeTrack extends HorizontalTiled1DPixiTrack {
       if (this.drawnRects && td.uid in this.drawnRects) {
         const rect = this.drawnRects[td.uid][0];
         const r = document.createElement('path');
+
         let d = `M ${rect[0]} ${rect[1]}`;
 
         for (let i = 2; i < rect.length; i += 2) {
