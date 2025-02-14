@@ -193,7 +193,7 @@ class ArrowheadDomainsTrack extends TiledPixiTrack {
   }
 
   updateExistingGraphics() {
-    const errors = this.checkForErrors();
+    const errors = this._checkForErrors();
 
     if (errors.length > 0) {
       this.draw();
