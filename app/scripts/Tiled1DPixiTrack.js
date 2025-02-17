@@ -275,6 +275,9 @@ class Tiled1DPixiTrack extends TiledPixiTrack {
     const minimumsPerTile = visibleAndFetchedIds
       .map(x => this.fetchedTiles[x])
       .map(tile => {
+        // See if tile is in error, because then there's no sense in trying to do anything
+        if (tile.tileData.error) return null;
+
         const ind = this.getIndicesOfVisibleDataInTile(tile);
         return tile.tileData.denseDataExtrema.getMinNonZeroInSubset(ind);
       });
@@ -299,6 +302,9 @@ class Tiled1DPixiTrack extends TiledPixiTrack {
     const maximumsPerTile = visibleAndFetchedIds
       .map(x => this.fetchedTiles[x])
       .map(tile => {
+        // See if tile is in error, because then there's no sense in trying to do anything
+        if (tile.tileData.error) return null;
+
         const ind = this.getIndicesOfVisibleDataInTile(tile);
         return tile.tileData.denseDataExtrema.getMaxNonZeroInSubset(ind);
       });

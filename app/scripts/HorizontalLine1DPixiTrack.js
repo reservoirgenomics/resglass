@@ -62,6 +62,11 @@ class HorizontalLine1DPixiTrack extends HorizontalTiled1DPixiTrack {
   initTile(tile) {
     super.initTile(tile);
 
+    if (tile.tileData?.error) {
+      this.setError(tile.error);
+      return;
+    }
+
     if (!tile.tileData || !tile.tileData.dense) {
       console.warn('emptyTile:', tile);
       return;
@@ -99,6 +104,9 @@ class HorizontalLine1DPixiTrack extends HorizontalTiled1DPixiTrack {
   renderTile(tile) {
     // this function is just so that we follow the same pattern as
     // HeatmapTiledPixiTrack.js
+    if (!tile.tileData) return;
+    if (tile.tileData.error) return;
+
     this.drawTile(tile);
     this.drawAxis(this.valueScale);
   }
