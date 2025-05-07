@@ -8,7 +8,7 @@ import { trimTrailingSlash as tts } from '../utils';
 // Config
 import { TILE_FETCH_DEBOUNCE } from '../configs';
 
-const MAX_FETCH_TILES = 5;
+const MAX_FETCH_TILES = 1;
 
 /*
 const str = document.currentScript.src
