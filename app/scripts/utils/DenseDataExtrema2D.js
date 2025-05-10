@@ -191,7 +191,7 @@ class DenseDataExtrema2D {
         if (x < this.epsilon && x > -this.epsilon) {
           continue;
         }
-        if (x > curMax) {
+        if (x !== Number.POSITIVE_INFINITY && x > curMax) {
           curMax = x;
         }
       }
